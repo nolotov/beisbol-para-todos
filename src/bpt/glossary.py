@@ -85,7 +85,7 @@ GLOSARIO: dict[str, Metric] = {
                  "Revoluciones por minuto de la recta: más giro, más 'sube'."),
     "whiff_pct": M("Whiff%", "% de abanicados", "swings sin contacto",
                    "Porcentaje de swings en los que el bateador no toca la pelota."),
-    "chase_pct": M("Chase%", "Persecución", "swings a bolas malas",
+    "chase_pct": M("Chase%", "Chase%", "swings a bolas malas",
                    "Porcentaje de swings a lanzamientos fuera de la zona."),
     "ev": M("EV", "Velocidad de salida", "qué tan duro batea",
             "Velocidad promedio de la pelota al salir del bate."),
