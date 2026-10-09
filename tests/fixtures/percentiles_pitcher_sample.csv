@@ -1,0 +1,3 @@
+player_name,player_id,year,xwoba,xba,xslg,brl_percent,exit_velocity,hard_hit_percent,k_percent,bb_percent,whiff_percent,chase_percent,xera,fb_velocity,fb_spin
+"Prueba, Lanzador",100001,2025,92,88,90,85,70,74,97,81,95,77,93,89,62
+"Ejemplo, Zurdo",100002,2025,40,45,38,30,55,50,35,60,42,48,41,20,
