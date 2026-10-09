@@ -81,7 +81,7 @@ def _tile(fig, x, y, w, h, label, value, sub, fonts, value_color=theme.TEXT):
 
 
 def render_team_card(t: pd.DataFrame, equipo: str, season_label: str, out_path: Path,
-                     handle: str = "@beisbolparatodos",
+                     handle: str = theme.HANDLE,
                      source: str = "Datos: LVBP / TuJonrón") -> Path:
     fonts = theme.apply()
     idx = int(t.index[t["equipo"] == equipo][0])

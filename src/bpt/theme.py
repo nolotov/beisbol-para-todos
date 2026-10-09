@@ -5,6 +5,9 @@ import matplotlib as mpl
 from matplotlib import font_manager
 from matplotlib.colors import LinearSegmentedColormap
 
+# --- Marca -------------------------------------------------------------------
+HANDLE = "@mbp.deportes"
+
 # --- Paleta de marca --------------------------------------------------------
 BG = "#0B1426"          # azul noche (fondo)
 SURFACE = "#16233D"     # tarjetas

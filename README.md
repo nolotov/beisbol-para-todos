@@ -1,6 +1,6 @@
 # Beisbol Para Todos ⚾📊
 
-Toolkit de datos y visualización para la cuenta faceless de análisis sabermétrico (MLB + LVBP).
+Toolkit de datos y visualización de **@mbp.deportes**: análisis sabermétrico de MLB y LVBP.
 
 ## Setup (Windows)
 

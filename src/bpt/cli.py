@@ -15,6 +15,7 @@ import re
 import sys
 from pathlib import Path
 
+from bpt import theme
 from bpt.data import savant
 from bpt.viz.percentile_card import render_card
 
@@ -123,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--refresh", action="store_true", help="Ignorar caché y volver a descargar")
     c.add_argument("--csv", type=Path, default=None, help="Usar un CSV local (modo offline)")
     c.add_argument("--salida", default="output/cards")
-    c.add_argument("--handle", default="@beisbolparatodos")
+    c.add_argument("--handle", default=theme.HANDLE)
     c.set_defaults(func=cmd_card)
 
     def lvbp_common(sp):
@@ -145,13 +146,13 @@ def main(argv: list[str] | None = None) -> int:
     lc.add_argument("--min-al", type=int, default=100, help="Mínimo de apariciones (bateo)")
     lc.add_argument("--min-ip", type=float, default=20.0, help="Mínimo de innings (pitcheo)")
     lc.add_argument("--salida", default="output/cards")
-    lc.add_argument("--handle", default="@beisbolparatodos")
+    lc.add_argument("--handle", default=theme.HANDLE)
     lvbp_common(lc)
     lc.set_defaults(func=cmd_lvbp_card)
 
     te = sub.add_parser("lvbp-equipos", help="Tarjetas de bateo y pitcheo por equipo")
     te.add_argument("--salida", default="output/cards")
-    te.add_argument("--handle", default="@beisbolparatodos")
+    te.add_argument("--handle", default=theme.HANDLE)
     lvbp_common(te)
     te.set_defaults(func=cmd_lvbp_teams)
 

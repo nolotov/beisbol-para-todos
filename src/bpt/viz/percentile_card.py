@@ -11,7 +11,7 @@ from bpt import theme
 
 def render_card(player: str, kind: str, year: int,
                 metrics: list[tuple[str, float]], out_path: Path,
-                handle: str = "@beisbolparatodos",
+                handle: str = theme.HANDLE,
                 source: str = "Datos: Baseball Savant",
                 subtitle: str | None = None,
                 accent: str = theme.ACCENT) -> Path:
