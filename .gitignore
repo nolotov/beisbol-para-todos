@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# Datos y salidas (se regeneran)
+/data/
+/output/
+
+# Entorno / IDE
+.env
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
