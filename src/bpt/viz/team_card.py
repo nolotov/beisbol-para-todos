@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.patches import FancyBboxPatch
 
-from bpt import theme
+from bpt import glossary, theme
 from bpt.data.lvbp import TEAM_BATTING, TEAM_PITCHING, team_rank
 
 W, H = 10.8, 13.5
@@ -18,7 +18,7 @@ def _rank_color(rank: int, n: int):
     return theme.percentile_color(100 * (n - rank) / max(n - 1, 1))
 
 
-def _panel(fig, rect, title: str, t: pd.DataFrame, idx: int, specs, fonts):
+def _panel(fig, rect, title: str, t: pd.DataFrame, idx: int, specs, fonts, etiquetas: str):
     x0, y0, w, h = rect
     bg = fig.add_axes(rect)
     bg.set_axis_off()
@@ -35,13 +35,19 @@ def _panel(fig, rect, title: str, t: pd.DataFrame, idx: int, specs, fonts):
     step = (top - bottom) / rows
     strip_l, strip_w = x0 + 0.40, 0.33
 
-    for i, (col, label, fmt, higher) in enumerate(specs):
+    for i, (col, key, fmt, higher) in enumerate(specs):
         yc = top - step * (i + 0.5)
         vals = t[col].astype(float)
         ranks = team_rank(t, col, higher)
         v, r = vals.iloc[idx], int(ranks.iloc[idx])
 
-        fig.text(x0 + 0.03, yc, label, fontsize=14, color=theme.TEXT, va="center")
+        main, secondary = glossary.label(key, etiquetas)
+        if secondary:
+            fig.text(x0 + 0.03, yc + 0.0015, main, fontsize=14, color=theme.TEXT, va="bottom")
+            fig.text(x0 + 0.03, yc - 0.0015, secondary, fontsize=9.5, color=theme.MUTED,
+                     va="top", family=fonts["number"])
+        else:
+            fig.text(x0 + 0.03, yc, main, fontsize=14, color=theme.TEXT, va="center")
         txt = fmt.format(v)
         if fmt == "{:.3f}" and txt.startswith("0."):  # estilo béisbol: .272
             txt = txt[1:]
@@ -82,7 +88,8 @@ def _tile(fig, x, y, w, h, label, value, sub, fonts, value_color=theme.TEXT):
 
 def render_team_card(t: pd.DataFrame, equipo: str, season_label: str, out_path: Path,
                      handle: str = theme.HANDLE,
-                     source: str = "Datos: LVBP / TuJonrón") -> Path:
+                     source: str = "Datos: LVBP / TuJonrón",
+                     etiquetas: str = "mixto") -> Path:
     fonts = theme.apply()
     idx = int(t.index[t["equipo"] == equipo][0])
     row = t.iloc[idx]
@@ -108,8 +115,8 @@ def render_team_card(t: pd.DataFrame, equipo: str, season_label: str, out_path: 
           ("justo lo que merecía" if luck == 0 else
            f"ganó {abs(luck)} {'más' if luck > 0 else 'menos'} de lo esperado"), fonts)
 
-    _panel(fig, [0.04, 0.418, 0.92, 0.345], "BATEO", t, idx, TEAM_BATTING, fonts)
-    _panel(fig, [0.04, 0.062, 0.92, 0.345], "PITCHEO", t, idx, TEAM_PITCHING, fonts)
+    _panel(fig, [0.04, 0.418, 0.92, 0.345], "BATEO", t, idx, TEAM_BATTING, fonts, etiquetas)
+    _panel(fig, [0.04, 0.062, 0.92, 0.345], "PITCHEO", t, idx, TEAM_PITCHING, fonts, etiquetas)
 
     fig.text(0.06, 0.04, "Cada punto es un equipo  ·  a la derecha = mejor  ·  "
              "línea punteada = promedio de la liga", fontsize=10.5, color=theme.MUTED,

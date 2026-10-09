@@ -48,13 +48,27 @@ Fuente: `stats.lvbp.com` (datos de TuJonrón). Una petición por segundo y cach�
 > ⚠️ En las tablas de pitcheo de la LVBP, la columna "K%" es el **% de strikes** (S/NP). El K% real
 > lo calculamos con `K/AL`. Está cubierto por un test.
 
+### Etiquetas de métricas
+
+Todas las tarjetas aceptan `--etiquetas`:
+
+| Modo | Ejemplo | Cuándo |
+|---|---|---|
+| `mixto` (defecto) | **Efectividad** / ERA · **wOBA** / valor de cada turno | Tarjetas completas: puente entre lo tradicional y lo nuevo |
+| `espanol` | Efectividad, Embasado, % de ponches | Público tradicional |
+| `siglas` | ERA, OBP, K% | Poco espacio, público analítico |
+
+El glosario (`src/bpt/glossary.py`) tiene sigla, nombre, pista y una explicación de una frase por métrica,
+para usar en captions y guiones.
+
 Las tarjetas salen en `output/cards/`. Los datos crudos se cachean en `data/raw/` (ambos fuera de git).
 
 ## Estructura
 
 ```
 src/bpt/
-  theme.py               # paleta "Dashboard de dugout" + estilo matplotlib
+  theme.py               # paleta "Dashboard de dugout", estilo matplotlib y firma @mbp.deportes
+  glossary.py            # glosario de métricas: sigla, nombre en español, pista y explicación
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
   data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga
   viz/percentile_card.py # tarjeta de percentiles por jugador

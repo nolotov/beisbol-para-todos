@@ -8,34 +8,34 @@ import pandas as pd
 
 CACHE_DIR = Path("data/raw/savant")
 
-# Métrica de Savant -> etiqueta en español. Solo se grafican las que vengan en el CSV.
+# Columna de Savant -> clave del glosario (bpt.glossary). Solo se grafican las que vengan.
 PITCHER_METRICS = {
-    "xera": "xERA",
-    "xwoba": "xwOBA permitido",
-    "fb_velocity": "Velocidad recta",
-    "fb_spin": "Spin recta",
-    "k_percent": "K%",
-    "bb_percent": "BB%",
-    "whiff_percent": "Whiff%",
-    "chase_percent": "Chase%",
-    "exit_velocity": "Exit Velo permitida",
-    "hard_hit_percent": "Hard-Hit% permitido",
-    "brl_percent": "Barrel% permitido",
+    "xera": "xera",
+    "xwoba": "xwoba_opp",
+    "fb_velocity": "fb_velo",
+    "fb_spin": "fb_spin",
+    "k_percent": "k_pct",
+    "bb_percent": "bb_pct",
+    "whiff_percent": "whiff_pct",
+    "chase_percent": "chase_pct",
+    "exit_velocity": "ev_opp",
+    "hard_hit_percent": "hardhit_opp",
+    "brl_percent": "barrel_opp",
 }
 
 BATTER_METRICS = {
-    "xwoba": "xwOBA",
-    "xba": "xBA",
-    "xslg": "xSLG",
-    "exit_velocity": "Exit Velo prom.",
-    "brl_percent": "Barrel%",
-    "hard_hit_percent": "Hard-Hit%",
-    "bat_speed": "Bat Speed",
-    "k_percent": "K%",
-    "bb_percent": "BB%",
-    "whiff_percent": "Whiff%",
-    "chase_percent": "Chase%",
-    "sprint_speed": "Sprint Speed",
+    "xba": "xba",
+    "xslg": "xslg",
+    "xwoba": "xwoba",
+    "exit_velocity": "ev",
+    "hard_hit_percent": "hardhit_pct",
+    "brl_percent": "barrel_pct",
+    "bat_speed": "bat_speed",
+    "k_percent": "k_pct",
+    "bb_percent": "bb_pct",
+    "whiff_percent": "whiff_pct",
+    "chase_percent": "chase_pct",
+    "sprint_speed": "sprint_speed",
 }
 
 
@@ -98,7 +98,7 @@ def find_player(df: pd.DataFrame, query: str) -> pd.Series:
 def player_metrics(row: pd.Series, kind: str) -> list[tuple[str, float]]:
     mapping = PITCHER_METRICS if kind == "pitcher" else BATTER_METRICS
     out = []
-    for col, label in mapping.items():
+    for col, key in mapping.items():
         if col in row.index and pd.notna(row[col]):
-            out.append((label, float(row[col])))
+            out.append((key, float(row[col])))
     return out

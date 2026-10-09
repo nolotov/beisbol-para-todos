@@ -67,8 +67,8 @@ def test_percentiles_respetan_direccion_y_muestra():
     df = _pool_bateo()
     mejor = dict(lvbp.percentiles(df, df.iloc[9], "bateo"))
     peor = dict(lvbp.percentiles(df, df.iloc[0], "bateo"))
-    assert mejor["wOBA"] > 90 and peor["wOBA"] < 10
-    assert mejor["K%"] > 90  # menos ponches = mejor
+    assert mejor["woba"] > 90 and peor["woba"] < 10
+    assert mejor["k_pct"] > 90  # menos ponches = mejor
     assert "Chiquito" not in set(lvbp.qualified_pool(df, "bateo")["jugador"])
 
 
@@ -124,5 +124,5 @@ def test_pitcheo_k_pct_es_strike_pct_en_la_fuente():
     df = lvbp.parse_leaders(PIT_HTML)
     con_np = df[df["NP"] > 0]
     assert ((con_np["S"] / con_np["NP"]).round(2) == con_np["K%"].round(2)).all()
-    assert lvbp.PITCHER_METRICS["K/AL"][0] == "K%"
-    assert lvbp.PITCHER_METRICS["K%"][0] == "Strike%"
+    assert lvbp.PITCHER_METRICS["K/AL"][0] == "k_pct"
+    assert lvbp.PITCHER_METRICS["K%"][0] == "strike_pct"

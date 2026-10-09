@@ -15,7 +15,7 @@ import re
 import sys
 from pathlib import Path
 
-from bpt import theme
+from bpt import glossary, theme
 from bpt.data import savant
 from bpt.viz.percentile_card import render_card
 
@@ -35,7 +35,8 @@ def cmd_card(args: argparse.Namespace) -> int:
     name = savant.display_name(row["player_name"])
     metrics = savant.player_metrics(row, args.tipo)
     out = Path(args.salida) / f"{_slug(name)}_{args.tipo}_{args.anio}.png"
-    render_card(name, args.tipo, args.anio, metrics, out, handle=args.handle)
+    render_card(name, args.tipo, args.anio, metrics, out, handle=args.handle,
+                etiquetas=args.etiquetas)
     print(f"[ok] Tarjeta generada: {out}")
     return 0
 
@@ -85,7 +86,7 @@ def cmd_lvbp_card(args: argparse.Namespace) -> int:
     out = Path(args.salida) / f"lvbp_{_slug(row['jugador'])}_{args.tipo}_{args.temporada}.png"
     render_card(row["jugador"], args.tipo, args.temporada, metrics, out,
                 handle=args.handle, source=lvbp.SOURCE_LABEL, subtitle=subtitle,
-                accent=theme.LVBP)
+                accent=theme.LVBP, etiquetas=args.etiquetas)
     print(f"[ok] Tarjeta generada: {out}")
     return 0
 
@@ -108,7 +109,7 @@ def cmd_lvbp_teams(args: argparse.Namespace) -> int:
     for eq in sel:
         code = t.loc[t["equipo"] == eq, "codigo"].iloc[0]
         out = Path(args.salida) / f"lvbp_equipo_{str(code).lower()}_{args.temporada}.png"
-        render_team_card(t, eq, label, out, handle=args.handle)
+        render_team_card(t, eq, label, out, handle=args.handle, etiquetas=args.etiquetas)
         print(f"[ok] {eq}: {out}")
     return 0
 
@@ -125,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--csv", type=Path, default=None, help="Usar un CSV local (modo offline)")
     c.add_argument("--salida", default="output/cards")
     c.add_argument("--handle", default=theme.HANDLE)
+    c.add_argument("--etiquetas", choices=glossary.MODES, default="mixto",
+                    help="mixto: español + sigla | espanol | siglas")
     c.set_defaults(func=cmd_card)
 
     def lvbp_common(sp):
@@ -147,12 +150,16 @@ def main(argv: list[str] | None = None) -> int:
     lc.add_argument("--min-ip", type=float, default=20.0, help="Mínimo de innings (pitcheo)")
     lc.add_argument("--salida", default="output/cards")
     lc.add_argument("--handle", default=theme.HANDLE)
+    lc.add_argument("--etiquetas", choices=glossary.MODES, default="mixto",
+                    help="mixto: español + sigla | espanol | siglas")
     lvbp_common(lc)
     lc.set_defaults(func=cmd_lvbp_card)
 
     te = sub.add_parser("lvbp-equipos", help="Tarjetas de bateo y pitcheo por equipo")
     te.add_argument("--salida", default="output/cards")
     te.add_argument("--handle", default=theme.HANDLE)
+    te.add_argument("--etiquetas", choices=glossary.MODES, default="mixto",
+                    help="mixto: español + sigla | espanol | siglas")
     lvbp_common(te)
     te.set_defaults(func=cmd_lvbp_teams)
 

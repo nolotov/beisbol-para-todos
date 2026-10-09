@@ -5,8 +5,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
+from matplotlib.transforms import blended_transform_factory
 
-from bpt import theme
+from bpt import glossary, theme
 
 
 def render_card(player: str, kind: str, year: int,
@@ -14,7 +15,9 @@ def render_card(player: str, kind: str, year: int,
                 handle: str = theme.HANDLE,
                 source: str = "Datos: Baseball Savant",
                 subtitle: str | None = None,
-                accent: str = theme.ACCENT) -> Path:
+                accent: str = theme.ACCENT,
+                etiquetas: str = "mixto") -> Path:
+    """`metrics`: lista de (clave del glosario, percentil 0-100)."""
     if not metrics:
         raise ValueError("No hay métricas para graficar.")
     fonts = theme.apply()
@@ -37,7 +40,7 @@ def render_card(player: str, kind: str, year: int,
                                    transform=panel.transAxes, color=theme.SURFACE, zorder=0))
 
     ax = fig.add_axes([0.30, 0.12, 0.62, 0.70])
-    labels = [m[0] for m in metrics][::-1]
+    labels = [glossary.label(m[0], etiquetas) for m in metrics][::-1]
     values = [m[1] for m in metrics][::-1]
     y = range(len(values))
 
@@ -52,7 +55,17 @@ def render_card(player: str, kind: str, year: int,
         ax.text(v, yi, f"{v:.0f}", ha="center", va="center", fontsize=13,
                 weight="bold", color=theme.TEXT, zorder=5, family=fonts["number"])
 
-    ax.set_yticks(list(y), labels, fontsize=16)
+    ax.set_yticks([])
+    tr = blended_transform_factory(ax.transAxes, ax.transData)
+    for yi, (main, secondary) in zip(y, labels):
+        if secondary:
+            ax.text(-0.03, yi + 0.05, main, transform=tr, ha="right", va="bottom",
+                    fontsize=15, color=theme.TEXT)
+            ax.text(-0.03, yi - 0.05, secondary, transform=tr, ha="right", va="top",
+                    fontsize=11, color=theme.MUTED, family=fonts["number"])
+        else:
+            ax.text(-0.03, yi, main, transform=tr, ha="right", va="center",
+                    fontsize=16, color=theme.TEXT)
     ax.set_xlim(-4, 104)
     ax.set_xticks([0, 50, 100], ["MALO", "PROMEDIO", "ÉLITE"], fontsize=11)
     ax.tick_params(length=0, pad=12)

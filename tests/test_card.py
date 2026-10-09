@@ -23,8 +23,8 @@ def test_jugador_inexistente():
 
 def test_metricas_omiten_nulos():
     df = savant.load_percentiles("pitcher", 2025, source_csv=FIXTURE)
-    labels = [m[0] for m in savant.player_metrics(savant.find_player(df, "Zurdo"), "pitcher")]
-    assert "Spin recta" not in labels and "xERA" in labels
+    keys = [m[0] for m in savant.player_metrics(savant.find_player(df, "Zurdo"), "pitcher")]
+    assert "fb_spin" not in keys and "xera" in keys
 
 
 def test_cli_genera_png(tmp_path):

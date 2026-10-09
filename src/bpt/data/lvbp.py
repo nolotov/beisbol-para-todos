@@ -168,31 +168,31 @@ def innings(ip) -> float:
     return int(whole) + int(frac) / 3
 
 
-# columna -> (etiqueta, mayor_es_mejor)
+# columna -> (clave del glosario, mayor_es_mejor). Primero lo tradicional, luego lo nuevo.
 BATTER_METRICS = {
-    "wOBA": ("wOBA", True),
-    "OPS": ("OPS", True),
-    "AVE": ("AVG", True),
-    "PEB": ("OBP", True),
-    "SLG": ("SLG", True),
-    "ISO": ("ISO", True),
-    "BB%": ("BB%", True),
-    "K%": ("K%", False),
-    "LD%": ("Line Drive%", True),
-    "HR/AL": ("HR por turno", True),
+    "AVE": ("avg", True),
+    "PEB": ("obp", True),
+    "SLG": ("slg", True),
+    "OPS": ("ops", True),
+    "wOBA": ("woba", True),
+    "ISO": ("iso", True),
+    "BB%": ("bb_pct", True),
+    "K%": ("k_pct", False),
+    "LD%": ("ld_pct", True),
+    "HR/AL": ("hr_pa", True),
 }
 # OJO: en las tablas de pitcheo de stats.lvbp.com la columna "K%" es en realidad
 # el % de strikes (S/NP). El K% real (ponches / bateadores enfrentados) es "K/AL".
 PITCHER_METRICS = {
-    "EFE": ("ERA", False),
-    "FIP": ("FIP", False),
-    "WHIP": ("WHIP", False),
-    "K/AL": ("K%", True),
-    "BB/AL": ("BB%", False),
-    "K%": ("Strike%", True),
-    "K/BB": ("K/BB", True),
-    "HR/9": ("HR/9", False),
-    "AVE": ("AVG permitido", False),
+    "EFE": ("era", False),
+    "FIP": ("fip", False),
+    "WHIP": ("whip", False),
+    "AVE": ("avg_opp", False),
+    "K/AL": ("k_pct", True),
+    "BB/AL": ("bb_pct", False),
+    "K/BB": ("k_bb", True),
+    "HR/9": ("hr9", False),
+    "K%": ("strike_pct", True),
 }
 
 
@@ -211,7 +211,7 @@ def percentiles(df: pd.DataFrame, row: pd.Series, kind: str,
     pool = qualified_pool(df, kind, **pool_kwargs)
     mapping = BATTER_METRICS if kind == "bateo" else PITCHER_METRICS
     out = []
-    for col, (label, higher_better) in mapping.items():
+    for col, (key, higher_better) in mapping.items():
         if col not in df.columns or pd.isna(row.get(col)):
             continue
         vals = pd.to_numeric(pool[col], errors="coerce").dropna()
@@ -220,7 +220,7 @@ def percentiles(df: pd.DataFrame, row: pd.Series, kind: str,
         v = float(row[col])
         share = ((vals < v).sum() + 0.5 * (vals == v).sum()) / len(vals)
         pct = share * 100 if higher_better else (1 - share) * 100
-        out.append((label, round(max(1.0, min(100.0, pct)))))
+        out.append((key, round(max(1.0, min(100.0, pct)))))
     return out
 
 
@@ -330,26 +330,26 @@ def fetch_team_stats(season: int, *, game_type: str = "regular", refresh: bool =
     return t
 
 
-# columna -> (etiqueta, formato, mayor_es_mejor)
+# columna -> (clave del glosario, formato, mayor_es_mejor)
 TEAM_BATTING = [
-    ("bat_AVE", "AVG", "{:.3f}", True),
-    ("bat_PEB", "OBP", "{:.3f}", True),
-    ("bat_SLG", "SLG", "{:.3f}", True),
-    ("bat_wOBA", "wOBA", "{:.3f}", True),
-    ("bat_HR", "Jonrones", "{:.0f}", True),
-    ("bat_BB%", "BB%", "{:.1%}", True),
-    ("bat_K%", "K%", "{:.1%}", False),
-    ("bat_BR", "Bases robadas", "{:.0f}", True),
+    ("bat_AVE", "avg", "{:.3f}", True),
+    ("bat_PEB", "obp", "{:.3f}", True),
+    ("bat_SLG", "slg", "{:.3f}", True),
+    ("bat_wOBA", "woba", "{:.3f}", True),
+    ("bat_HR", "hr", "{:.0f}", True),
+    ("bat_BB%", "bb_pct", "{:.1%}", True),
+    ("bat_K%", "k_pct", "{:.1%}", False),
+    ("bat_BR", "sb", "{:.0f}", True),
 ]
 TEAM_PITCHING = [
-    ("pit_EFE", "ERA", "{:.2f}", False),
-    ("pit_FIP", "FIP", "{:.2f}", False),
-    ("pit_WHIP", "WHIP", "{:.2f}", False),
-    ("pit_K%", "K%", "{:.1%}", True),
-    ("pit_BB%", "BB%", "{:.1%}", False),
-    ("pit_HR/9", "HR/9", "{:.2f}", False),
-    ("pit_AVE", "AVG permitido", "{:.3f}", False),
-    ("pit_SV", "Salvados", "{:.0f}", True),
+    ("pit_EFE", "era", "{:.2f}", False),
+    ("pit_FIP", "fip", "{:.2f}", False),
+    ("pit_WHIP", "whip", "{:.2f}", False),
+    ("pit_K%", "k_pct", "{:.1%}", True),
+    ("pit_BB%", "bb_pct", "{:.1%}", False),
+    ("pit_HR/9", "hr9", "{:.2f}", False),
+    ("pit_AVE", "avg_opp", "{:.3f}", False),
+    ("pit_SV", "sv", "{:.0f}", True),
 ]
 
 
