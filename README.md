@@ -36,6 +36,10 @@ bpt lvbp-sync --temporada 2025
 bpt lvbp-card "Gorkys Hernandez" --temporada 2025
 bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
 
+# Tarjetas por equipo: récord, diferencial, récord pitagórico y bateo/pitcheo vs. la liga
+bpt lvbp-equipos --temporada 2025            # las 8
+bpt lvbp-equipos --temporada 2025 --equipo MAG
+
 # Filtros: --equipo MAG, --fase final, --refresh
 ```
 
@@ -53,7 +57,8 @@ src/bpt/
   theme.py               # paleta "Dashboard de dugout" + estilo matplotlib
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
   data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga
-  viz/percentile_card.py # render de la tarjeta
+  viz/percentile_card.py # tarjeta de percentiles por jugador
+  viz/team_card.py       # tarjeta de equipo (dot strip vs. los 8 equipos)
   cli.py                 # comando `bpt`
 tests/                   # tests offline con CSV sintético
 scripts/setup.ps1        # bootstrap del entorno en Windows

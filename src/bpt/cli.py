@@ -5,6 +5,8 @@ Ejemplos:
     bpt lvbp-sync --temporada 2025
     bpt lvbp-card "Gorkys Hernandez" --temporada 2025
     bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
+    bpt lvbp-equipos --temporada 2025            # las 8 tarjetas de equipo
+    bpt lvbp-equipos --temporada 2025 --equipo MAG
 """
 from __future__ import annotations
 
@@ -87,6 +89,29 @@ def cmd_lvbp_card(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_lvbp_teams(args: argparse.Namespace) -> int:
+    from bpt.data import lvbp
+    from bpt.viz.team_card import render_team_card
+
+    t = lvbp.fetch_team_stats(args.temporada, game_type=args.fase, refresh=args.refresh)
+    if args.equipo:
+        code = args.equipo.upper()
+        sel = t[t["codigo"] == code]["equipo"].tolist()
+        if not sel:
+            print(f"[error] Equipo '{args.equipo}' no válido. Usa: {', '.join(lvbp.TEAMS)}",
+                  file=sys.stderr)
+            return 1
+    else:
+        sel = t["equipo"].tolist()
+    label = lvbp.season_label(args.temporada)
+    for eq in sel:
+        code = t.loc[t["equipo"] == eq, "codigo"].iloc[0]
+        out = Path(args.salida) / f"lvbp_equipo_{str(code).lower()}_{args.temporada}.png"
+        render_team_card(t, eq, label, out, handle=args.handle)
+        print(f"[ok] {eq}: {out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="bpt", description="Beisbol Para Todos - toolkit de datos")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -123,6 +148,12 @@ def main(argv: list[str] | None = None) -> int:
     lc.add_argument("--handle", default="@beisbolparatodos")
     lvbp_common(lc)
     lc.set_defaults(func=cmd_lvbp_card)
+
+    te = sub.add_parser("lvbp-equipos", help="Tarjetas de bateo y pitcheo por equipo")
+    te.add_argument("--salida", default="output/cards")
+    te.add_argument("--handle", default="@beisbolparatodos")
+    lvbp_common(te)
+    te.set_defaults(func=cmd_lvbp_teams)
 
     args = p.parse_args(argv)
     return args.func(args)

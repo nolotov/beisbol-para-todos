@@ -222,3 +222,137 @@ def percentiles(df: pd.DataFrame, row: pd.Series, kind: str,
         pct = share * 100 if higher_better else (1 - share) * 100
         out.append((label, round(max(1.0, min(100.0, pct)))))
     return out
+
+
+# --- Estadísticas colectivas por equipo ---------------------------------------
+
+COLLECTIVES_URL = "https://stats.lvbp.com/resources/views/collectives.php"
+
+TEAM_NAMES = {
+    "Águilas": "Águilas del Zulia", "Bravos": "Bravos de Margarita",
+    "Cardenales": "Cardenales de Lara", "Caribes": "Caribes de Anzoátegui",
+    "Leones": "Leones del Caracas", "Navegantes": "Navegantes del Magallanes",
+    "Tiburones": "Tiburones de La Guaira", "Tigres": "Tigres de Aragua",
+}
+PYTH_EXP = 1.83
+
+TEAM_CODES = {"Águilas": "AGU", "Bravos": "BRA", "Cardenales": "CAR", "Caribes": "ANZ",
+              "Leones": "LEO", "Navegantes": "MAG", "Tiburones": "TIB", "Tigres": "TIG"}
+
+
+def parse_collectives(html: str, panes: tuple[str, ...]) -> pd.DataFrame:
+    """Une las tablas de los paneles indicados (p. ej. totales + avanzadas) por EQUIPO.
+
+    Se ignoran los paneles de En Casa / Visitante.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    merged: pd.DataFrame | None = None
+    for pane_id in panes:
+        pane = soup.find(id=pane_id)
+        table = pane.find("table") if pane else None
+        if table is None:
+            continue
+        headers = [th.get_text(strip=True) for th in table.find("thead").find_all(["th", "td"])]
+        rows = []
+        for tr in table.find("tbody").find_all("tr"):
+            cells = [td.get_text(" ", strip=True) for td in tr.find_all("td")]
+            if len(cells) != len(headers):
+                continue
+            rec = {"equipo": cells[0]}
+            rec.update({h: _to_number(c) for h, c in zip(headers[1:], cells[1:])})
+            rows.append(rec)
+        df = pd.DataFrame(rows)
+        if merged is None:
+            merged = df
+        else:
+            new_cols = [c for c in df.columns if c not in merged.columns]
+            merged = merged.merge(df[["equipo"] + new_cols], on="equipo", how="left")
+    if merged is None:
+        return pd.DataFrame()
+    for col in merged.columns.drop("equipo"):
+        merged[col] = pd.to_numeric(merged[col], errors="coerce")
+    return merged
+
+
+def build_team_table(bat: pd.DataFrame, pit: pd.DataFrame) -> pd.DataFrame:
+    """Une bateo y pitcheo por equipo y calcula métricas derivadas."""
+    b = bat.add_prefix("bat_").rename(columns={"bat_equipo": "equipo"})
+    p = pit.add_prefix("pit_").rename(columns={"pit_equipo": "equipo"})
+    t = b.merge(p, on="equipo", how="inner")
+    t["G"] = t["pit_G"]
+    t["P"] = t["pit_P"]
+    t["pct"] = t["G"] / (t["G"] + t["P"])
+    t["CA"] = t["bat_CA"]          # carreras anotadas
+    t["CP"] = t["pit_CP"]          # carreras permitidas
+    t["dif"] = t["CA"] - t["CP"]
+    t["bat_K%"] = t["bat_K"] / t["bat_AL"]
+    # En la fuente, 'K%' de pitcheo es Strike%. Se recalcula con bateadores enfrentados (BE).
+    t["pit_Strike%"] = t["pit_K%"]
+    t["pit_K%"] = t["pit_K"] / t["pit_BE"]
+    t["pit_BB%"] = t["pit_BB"] / t["pit_BE"]
+    # Récord pitagórico (exponente 1.83): lo que "merecía" según carreras a favor y en contra
+    jj = t["G"] + t["P"]
+    t["pyth_pct"] = t["CA"] ** PYTH_EXP / (t["CA"] ** PYTH_EXP + t["CP"] ** PYTH_EXP)
+    t["pyth_G"] = (t["pyth_pct"] * jj).round().astype(int)
+    t["pyth_P"] = (jj - t["pyth_G"]).astype(int)
+    t["nombre"] = t["equipo"].map(TEAM_NAMES).fillna(t["equipo"])
+    t["codigo"] = t["equipo"].map(TEAM_CODES)
+    # Orden por récord y diferencial (no replica los desempates oficiales de la LVBP)
+    return t.sort_values(["pct", "dif"], ascending=False).reset_index(drop=True)
+
+
+def fetch_team_stats(season: int, *, game_type: str = "regular", refresh: bool = False,
+                     session: requests.Session | None = None) -> pd.DataFrame:
+    """Bateo + pitcheo por equipo de una temporada (con caché)."""
+    gt = GAME_TYPES[game_type]
+    cache = CACHE_DIR / f"equipos_{season}_{gt}.csv"
+    if cache.exists() and not refresh:
+        return pd.read_csv(cache)
+
+    s = session or requests.Session()
+    s.headers.update({"User-Agent": USER_AGENT, "X-Requested-With": "XMLHttpRequest"})
+    html = {}
+    for kind in ("hittings", "pitchings"):
+        r = s.post(COLLECTIVES_URL, data={"season_id": season, "game_type": gt, "type": kind},
+                   timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        html[kind] = r.text
+        time.sleep(0.5)
+    bat = parse_collectives(html["hittings"], ("bat-tab-pane", "adv_bat-tab-pane"))
+    pit = parse_collectives(html["pitchings"], ("pit-tab-pane", "adv_pit-tab-pane"))
+    if bat.empty or pit.empty:
+        raise LookupError(f"Sin estadísticas de equipos para {season_label(season)}.")
+    t = build_team_table(bat, pit)
+    t.insert(0, "temporada", season_label(season))
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    t.to_csv(cache, index=False)
+    return t
+
+
+# columna -> (etiqueta, formato, mayor_es_mejor)
+TEAM_BATTING = [
+    ("bat_AVE", "AVG", "{:.3f}", True),
+    ("bat_PEB", "OBP", "{:.3f}", True),
+    ("bat_SLG", "SLG", "{:.3f}", True),
+    ("bat_wOBA", "wOBA", "{:.3f}", True),
+    ("bat_HR", "Jonrones", "{:.0f}", True),
+    ("bat_BB%", "BB%", "{:.1%}", True),
+    ("bat_K%", "K%", "{:.1%}", False),
+    ("bat_BR", "Bases robadas", "{:.0f}", True),
+]
+TEAM_PITCHING = [
+    ("pit_EFE", "ERA", "{:.2f}", False),
+    ("pit_FIP", "FIP", "{:.2f}", False),
+    ("pit_WHIP", "WHIP", "{:.2f}", False),
+    ("pit_K%", "K%", "{:.1%}", True),
+    ("pit_BB%", "BB%", "{:.1%}", False),
+    ("pit_HR/9", "HR/9", "{:.2f}", False),
+    ("pit_AVE", "AVG permitido", "{:.3f}", False),
+    ("pit_SV", "Salvados", "{:.0f}", True),
+]
+
+
+def team_rank(t: pd.DataFrame, col: str, higher_better: bool) -> pd.Series:
+    """Puesto 1..N (1 = mejor); empates comparten el mejor puesto."""
+    return t[col].rank(ascending=not higher_better, method="min").astype(int)
