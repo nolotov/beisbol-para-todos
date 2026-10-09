@@ -5,7 +5,7 @@ Ejemplos:
     bpt lvbp-sync --temporada 2025
     bpt lvbp-card "Gorkys Hernandez" --temporada 2025
     bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
-    bpt lvbp-equipos --temporada 2025            # las 8 tarjetas de equipo
+    bpt lvbp-equipos --temporada 2025            # portada + las 8 tarjetas de equipo
     bpt lvbp-equipos --temporada 2025 --equipo MAG
 """
 from __future__ import annotations
@@ -106,6 +106,11 @@ def cmd_lvbp_teams(args: argparse.Namespace) -> int:
     else:
         sel = t["equipo"].tolist()
     label = lvbp.season_label(args.temporada)
+    if not args.equipo:
+        from bpt.viz.cover import render_season_cover
+        out = Path(args.salida) / f"lvbp_equipo_00_portada_{args.temporada}.png"
+        render_season_cover(t, label, out, handle=args.handle)
+        print(f"[ok] Portada: {out}")
     for eq in sel:
         code = t.loc[t["equipo"] == eq, "codigo"].iloc[0]
         out = Path(args.salida) / f"lvbp_equipo_{str(code).lower()}_{args.temporada}.png"

@@ -49,7 +49,8 @@ def test_ranking_direccion(tabla):
 def test_cli_genera_las_ocho(tabla, tmp_path, monkeypatch):
     monkeypatch.setattr(lvbp, "fetch_team_stats", lambda *a, **k: tabla)
     assert main(["lvbp-equipos", "--salida", str(tmp_path)]) == 0
-    assert len(list(tmp_path.glob("lvbp_equipo_*_2025.png"))) == 8
+    assert len(list(tmp_path.glob("lvbp_equipo_*_2025.png"))) == 9  # portada + 8
+    assert (tmp_path / "lvbp_equipo_00_portada_2025.png").exists()
     assert main(["lvbp-equipos", "--equipo", "XYZ", "--salida", str(tmp_path)]) == 1
 
 

@@ -37,7 +37,7 @@ bpt lvbp-card "Gorkys Hernandez" --temporada 2025
 bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
 
 # Tarjetas por equipo: récord, diferencial, récord pitagórico y bateo/pitcheo vs. la liga
-bpt lvbp-equipos --temporada 2025            # las 8
+bpt lvbp-equipos --temporada 2025            # portada del carrusel + las 8
 bpt lvbp-equipos --temporada 2025 --equipo MAG
 
 # Filtros: --equipo MAG, --fase final, --refresh
