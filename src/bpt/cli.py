@@ -1,8 +1,10 @@
-"""CLI: genera una tarjeta de percentiles para un jugador.
+"""CLI de Beisbol Para Todos.
 
 Ejemplos:
-    python -m bpt.cli card "Tarik Skubal" --tipo pitcher --anio 2025
-    python -m bpt.cli card "Ronald Acuna" --tipo batter --anio 2025 --refresh
+    bpt card "Tarik Skubal" --tipo pitcher --anio 2025
+    bpt lvbp-sync --temporada 2025
+    bpt lvbp-card "Gorkys Hernandez" --temporada 2025
+    bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
 """
 from __future__ import annotations
 
@@ -35,6 +37,56 @@ def cmd_card(args: argparse.Namespace) -> int:
     return 0
 
 
+def _lvbp_kwargs(args: argparse.Namespace) -> dict:
+    return dict(team=args.equipo, game_type=args.fase, refresh=args.refresh)
+
+
+def cmd_lvbp_sync(args: argparse.Namespace) -> int:
+    from bpt.data import lvbp
+
+    for kind in (["bateo", "pitcheo"] if args.tipo == "ambos" else [args.tipo]):
+        df = lvbp.fetch_leaders(args.temporada, kind, **_lvbp_kwargs(args))
+        print(f"[ok] LVBP {lvbp.season_label(args.temporada)} {kind}: {len(df)} jugadores "
+              f"-> data/raw/lvbp/")
+    return 0
+
+
+def cmd_lvbp_card(args: argparse.Namespace) -> int:
+    from bpt import theme
+    from bpt.data import lvbp
+
+    df = lvbp.fetch_leaders(args.temporada, args.tipo, **_lvbp_kwargs(args))
+    key = savant._normalize(args.jugador)
+    names = df["jugador"].map(savant._normalize)
+    hits = df[names == key]
+    if hits.empty:
+        hits = df[names.str.contains(key, regex=False)]
+    if hits.empty:
+        print(f"[error] No encontré a '{args.jugador}' en LVBP {lvbp.season_label(args.temporada)}.",
+              file=sys.stderr)
+        return 1
+    if len(hits) > 1:
+        opts = ", ".join(f"{r.jugador} ({r.equipo})" for r in hits.head(8).itertuples())
+        print(f"[error] '{args.jugador}' es ambiguo. Opciones: {opts}", file=sys.stderr)
+        return 1
+    row = hits.iloc[0]
+
+    pool_kw = dict(min_pa=args.min_al, min_ip=args.min_ip)
+    if not lvbp.qualified_pool(df, args.tipo, **pool_kw)["jugador"].eq(row["jugador"]).any():
+        print("[aviso] El jugador no alcanza el mínimo de muestra; percentiles poco fiables.",
+              file=sys.stderr)
+    metrics = lvbp.percentiles(df, row, args.tipo, **pool_kw)
+    role = "BATEADOR" if args.tipo == "bateo" else "LANZADOR"
+    subtitle = (f"{role}  ·  {str(row['equipo']).upper()}  ·  LVBP "
+                f"{lvbp.season_label(args.temporada)}  ·  PERCENTIL VS LIGA")
+    out = Path(args.salida) / f"lvbp_{_slug(row['jugador'])}_{args.tipo}_{args.temporada}.png"
+    render_card(row["jugador"], args.tipo, args.temporada, metrics, out,
+                handle=args.handle, source=lvbp.SOURCE_LABEL, subtitle=subtitle,
+                accent=theme.LVBP)
+    print(f"[ok] Tarjeta generada: {out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="bpt", description="Beisbol Para Todos - toolkit de datos")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -48,6 +100,29 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--salida", default="output/cards")
     c.add_argument("--handle", default="@beisbolparatodos")
     c.set_defaults(func=cmd_card)
+
+    def lvbp_common(sp):
+        sp.add_argument("--temporada", type=int, default=2025,
+                        help="Año de inicio de la zafra (2025 = 2025-26)")
+        sp.add_argument("--equipo", default=None, help="AGU, BRA, CAR, ANZ, LEO, MAG, TIB, TIG")
+        sp.add_argument("--fase", choices=["regular", "comodin", "semifinal", "final"],
+                        default="regular")
+        sp.add_argument("--refresh", action="store_true", help="Ignorar caché y volver a descargar")
+
+    s = sub.add_parser("lvbp-sync", help="Descargar estadísticas LVBP (stats.lvbp.com)")
+    s.add_argument("--tipo", choices=["bateo", "pitcheo", "ambos"], default="ambos")
+    lvbp_common(s)
+    s.set_defaults(func=cmd_lvbp_sync)
+
+    lc = sub.add_parser("lvbp-card", help="Tarjeta de percentiles vs. la LVBP")
+    lc.add_argument("jugador", help='Nombre, p. ej. "Gorkys Hernandez"')
+    lc.add_argument("--tipo", choices=["bateo", "pitcheo"], default="bateo")
+    lc.add_argument("--min-al", type=int, default=100, help="Mínimo de apariciones (bateo)")
+    lc.add_argument("--min-ip", type=float, default=20.0, help="Mínimo de innings (pitcheo)")
+    lc.add_argument("--salida", default="output/cards")
+    lc.add_argument("--handle", default="@beisbolparatodos")
+    lvbp_common(lc)
+    lc.set_defaults(func=cmd_lvbp_card)
 
     args = p.parse_args(argv)
     return args.func(args)

@@ -12,7 +12,9 @@ from bpt import theme
 def render_card(player: str, kind: str, year: int,
                 metrics: list[tuple[str, float]], out_path: Path,
                 handle: str = "@beisbolparatodos",
-                source: str = "Datos: Baseball Savant") -> Path:
+                source: str = "Datos: Baseball Savant",
+                subtitle: str | None = None,
+                accent: str = theme.ACCENT) -> Path:
     if not metrics:
         raise ValueError("No hay métricas para graficar.")
     fonts = theme.apply()
@@ -22,9 +24,11 @@ def render_card(player: str, kind: str, year: int,
     # Encabezado
     fig.text(0.06, 0.94, player.upper(), fontsize=40, weight="bold",
              color=theme.TEXT, va="top")
-    role = "LANZADOR" if kind == "pitcher" else "BATEADOR"
-    fig.text(0.06, 0.885, f"{role}  ·  MLB {year}  ·  PERCENTILES STATCAST",
-             fontsize=15, color=theme.ACCENT, va="top", family=fonts["number"])
+    if subtitle is None:
+        role = "LANZADOR" if kind == "pitcher" else "BATEADOR"
+        subtitle = f"{role}  ·  MLB {year}  ·  PERCENTILES STATCAST"
+    fig.text(0.06, 0.885, subtitle,
+             fontsize=15, color=accent, va="top", family=fonts["number"])
 
     # Panel
     panel = fig.add_axes([0.04, 0.09, 0.92, 0.76])
@@ -58,7 +62,7 @@ def render_card(player: str, kind: str, year: int,
     # Pie
     fig.text(0.06, 0.045, source, fontsize=12, color=theme.MUTED,
              family=fonts["number"])
-    fig.text(0.94, 0.045, handle, fontsize=14, color=theme.ACCENT,
+    fig.text(0.94, 0.045, handle, fontsize=14, color=accent,
              ha="right", weight="bold")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)

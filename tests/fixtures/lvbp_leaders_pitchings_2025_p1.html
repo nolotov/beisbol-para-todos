@@ -1,0 +1,578 @@
+<div id="result">
+ <form id="frm">
+ <div class="row g-1 align-items-center">
+ <div class="col-auto">
+ <select class="form-select" name="season_id">
+ <option value="2015">2015</option>
+ <option value="2016">2016</option>
+ <option value="2017">2017</option>
+ <option value="2018">2018</option>
+ <option value="2019">2019</option>
+ <option value="2020">2020</option>
+ <option value="2021">2021</option>
+ <option value="2022">2022</option>
+ <option value="2023">2023</option>
+ <option value="2024">2024</option>
+ <option value="2025" selected="">2025</option>
+ </select>
+ </div>
+ <div class="col-auto">
+ <select class="form-select" name="team_id">
+ <option value="0">LVBP</option>
+ <option value="692">Aguilas del Zulia</option>
+ <option value="697">Bravos de Margarita</option>
+ <option value="693">Cardenales de Lara</option>
+ <option value="694">Caribes de Anzoátegui</option>
+ <option value="695">Leones del Caracas</option>
+ <option value="696">Navegantes del Magallanes</option>
+ <option value="698">Tiburones de la Guaira</option>
+ <option value="699">Tigres de Aragua</option>
+ </select>
+ </div>
+ <div class="col-auto">
+ <select class="form-select" name="game_type">
+ <option value="R" selected="">Regular</option>
+ <option value="D">Play Offs/Comodín</option>
+ <option value="L">Semifinal</option>
+ <option value="W">Final</option>
+ </select>
+ </div>
+ <div class="col-auto">
+ <select class="form-select" name="type">
+ <option value="hittings">Bateo</option>
+ <option selected="" value="pitchings">Pitcheo</option>
+ <option value="fieldings">Defensiva</option>
+ </select>
+ </div>
+ <div class="col-auto">
+ <select class="form-select" name="split" id="split">
+ <option value="none">seleccione un split</option>
+ <optgroup label="Juego">
+ <option value="h">En Casa</option>
+ <option value="a">Visitante</option>
+ </optgroup>
+ <optgroup label="Mes">
+ <option value="10">Octubre</option>
+ <option value="11">Noviembre</option>
+ <option value="12">Diciembre</option>
+ <option value="1">Enero</option>
+ </optgroup>
+ <optgroup label="Al Bate">
+ <option value="vl">vs Zurdos</option>
+ <option value="vr">vs Derechos</option>
+ <option value="vb">vs Bateador</option>
+ </optgroup>
+ <optgroup label="Marcador">
+ <option value="sah">Con el equipo arriba en el marcador</option>
+ <option value="sbh">Con el equipo abajo en el marcador</option>
+ <option value="sti">Con el marcador empatado</option>
+ </optgroup>
+ <optgroup label="Resultados">
+ <option value="twn">En juegos ganados por el equipo</option>
+ <option value="tls">En juegos perdidos por el equipo</option>
+ <option value="taw">En rachas de juegos ganados</option>
+ <option value="tal">En rachas de juegos perdidos</option>
+ </optgroup>
+ <optgroup label="Pitching">
+ <option value="sp">Lanzador Abridor</option>
+ <option value="rp">Lanzador Relevista</option>
+ <option value="fip">1er. Inn Lanzado</option>
+ <option value="fba">1er. Bateador del Juego</option>
+ <option value="pi000">Como lanza despues del los 1ros. 75 Pitcheos</option>
+ </optgroup>
+ <optgroup label="Inning">
+ <option value="lo">Abriendo Inning</option>
+ <option value="i01">Como lanza durante el 1er. Inning</option>
+ <option value="i02">Como lanza durante el 2do. Inning</option>
+ <option value="i03">Como lanza durante el 3er. Inning</option>
+ <option value="i04">Como lanza durante el 4to. Inning</option>
+ <option value="i05">Como lanza durante el 5to. Inning</option>
+ <option value="i06">Como lanza durante el 6to. Inning</option>
+ <option value="i07">Como lanza durante el 7mo. Inning</option>
+ <option value="i08">Como lanza durante el 8vo. Inning</option>
+ <option value="i09">Como lanza durante el 9no. Inning</option>
+ <option value="ix">Como lanza en Extra Inning</option>
+ <option value="ig01">Como lanza desde el 1er al 6to Inn.</option>
+ <option value="ig07">Como lanza desde el 7mo en adelante.</option>
+ <option value="ig08">Como lanza desde el 8vo en adelante.</option>
+ <option value="ig09">Como lanza desde el 9no. en adelante.</option>
+ </optgroup>
+ <optgroup label="Corredores">
+ <option value="e">Sin gente en bases</option>
+ <option value="r0">Con bases vacias</option>
+ <option value="r123">Con bases llenas</option>
+ <option value="r1">Con Corredor en 1ra Base</option>
+ <option value="r12">Con Corredores en 1ra Base y 2da. Base</option>
+ <option value="r13">Con Corredores en 1ra Base y 3ra. Base</option>
+ <option value="r2">Con Corredor en 2da Base</option>
+ <option value="r23">Con Corredores en 2da y 3ra Base</option>
+ <option value="r3">Con corredor en 3ra Base</option>
+ <option value="ron">Con alguien en base</option>
+ <option value="ron2">Con alguien en base y 2 outs</option>
+ <option value="risp">Con Corredor en Posición de anotar</option>
+ <option value="risp2">Con Corredor en Posición de anotar y 2 Outs</option>
+ <option value="r3l2">Con corredor en 3ra Base y menos de 2 outs</option>
+ </optgroup>
+ <optgroup label="Outs">
+ <option value="o0">Sin outs</option>
+ <option value="o1">Con 1 out</option>
+ <option value="o2">Con 2 outs</option>
+ </optgroup>
+ <optgroup label="Cuenta">
+ <option value="fp">Primer Pitcheo</option>
+ <option value="ac">Arriba en la cuenta</option>
+ <option value="bc">Abajo en la cuenta</option>
+ <option value="ec">En cualquier cuenta</option>
+ <option value="2s">Con 2 Strike</option>
+ <option value="fc">En 3-2</option>
+ <option value="uc">Desconocido o sin conteo</option>
+ </optgroup>
+ </select>
+ </div> 
+ <div class="col-auto">
+ <div class="form-check form-check-inline">
+ <input class="form-check-input" type="checkbox" id="qualified" name="qualified">
+ <label class="form-check-label" for="qualified" id="qualified_label">Con Mínimos Legales</label>
+ </div>
+ </div> 
+ </div> 
+</form> <ul class="nav nav-tabs mt-3" id="TabList" role="tablist">
+ <li class="nav-item" role="presentation">
+ <button class="tab-btn btn-sm nav-link active" id="pit-tab" data-bs-toggle="tab" data-bs-target="#pit-tab-pane" type="button" role="tab" aria-controls="pit-tab-pane" aria-selected="true">Pitcheo</button>
+ </li>
+ <li class="nav-item" role="presentation">
+ <button class="tab-btn btn-sm nav-link" id="adv_pit-tab" data-bs-toggle="tab" data-bs-target="#adv_pit-tab-pane" type="button" role="tab" aria-controls="adv_pit-tab-pane" aria-selected="false">Avanzadas de Pitcheo</button>
+ </li>
+</ul>
+<div class="tab-content" id="TabListContent">
+ <div class="tab-pane fade show active" id="pit-tab-pane" role="tabpanel" aria-labelledby="pit-tab" tabindex="0">
+ <div class="table-responsive my-3">
+ <table class="table table-sm table-hover table-stats table-striped table-bordered">
+ <thead>
+ <tr>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+ JUGADOR
+ </a>
+ </th>
+ <th>EQUIPO</th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w">
+ G
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="l">
+ P
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="era">
+ EFE
+ <i class="bi bi-chevron-up"></i>
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="g">
+ JL
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gs">
+ JI
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sv">
+ SV
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ip">
+ IP
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="h">
+ H
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="r">
+ CP
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="er">
+ CL
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr">
+ HR
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bb">
+ BB
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so">
+ K
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hld">
+ HLD
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="whip">
+ WHIP
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="avg">
+ AVE
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="s">
+ S
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="np">
+ NP
+ </a>
+ </th>
+ </tr>
+ </thead>
+ <tbody><tr>
+ <td class="">
+ Mayckol Guaipe</td>
+ <td>Tigres</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="sp">0.00</td>
+ <td class="">1</td>
+ <td class="">0</td>
+ <td class="">1</td>
+ <td class="">0.1</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">1</td>
+ <td class="">0</td>
+ <td class="">0.00</td> 
+ <td class="">.000</td> 
+ <td class="">3</td>
+ <td class="">6</td> 
+ </tr>
+ <tr>
+ <td class="">
+ DJ Johnson</td>
+ <td>Leones</td>
+ <td class="">1</td>
+ <td class="">0</td>
+ <td class="sp">0.00</td>
+ <td class="">7</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">7.2</td>
+ <td class="">6</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">6</td>
+ <td class="">4</td>
+ <td class="">0</td>
+ <td class="">1.57</td> 
+ <td class="">.214</td> 
+ <td class="">72</td>
+ <td class="">129</td> 
+ </tr>
+ <tr>
+ <td class="">
+ Ronald Herrera</td>
+ <td>Leones</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="sp">0.00</td>
+ <td class="">1</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">1.0</td>
+ <td class="">1</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">2</td>
+ <td class="">0</td>
+ <td class="">1.00</td> 
+ <td class="">.250</td> 
+ <td class="">9</td>
+ <td class="">16</td> 
+ </tr>
+ </tbody></table>
+ <small>* Lanza a la Zurda</small>
+</div> </div>
+ <div class="tab-pane fade" id="adv_pit-tab-pane" role="tabpanel" aria-labelledby="adv_pit-tab" tabindex="0">
+ <div class="table-responsive my-3">
+ <table class="table table-sm table-hover table-stats table-striped table-bordered">
+ <thead>
+ <tr>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+ JUGADOR
+ </a>
+ </th>
+ <th>EQUIPO</th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="qs">
+ QS
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bqr">
+ BQR
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bqrs">
+ BQRS
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="babip">
+ BABIP
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="fip">
+ FIP
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ts">
+ TS
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sam">
+ SAM
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="go_ao">
+ GO/AO
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="p_ip">
+ P/IP
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so_bb">
+ K/BB
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="s_pct">
+ K%
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bb_pct">
+ BB%
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w_9">
+ BB/9
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr_9">
+ HR/9
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="k_9">
+ K/9
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="h_9">
+ H/9
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ir">
+ IR
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="irs">
+ IRS
+ </a>
+ </th> 
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="np_pa">
+ NP/AL
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w_pa">
+ BB/AL
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so_al">
+ K/AL
+ </a>
+ </th>
+ <th>
+ <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr_pa">
+ HR/AL
+ </a>
+ </th>
+ </tr>
+ </thead>
+ <tbody><tr>
+ <td class="">
+ Mayckol Guaipe</td>
+ <td>Tigres</td> 
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">.---</td>
+ <td class="">-2.41</td>
+ <td class="">1</td>
+ <td class="">0</td>
+ <td class="">-.--</td>
+ <td class="">18.00</td>
+ <td class="">-.--</td>
+ <td class="">.500</td>
+ <td class="">.000</td>
+ <td class="">0.00</td>
+ <td class="">0.00</td>
+ <td class="">27.00</td>
+ <td class="">0.00</td>
+ <td class="">2</td>
+ <td class="">0</td>
+ <td class="">6.000</td>
+ <td class="">.000</td>
+ <td class="">1.000</td>
+ <td class="">.000</td>
+ </tr>
+ <tr>
+ <td class="">
+ DJ Johnson</td>
+ <td>Leones</td> 
+ <td class="">0</td>
+ <td class="">6</td>
+ <td class="">0</td>
+ <td class="">.250</td>
+ <td class="">5.29</td>
+ <td class="">55</td>
+ <td class="">9</td>
+ <td class="">1.11</td>
+ <td class="">16.83</td>
+ <td class="">0.67</td>
+ <td class="">.560</td>
+ <td class="">.167</td>
+ <td class="">7.04</td>
+ <td class="">0.00</td>
+ <td class="">4.70</td>
+ <td class="">7.04</td>
+ <td class="">4</td>
+ <td class="">1</td>
+ <td class="">3.583</td>
+ <td class="">.167</td>
+ <td class="">.111</td>
+ <td class="">.000</td>
+ </tr>
+ <tr>
+ <td class="">
+ Ronald Herrera</td>
+ <td>Leones</td> 
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">.500</td>
+ <td class="">2.59</td>
+ <td class="">7</td>
+ <td class="">4</td>
+ <td class="">0.00</td>
+ <td class="">16.00</td>
+ <td class="">-.--</td>
+ <td class="">.560</td>
+ <td class="">.000</td>
+ <td class="">0.00</td>
+ <td class="">0.00</td>
+ <td class="">18.00</td>
+ <td class="">9.00</td>
+ <td class="">0</td>
+ <td class="">0</td>
+ <td class="">3.200</td>
+ <td class="">.000</td>
+ <td class="">.400</td>
+ <td class="">.000</td>
+ </tr>
+ </tbody></table>
+ <small>* Lanza a la Zurda</small>
+</div> 
+ </div>
+</div>
+ <nav aria-label="navigation">
+ <ul class="pagination pagination-sm justify-content-center">
+ <!-- Botón Anterior -->
+ <li class="page-item disabled">
+ <a class="page-link" href="#" onclick="event.preventDefault();">« Anterior</a>
+ </li>
+ <!-- Números de página -->
+ <li class="page-item active">
+ <a class="page-link" href="#" onclick="event.preventDefault(); ">
+ 1 </a>
+ </li>
+ <li class="page-item ">
+ <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
+ 2 </a>
+ </li>
+ <li class="page-item ">
+ <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(3);">
+ 3 </a>
+ </li>
+ <li class="page-item ">
+ <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(4);">
+ 4 </a>
+ </li>
+ <li class="page-item ">
+ <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(5);">
+ 5 </a>
+ </li>
+ <li class="page-item disabled">
+ <a class="page-link" href="#" onclick="event.preventDefault();">...</a>
+ </li>
+ <li class="page-item">
+ <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(9);">9</a>
+ </li>
+ <!-- Botón Siguiente -->
+ <li class="page-item">
+ <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
+ Siguiente »
+ </a>
+ </li>
+ </ul>
+ </nav>
+ <div class="d-flex justify-content-center mt-2">
+ <small class="text-muted">
+ Página 1 de 9 </small>
+ </div>
+</div> 

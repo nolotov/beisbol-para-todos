@@ -26,6 +26,24 @@ bpt card "Pablo Lopez" --refresh
 bpt card "Nombre" --csv ruta\al\archivo.csv
 ```
 
+### LVBP
+
+```powershell
+# Descargar bateo y pitcheo de la zafra (2025 = 2025-26). Se cachea en data/raw/lvbp/
+bpt lvbp-sync --temporada 2025
+
+# Tarjeta de percentiles vs. la liga (mínimo 100 AL / 20 IP para entrar al pool)
+bpt lvbp-card "Gorkys Hernandez" --temporada 2025
+bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
+
+# Filtros: --equipo MAG, --fase final, --refresh
+```
+
+Fuente: `stats.lvbp.com` (datos de TuJonrón). Una petición por segundo y caché local; cita siempre la fuente.
+
+> ⚠️ En las tablas de pitcheo de la LVBP, la columna "K%" es el **% de strikes** (S/NP). El K% real
+> lo calculamos con `K/AL`. Está cubierto por un test.
+
 Las tarjetas salen en `output/cards/`. Los datos crudos se cachean en `data/raw/` (ambos fuera de git).
 
 ## Estructura
@@ -34,6 +52,7 @@ Las tarjetas salen en `output/cards/`. Los datos crudos se cachean en `data/raw/
 src/bpt/
   theme.py               # paleta "Dashboard de dugout" + estilo matplotlib
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
+  data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga
   viz/percentile_card.py # render de la tarjeta
   cli.py                 # comando `bpt`
 tests/                   # tests offline con CSV sintético
@@ -50,7 +69,8 @@ scripts/setup.ps1        # bootstrap del entorno en Windows
 
 - [x] Tarjeta de percentiles Statcast
 - [ ] Gráfico de movimiento de pitcheos (antes vs. ahora)
-- [ ] Ingesta LVBP (Pelota Binaria / LVBP.com, respetando términos de uso)
+- [x] Ingesta LVBP (stats.lvbp.com) + tarjeta de percentiles vs. liga
+- [ ] Splits LVBP (vs. zurdos/derechos, por mes) y comparativa MLB vs. LVBP
 - [ ] Modelo de pronóstico (log5 + bullpen + park factor) con track record público
 - [ ] Job diario de extracción
 
