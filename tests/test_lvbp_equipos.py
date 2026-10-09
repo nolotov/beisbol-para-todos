@@ -51,3 +51,18 @@ def test_cli_genera_las_ocho(tabla, tmp_path, monkeypatch):
     assert main(["lvbp-equipos", "--salida", str(tmp_path)]) == 0
     assert len(list(tmp_path.glob("lvbp_equipo_*_2025.png"))) == 8
     assert main(["lvbp-equipos", "--equipo", "XYZ", "--salida", str(tmp_path)]) == 1
+
+
+def test_logo_opcional(tabla, tmp_path):
+    from PIL import Image
+
+    from bpt.viz.team_card import render_team_card
+    logos = tmp_path / "logos"
+    logos.mkdir()
+    Image.new("RGBA", (100, 100), (200, 30, 30, 255)).save(logos / "car.png")
+    con = render_team_card(tabla, "Cardenales", "2025-26", tmp_path / "con.png", logos_dir=logos)
+    sin = render_team_card(tabla, "Cardenales", "2025-26", tmp_path / "sin.png",
+                           logos_dir=tmp_path / "no-existe")
+    a, b = Image.open(con).convert("RGB"), Image.open(sin).convert("RGB")
+    assert a.size == b.size == (1080, 1350)
+    assert a.getpixel((1000, 80)) != b.getpixel((1000, 80))  # el logo aparece arriba a la derecha

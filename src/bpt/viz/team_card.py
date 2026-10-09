@@ -11,6 +11,18 @@ from bpt import glossary, theme
 from bpt.data.lvbp import TEAM_BATTING, TEAM_PITCHING, team_rank
 
 W, H = 10.8, 13.5
+LOGOS_DIR = Path("assets/logos")  # {codigo}.png, fuera de git (ver README)
+
+
+def _draw_logo(fig, path: Path, size_px: int = 100, right: float = 0.94, top: float = 0.965):
+    """Dibuja el logo a su tamaño nativo (sin escalar hacia arriba) en la esquina superior derecha."""
+    img = plt.imread(str(path))
+    h_px, w_px = img.shape[:2]
+    scale = min(1.0, size_px / max(h_px, w_px))
+    w, h = w_px * scale / (W * 100), h_px * scale / (H * 100)
+    ax = fig.add_axes([right - w, top - h, w, h])
+    ax.imshow(img, interpolation="lanczos")
+    ax.set_axis_off()
 
 
 def _rank_color(rank: int, n: int):
@@ -89,12 +101,17 @@ def _tile(fig, x, y, w, h, label, value, sub, fonts, value_color=theme.TEXT):
 def render_team_card(t: pd.DataFrame, equipo: str, season_label: str, out_path: Path,
                      handle: str = theme.HANDLE,
                      source: str = "Datos: LVBP / TuJonrón",
-                     etiquetas: str = "mixto") -> Path:
+                     etiquetas: str = "mixto",
+                     logos_dir: Path | None = LOGOS_DIR) -> Path:
     fonts = theme.apply()
     idx = int(t.index[t["equipo"] == equipo][0])
     row = t.iloc[idx]
 
     fig = plt.figure(figsize=(W, H), dpi=100)
+
+    logo = Path(logos_dir) / f"{str(row.get('codigo', '')).lower()}.png" if logos_dir else None
+    if logo is not None and logo.exists():
+        _draw_logo(fig, logo)
 
     fig.text(0.06, 0.955, str(row["nombre"]).upper(), fontsize=34, weight="bold",
              color=theme.TEXT, va="top")
