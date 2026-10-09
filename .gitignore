@@ -9,6 +9,9 @@ __pycache__/
 /data/
 /output/
 
+# Logos de equipos: marcas de terceros, no se versionan (fuente: lvbp.com)
+/assets/logos/
+
 # Entorno / IDE
 .env
 .vscode/
