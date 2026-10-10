@@ -1,4 +1,4 @@
-"""Tests de estadísticas por equipo con respuestas reales de stats.lvbp.com (2025-26)."""
+"""Tests de estadísticas por equipo con respuestas crudas de stats.lvbp.com (2025-26, sin <tbody>)."""
 from pathlib import Path
 
 import pytest

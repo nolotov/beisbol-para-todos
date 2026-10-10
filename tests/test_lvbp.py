@@ -1,8 +1,8 @@
 """Tests de la ingesta LVBP.
 
-Los fixtures HTML son respuestas reales de stats.lvbp.com (temporada 2025-26,
-página 1, recortadas a 3 filas por tabla). Las pruebas de percentiles usan
-datos sintéticos.
+Los fixtures HTML son las respuestas crudas de stats.lvbp.com (temporada 2025-26,
+página 1), tal como las envía el servidor: con <thead> y SIN <tbody>. Las pruebas
+de percentiles usan datos sintéticos.
 """
 from pathlib import Path
 
@@ -19,7 +19,7 @@ PIT_HTML = (FIX / "lvbp_leaders_pitchings_2025_p1.html").read_text(encoding="utf
 
 def test_parse_bateo_une_las_tres_tablas():
     df = lvbp.parse_leaders(BAT_HTML)
-    assert len(df) == 3
+    assert len(df) == 30
     for col in ["jugador", "equipo", "posicion", "mano", "AVE", "OPS", "wOBA", "ISO", "LD%", "AL"]:
         assert col in df.columns, col
     assert df["jugador"].str.len().gt(0).all()
@@ -29,7 +29,7 @@ def test_parse_bateo_une_las_tres_tablas():
 
 def test_parse_pitcheo_une_tradicional_y_avanzada():
     df = lvbp.parse_leaders(PIT_HTML)
-    assert len(df) == 3
+    assert len(df) == 30
     for col in ["EFE", "IP", "WHIP", "FIP", "K%", "BB%"]:
         assert col in df.columns, col
 
@@ -102,7 +102,7 @@ def test_fetch_pagina_dedup_y_cachea(tmp_path, monkeypatch):
     df = lvbp.fetch_leaders(2025, "bateo", session=s, delay=0)
     assert s.calls == [1, 2]
     assert "Otro Jugador" in set(df["jugador"])
-    assert len(df) == 4  # 3 + 3 menos 2 repetidos
+    assert len(df) == 31  # 30 + 30, todos repetidos menos "Otro Jugador"
     assert (df["temporada"] == "2025-26").all()
     # segunda llamada sale de la caché, sin red
     s2 = _FakeSession()
@@ -123,6 +123,13 @@ def test_pitcheo_k_pct_es_strike_pct_en_la_fuente():
     """En stats.lvbp.com, 'K%' de pitcheo = S/NP. Nuestro K% debe salir de K/AL."""
     df = lvbp.parse_leaders(PIT_HTML)
     con_np = df[df["NP"] > 0]
-    assert ((con_np["S"] / con_np["NP"]).round(2) == con_np["K%"].round(2)).all()
+    # la fuente redondea a 2 decimales (0.625 -> .63), de ahí la tolerancia
+    assert ((con_np["S"] / con_np["NP"]) - con_np["K%"]).abs().max() <= 0.0051
     assert lvbp.PITCHER_METRICS["K/AL"][0] == "k_pct"
     assert lvbp.PITCHER_METRICS["K%"][0] == "strike_pct"
+
+
+def test_html_crudo_sin_tbody():
+    """Regresión: el servidor no envía <tbody>; el parser no puede depender de él."""
+    assert "<tbody" not in BAT_HTML and "<thead" in BAT_HTML
+    assert len(lvbp.parse_leaders(BAT_HTML)) == 30

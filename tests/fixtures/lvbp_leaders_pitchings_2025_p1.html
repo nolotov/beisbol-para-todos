@@ -1,578 +1,2061 @@
+
 <div id="result">
- <form id="frm">
- <div class="row g-1 align-items-center">
- <div class="col-auto">
- <select class="form-select" name="season_id">
- <option value="2015">2015</option>
- <option value="2016">2016</option>
- <option value="2017">2017</option>
- <option value="2018">2018</option>
- <option value="2019">2019</option>
- <option value="2020">2020</option>
- <option value="2021">2021</option>
- <option value="2022">2022</option>
- <option value="2023">2023</option>
- <option value="2024">2024</option>
- <option value="2025" selected="">2025</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="team_id">
- <option value="0">LVBP</option>
- <option value="692">Aguilas del Zulia</option>
- <option value="697">Bravos de Margarita</option>
- <option value="693">Cardenales de Lara</option>
- <option value="694">Caribes de Anzoátegui</option>
- <option value="695">Leones del Caracas</option>
- <option value="696">Navegantes del Magallanes</option>
- <option value="698">Tiburones de la Guaira</option>
- <option value="699">Tigres de Aragua</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="game_type">
- <option value="R" selected="">Regular</option>
- <option value="D">Play Offs/Comodín</option>
- <option value="L">Semifinal</option>
- <option value="W">Final</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="type">
- <option value="hittings">Bateo</option>
- <option selected="" value="pitchings">Pitcheo</option>
- <option value="fieldings">Defensiva</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="split" id="split">
- <option value="none">seleccione un split</option>
- <optgroup label="Juego">
- <option value="h">En Casa</option>
- <option value="a">Visitante</option>
- </optgroup>
- <optgroup label="Mes">
- <option value="10">Octubre</option>
- <option value="11">Noviembre</option>
- <option value="12">Diciembre</option>
- <option value="1">Enero</option>
- </optgroup>
- <optgroup label="Al Bate">
- <option value="vl">vs Zurdos</option>
- <option value="vr">vs Derechos</option>
- <option value="vb">vs Bateador</option>
- </optgroup>
- <optgroup label="Marcador">
- <option value="sah">Con el equipo arriba en el marcador</option>
- <option value="sbh">Con el equipo abajo en el marcador</option>
- <option value="sti">Con el marcador empatado</option>
- </optgroup>
- <optgroup label="Resultados">
- <option value="twn">En juegos ganados por el equipo</option>
- <option value="tls">En juegos perdidos por el equipo</option>
- <option value="taw">En rachas de juegos ganados</option>
- <option value="tal">En rachas de juegos perdidos</option>
- </optgroup>
- <optgroup label="Pitching">
- <option value="sp">Lanzador Abridor</option>
- <option value="rp">Lanzador Relevista</option>
- <option value="fip">1er. Inn Lanzado</option>
- <option value="fba">1er. Bateador del Juego</option>
- <option value="pi000">Como lanza despues del los 1ros. 75 Pitcheos</option>
- </optgroup>
- <optgroup label="Inning">
- <option value="lo">Abriendo Inning</option>
- <option value="i01">Como lanza durante el 1er. Inning</option>
- <option value="i02">Como lanza durante el 2do. Inning</option>
- <option value="i03">Como lanza durante el 3er. Inning</option>
- <option value="i04">Como lanza durante el 4to. Inning</option>
- <option value="i05">Como lanza durante el 5to. Inning</option>
- <option value="i06">Como lanza durante el 6to. Inning</option>
- <option value="i07">Como lanza durante el 7mo. Inning</option>
- <option value="i08">Como lanza durante el 8vo. Inning</option>
- <option value="i09">Como lanza durante el 9no. Inning</option>
- <option value="ix">Como lanza en Extra Inning</option>
- <option value="ig01">Como lanza desde el 1er al 6to Inn.</option>
- <option value="ig07">Como lanza desde el 7mo en adelante.</option>
- <option value="ig08">Como lanza desde el 8vo en adelante.</option>
- <option value="ig09">Como lanza desde el 9no. en adelante.</option>
- </optgroup>
- <optgroup label="Corredores">
- <option value="e">Sin gente en bases</option>
- <option value="r0">Con bases vacias</option>
- <option value="r123">Con bases llenas</option>
- <option value="r1">Con Corredor en 1ra Base</option>
- <option value="r12">Con Corredores en 1ra Base y 2da. Base</option>
- <option value="r13">Con Corredores en 1ra Base y 3ra. Base</option>
- <option value="r2">Con Corredor en 2da Base</option>
- <option value="r23">Con Corredores en 2da y 3ra Base</option>
- <option value="r3">Con corredor en 3ra Base</option>
- <option value="ron">Con alguien en base</option>
- <option value="ron2">Con alguien en base y 2 outs</option>
- <option value="risp">Con Corredor en Posición de anotar</option>
- <option value="risp2">Con Corredor en Posición de anotar y 2 Outs</option>
- <option value="r3l2">Con corredor en 3ra Base y menos de 2 outs</option>
- </optgroup>
- <optgroup label="Outs">
- <option value="o0">Sin outs</option>
- <option value="o1">Con 1 out</option>
- <option value="o2">Con 2 outs</option>
- </optgroup>
- <optgroup label="Cuenta">
- <option value="fp">Primer Pitcheo</option>
- <option value="ac">Arriba en la cuenta</option>
- <option value="bc">Abajo en la cuenta</option>
- <option value="ec">En cualquier cuenta</option>
- <option value="2s">Con 2 Strike</option>
- <option value="fc">En 3-2</option>
- <option value="uc">Desconocido o sin conteo</option>
- </optgroup>
- </select>
- </div> 
- <div class="col-auto">
- <div class="form-check form-check-inline">
- <input class="form-check-input" type="checkbox" id="qualified" name="qualified">
- <label class="form-check-label" for="qualified" id="qualified_label">Con Mínimos Legales</label>
- </div>
- </div> 
- </div> 
-</form> <ul class="nav nav-tabs mt-3" id="TabList" role="tablist">
- <li class="nav-item" role="presentation">
- <button class="tab-btn btn-sm nav-link active" id="pit-tab" data-bs-toggle="tab" data-bs-target="#pit-tab-pane" type="button" role="tab" aria-controls="pit-tab-pane" aria-selected="true">Pitcheo</button>
- </li>
- <li class="nav-item" role="presentation">
- <button class="tab-btn btn-sm nav-link" id="adv_pit-tab" data-bs-toggle="tab" data-bs-target="#adv_pit-tab-pane" type="button" role="tab" aria-controls="adv_pit-tab-pane" aria-selected="false">Avanzadas de Pitcheo</button>
- </li>
+
+    <form id="frm">
+    <div class="row g-1 align-items-center">
+
+        <div class="col-auto">
+            <select class="form-select" name="season_id">
+                                    <option value="2015">2015</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                  
+            </select>
+        </div>
+    
+        <div class="col-auto">
+            <select class="form-select" name="team_id">
+                <option value="0" >LVBP</option>
+                <option value="692" >Aguilas del Zulia</option>
+                <option value="697" >Bravos de Margarita</option>
+                <option value="693" >Cardenales de Lara</option>
+                <option value="694" >Caribes de Anzoátegui</option>
+                <option value="695" >Leones del Caracas</option>
+                <option value="696" >Navegantes del Magallanes</option>
+                <option value="698" >Tiburones de la Guaira</option>
+                <option value="699" >Tigres de Aragua</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <select class="form-select" name="game_type">
+                <option value="R"  selected>Regular</option>
+                <option value="D" >Play Offs/Comodín</option>
+                <option value="L" >Semifinal</option>
+                <option value="W" >Final</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <select class="form-select" name="type">
+                <option  value="hittings" >Bateo</option>
+                <option  selected value="pitchings"  selected>Pitcheo</option>
+                <option  value="fieldings" >Defensiva</option>
+            </select>
+        </div>
+    
+        <div class="col-auto">
+            <select class="form-select" name="split" id="split" >
+                <option value="none">seleccione un split</option>
+                <optgroup label="Juego">
+                    <option value="h" >En Casa</option>
+                    <option value="a" >Visitante</option>
+                </optgroup>
+                <optgroup label="Mes">
+                    <option value="10" >Octubre</option>
+                    <option value="11" >Noviembre</option>
+                    <option value="12" >Diciembre</option>
+                    <option value="1" >Enero</option>
+                </optgroup>
+                <optgroup label="Al Bate">
+                    <option value="vl" >vs Zurdos</option>
+                    <option value="vr" >vs Derechos</option>
+                    <option value="vb" >vs Bateador</option>
+                </optgroup>
+                <optgroup label="Marcador">
+                    <option value="sah" >Con el equipo arriba en el marcador</option>
+                    <option value="sbh" >Con el equipo abajo en el marcador</option>
+                    <option value="sti" >Con el marcador empatado</option>
+                </optgroup>
+                <optgroup label="Resultados">
+                    <option value="twn" >En juegos ganados por el equipo</option>
+                    <option value="tls" >En juegos perdidos por el equipo</option>
+                    <option value="taw" >En rachas de juegos ganados</option>
+                    <option value="tal" >En rachas de juegos perdidos</option>
+                </optgroup>
+                <optgroup label="Pitching">
+                    <option value="sp" >Lanzador Abridor</option>
+                    <option value="rp" >Lanzador Relevista</option>
+                    <option value="fip" >1er. Inn Lanzado</option>
+                    <option value="fba" >1er. Bateador del Juego</option>
+                    <option value="pi000" >Como lanza despues del los 1ros. 75 Pitcheos</option>
+                </optgroup>
+                <optgroup label="Inning">
+                    <option value="lo" >Abriendo Inning</option>
+                    <option value="i01" >Como lanza durante el 1er. Inning</option>
+                    <option value="i02" >Como lanza durante el 2do. Inning</option>
+                    <option value="i03" >Como lanza durante el 3er. Inning</option>
+                    <option value="i04" >Como lanza durante el 4to. Inning</option>
+                    <option value="i05" >Como lanza durante el 5to. Inning</option>
+                    <option value="i06" >Como lanza durante el 6to. Inning</option>
+                    <option value="i07" >Como lanza durante el 7mo. Inning</option>
+                    <option value="i08" >Como lanza durante el 8vo. Inning</option>
+                    <option value="i09" >Como lanza durante el 9no. Inning</option>
+                    <option value="ix" >Como lanza en Extra Inning</option>
+                    <option value="ig01" >Como lanza desde el 1er al 6to Inn.</option>
+                    <option value="ig07" >Como lanza desde el 7mo en adelante.</option>
+                    <option value="ig08" >Como lanza desde el 8vo en adelante.</option>
+                    <option value="ig09" >Como lanza desde el 9no. en adelante.</option>
+                </optgroup>
+                <optgroup label="Corredores">
+                    <option value="e" >Sin gente en bases</option>
+                    <option value="r0" >Con bases vacias</option>
+                    <option value="r123" >Con bases llenas</option>
+                    <option value="r1" >Con Corredor en 1ra Base</option>
+                    <option value="r12" >Con Corredores en 1ra Base y 2da. Base</option>
+                    <option value="r13" >Con Corredores en 1ra Base y 3ra. Base</option>
+                    <option value="r2" >Con Corredor en 2da Base</option>
+                    <option value="r23" >Con Corredores en 2da y 3ra Base</option>
+                    <option value="r3" >Con corredor en 3ra Base</option>
+                    <option value="ron" >Con alguien en base</option>
+                    <option value="ron2" >Con alguien en base y 2 outs</option>
+                    <option value="risp" >Con Corredor en Posición de anotar</option>
+                    <option value="risp2" >Con Corredor en Posición de anotar y 2 Outs</option>
+                    <option value="r3l2" >Con corredor en 3ra Base y menos de 2 outs</option>
+                </optgroup>
+                <optgroup label="Outs">
+                    <option value="o0" >Sin outs</option>
+                    <option value="o1" >Con 1 out</option>
+                    <option value="o2" >Con 2 outs</option>
+                </optgroup>
+                <optgroup label="Cuenta">
+                    <option value="fp" >Primer Pitcheo</option>
+                    <option value="ac" >Arriba en la cuenta</option>
+                    <option value="bc" >Abajo en la cuenta</option>
+                    <option value="ec" >En cualquier cuenta</option>
+                    <option value="2s" >Con 2 Strike</option>
+                    <option value="fc" >En 3-2</option>
+                    <option value="uc" >Desconocido o sin conteo</option>
+                </optgroup>
+            </select>
+        </div>                    
+
+        <div class="col-auto">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="qualified" name="qualified" >
+                <label class="form-check-label" for="qualified" id="qualified_label">Con Mínimos Legales</label>
+            </div>
+        </div> 
+    </div> 
+</form>    <ul class="nav nav-tabs mt-3" id="TabList" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="tab-btn btn-sm nav-link active" id="pit-tab" data-bs-toggle="tab" data-bs-target="#pit-tab-pane" type="button" role="tab" aria-controls="pit-tab-pane" aria-selected="true">Pitcheo</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="tab-btn btn-sm nav-link" id="adv_pit-tab" data-bs-toggle="tab" data-bs-target="#adv_pit-tab-pane" type="button" role="tab" aria-controls="adv_pit-tab-pane" aria-selected="false">Avanzadas de Pitcheo</button>
+    </li>
 </ul>
 <div class="tab-content" id="TabListContent">
- <div class="tab-pane fade show active" id="pit-tab-pane" role="tabpanel" aria-labelledby="pit-tab" tabindex="0">
- <div class="table-responsive my-3">
- <table class="table table-sm table-hover table-stats table-striped table-bordered">
- <thead>
- <tr>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
- JUGADOR
- </a>
- </th>
- <th>EQUIPO</th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w">
- G
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="l">
- P
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="era">
- EFE
- <i class="bi bi-chevron-up"></i>
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="g">
- JL
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gs">
- JI
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sv">
- SV
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ip">
- IP
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="h">
- H
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="r">
- CP
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="er">
- CL
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr">
- HR
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bb">
- BB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so">
- K
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hld">
- HLD
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="whip">
- WHIP
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="avg">
- AVE
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="s">
- S
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="np">
- NP
- </a>
- </th>
- </tr>
- </thead>
- <tbody><tr>
- <td class="">
- Mayckol Guaipe</td>
- <td>Tigres</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="sp">0.00</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">0.1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0.00</td> 
- <td class="">.000</td> 
- <td class="">3</td>
- <td class="">6</td> 
- </tr>
- <tr>
- <td class="">
- DJ Johnson</td>
- <td>Leones</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="sp">0.00</td>
- <td class="">7</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">7.2</td>
- <td class="">6</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">6</td>
- <td class="">4</td>
- <td class="">0</td>
- <td class="">1.57</td> 
- <td class="">.214</td> 
- <td class="">72</td>
- <td class="">129</td> 
- </tr>
- <tr>
- <td class="">
- Ronald Herrera</td>
- <td>Leones</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="sp">0.00</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">1.0</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">2</td>
- <td class="">0</td>
- <td class="">1.00</td> 
- <td class="">.250</td> 
- <td class="">9</td>
- <td class="">16</td> 
- </tr>
- </tbody></table>
- <small>* Lanza a la Zurda</small>
-</div> </div>
- <div class="tab-pane fade" id="adv_pit-tab-pane" role="tabpanel" aria-labelledby="adv_pit-tab" tabindex="0">
- <div class="table-responsive my-3">
- <table class="table table-sm table-hover table-stats table-striped table-bordered">
- <thead>
- <tr>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
- JUGADOR
- </a>
- </th>
- <th>EQUIPO</th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="qs">
- QS
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bqr">
- BQR
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bqrs">
- BQRS
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="babip">
- BABIP
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="fip">
- FIP
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ts">
- TS
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sam">
- SAM
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="go_ao">
- GO/AO
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="p_ip">
- P/IP
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so_bb">
- K/BB
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="s_pct">
- K%
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bb_pct">
- BB%
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w_9">
- BB/9
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr_9">
- HR/9
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="k_9">
- K/9
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="h_9">
- H/9
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ir">
- IR
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="irs">
- IRS
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="np_pa">
- NP/AL
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w_pa">
- BB/AL
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so_al">
- K/AL
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr_pa">
- HR/AL
- </a>
- </th>
- </tr>
- </thead>
- <tbody><tr>
- <td class="">
- Mayckol Guaipe</td>
- <td>Tigres</td> 
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">.---</td>
- <td class="">-2.41</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">-.--</td>
- <td class="">18.00</td>
- <td class="">-.--</td>
- <td class="">.500</td>
- <td class="">.000</td>
- <td class="">0.00</td>
- <td class="">0.00</td>
- <td class="">27.00</td>
- <td class="">0.00</td>
- <td class="">2</td>
- <td class="">0</td>
- <td class="">6.000</td>
- <td class="">.000</td>
- <td class="">1.000</td>
- <td class="">.000</td>
- </tr>
- <tr>
- <td class="">
- DJ Johnson</td>
- <td>Leones</td> 
- <td class="">0</td>
- <td class="">6</td>
- <td class="">0</td>
- <td class="">.250</td>
- <td class="">5.29</td>
- <td class="">55</td>
- <td class="">9</td>
- <td class="">1.11</td>
- <td class="">16.83</td>
- <td class="">0.67</td>
- <td class="">.560</td>
- <td class="">.167</td>
- <td class="">7.04</td>
- <td class="">0.00</td>
- <td class="">4.70</td>
- <td class="">7.04</td>
- <td class="">4</td>
- <td class="">1</td>
- <td class="">3.583</td>
- <td class="">.167</td>
- <td class="">.111</td>
- <td class="">.000</td>
- </tr>
- <tr>
- <td class="">
- Ronald Herrera</td>
- <td>Leones</td> 
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">.500</td>
- <td class="">2.59</td>
- <td class="">7</td>
- <td class="">4</td>
- <td class="">0.00</td>
- <td class="">16.00</td>
- <td class="">-.--</td>
- <td class="">.560</td>
- <td class="">.000</td>
- <td class="">0.00</td>
- <td class="">0.00</td>
- <td class="">18.00</td>
- <td class="">9.00</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">3.200</td>
- <td class="">.000</td>
- <td class="">.400</td>
- <td class="">.000</td>
- </tr>
- </tbody></table>
- <small>* Lanza a la Zurda</small>
+    <div class="tab-pane fade show active" id="pit-tab-pane" role="tabpanel" aria-labelledby="pit-tab" tabindex="0">
+        <div class="table-responsive my-3">
+    <table class="table table-sm table-hover table-stats table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+                JUGADOR
+                                            
+                </a>
+            </th>
+            <th>EQUIPO</th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="w">
+                G
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="l">
+                P
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="era">
+                EFE
+                 
+                    <i class="bi bi-chevron-up"></i>
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="g">
+                JL
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gs">
+                JI
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sv">
+                SV
+                                </a>
+            </th>            
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ip">
+                IP
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="h">
+                H
+                                </a>
+            </th>
+                <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="r">
+                CP
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="er">
+                CL
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hr">
+                HR
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="bb">
+                BB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="so">
+                K
+                                </a>
+            </th>             
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hld">
+                HLD
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="whip">
+                WHIP
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="avg">
+                AVE
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="s">
+                S
+                                </a>
+            </th>           
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="np">
+                NP
+                                </a>
+            </th>
+        </tr>
+        </thead>
+                <tr>
+            <td class="">
+            Mayckol Guaipe</td>
+            <td>Tigres</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0.1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0.00</td>  
+            <td class="">.000</td>           
+            <td class="">3</td>
+            <td class="">6</td> 
+        </tr>
+            <tr>
+            <td class="">
+            DJ Johnson</td>
+            <td>Leones</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">7</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">7.2</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">1.57</td>  
+            <td class="">.214</td>           
+            <td class="">72</td>
+            <td class="">129</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Ronald Herrera</td>
+            <td>Leones</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">1.00</td>  
+            <td class="">.250</td>           
+            <td class="">9</td>
+            <td class="">16</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Gleyvin Pineda</td>
+            <td>Tiburones</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0.1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.00</td>  
+            <td class="">.500</td>           
+            <td class="">5</td>
+            <td class="">8</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Wandisson Charles</td>
+            <td>Navegantes</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">5.2</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">0.35</td>  
+            <td class="">.118</td>           
+            <td class="">46</td>
+            <td class="">68</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Alfonso Hernández</td>
+            <td>Bravos</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">7.0</td>
+            <td class="">5</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">8</td>
+            <td class="">0</td>
+            <td class="">1.00</td>  
+            <td class="">.200</td>           
+            <td class="">78</td>
+            <td class="">118</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Frainger Aranguren</td>
+            <td>Bravos</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1.00</td>  
+            <td class="">.000</td>           
+            <td class="">11</td>
+            <td class="">17</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Wilser Barrios</td>
+            <td>Cardenales</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">2.00</td>  
+            <td class="">.250</td>           
+            <td class="">11</td>
+            <td class="">19</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Carlos Betancourt</td>
+            <td>Tigres</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2.0</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">2.00</td>  
+            <td class="">.375</td>           
+            <td class="">24</td>
+            <td class="">46</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Jesus Valles</td>
+            <td>Cardenales</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2.2</td>
+            <td class="">5</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">2.25</td>  
+            <td class="">.385</td>           
+            <td class="">34</td>
+            <td class="">53</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Joander Suarez</td>
+            <td>Caribes</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2.2</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0.75</td>  
+            <td class="">.125</td>           
+            <td class="">23</td>
+            <td class="">33</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Edgardo Henriquez</td>
+            <td>Tiburones</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">6.0</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">7</td>
+            <td class="">0</td>
+            <td class="">0.83</td>  
+            <td class="">.143</td>           
+            <td class="">60</td>
+            <td class="">87</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Ignacio Briceno</td>
+            <td>Águilas</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0.1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">6.00</td>  
+            <td class="">.500</td>           
+            <td class="">8</td>
+            <td class="">14</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Yerlin Rodriguez</td>
+            <td>Tiburones</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.2</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">5</td>
+            <td class="">1</td>
+            <td class="">1.80</td>  
+            <td class="">.000</td>           
+            <td class="">27</td>
+            <td class="">51</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Angel Hernandez</td>
+            <td>Tiburones</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">2.00</td>  
+            <td class="">.400</td>           
+            <td class="">8</td>
+            <td class="">16</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Juan Amarante</td>
+            <td>Navegantes</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0.00</td>  
+            <td class="">.000</td>           
+            <td class="">7</td>
+            <td class="">9</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Wilber Rodriguez</td>
+            <td>Águilas</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1.00</td>  
+            <td class="">.000</td>           
+            <td class="">10</td>
+            <td class="">17</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Christian Allegretti</td>
+            <td>Tiburones</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.00</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0.1</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">6.00</td>  
+            <td class="">.000</td>           
+            <td class="">8</td>
+            <td class="">16</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Carlos Guzman</td>
+            <td>Tigres</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="sp">0.73</td>
+            <td class="">26</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">24.2</td>
+            <td class="">16</td>
+            <td class="">3</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">26</td>
+            <td class="">6</td>
+            <td class="">0.77</td>  
+            <td class="">.182</td>           
+            <td class="">246</td>
+            <td class="">369</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Jaiker Garcia</td>
+            <td>Navegantes</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.77</td>
+            <td class="">11</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">11.2</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">10</td>
+            <td class="">11</td>
+            <td class="">2</td>
+            <td class="">1.20</td>  
+            <td class="">.103</td>           
+            <td class="">118</td>
+            <td class="">198</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Alex Martinez</td>
+            <td>Tiburones</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">0.98</td>
+            <td class="">21</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">18.1</td>
+            <td class="">16</td>
+            <td class="">2</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">8</td>
+            <td class="">19</td>
+            <td class="">5</td>
+            <td class="">1.31</td>  
+            <td class="">.229</td>           
+            <td class="">200</td>
+            <td class="">330</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Cristian Hernandez</td>
+            <td>Caribes</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">1.08</td>
+            <td class="">8</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">8.1</td>
+            <td class="">5</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">5</td>
+            <td class="">2</td>
+            <td class="">1.08</td>  
+            <td class="">.172</td>           
+            <td class="">85</td>
+            <td class="">134</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Yilber Díaz</td>
+            <td>Caribes</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="sp">1.08</td>
+            <td class="">14</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">16.2</td>
+            <td class="">9</td>
+            <td class="">7</td>
+            <td class="">2</td>
+            <td class="">2</td>
+            <td class="">8</td>
+            <td class="">23</td>
+            <td class="">2</td>
+            <td class="">1.02</td>  
+            <td class="">.161</td>           
+            <td class="">167</td>
+            <td class="">257</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Julio Rodriguez</td>
+            <td>Navegantes</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">1.23</td>
+            <td class="">9</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">7.1</td>
+            <td class="">3</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">7</td>
+            <td class="">3</td>
+            <td class="">1</td>
+            <td class="">1.36</td>  
+            <td class="">.130</td>           
+            <td class="">62</td>
+            <td class="">120</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Ricardo Rodríguez</td>
+            <td>Leones</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="sp">1.52</td>
+            <td class="">24</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">23.2</td>
+            <td class="">19</td>
+            <td class="">7</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">10</td>
+            <td class="">22</td>
+            <td class="">6</td>
+            <td class="">1.23</td>  
+            <td class="">.226</td>           
+            <td class="">237</td>
+            <td class="">380</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Yujanyer Herrera</td>
+            <td>Cardenales</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="sp">1.54</td>
+            <td class="">11</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">11.2</td>
+            <td class="">7</td>
+            <td class="">3</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">10</td>
+            <td class="">7</td>
+            <td class="">1</td>
+            <td class="">1.46</td>  
+            <td class="">.167</td>           
+            <td class="">119</td>
+            <td class="">207</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Bryan Mata</td>
+            <td>Navegantes</td>
+            <td class="">4</td>
+            <td class="">2</td>
+            <td class="sp">1.57</td>
+            <td class="">9</td>
+            <td class="">7</td>
+            <td class="">0</td>
+            <td class="">34.1</td>
+            <td class="">26</td>
+            <td class="">12</td>
+            <td class="">6</td>
+            <td class="">2</td>
+            <td class="">7</td>
+            <td class="">34</td>
+            <td class="">0</td>
+            <td class="">0.96</td>  
+            <td class="">.200</td>           
+            <td class="">336</td>
+            <td class="">509</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Christian Suarez</td>
+            <td>Tigres</td>
+            <td class="">3</td>
+            <td class="">1</td>
+            <td class="sp">1.57</td>
+            <td class="">32</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">23.0</td>
+            <td class="">17</td>
+            <td class="">5</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">12</td>
+            <td class="">24</td>
+            <td class="">7</td>
+            <td class="">1.26</td>  
+            <td class="">.205</td>           
+            <td class="">249</td>
+            <td class="">379</td> 
+        </tr>
+            <tr>
+            <td class="">
+            * Brayan Perez</td>
+            <td>Cardenales</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="sp">2.03</td>
+            <td class="">14</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">13.1</td>
+            <td class="">12</td>
+            <td class="">5</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">12</td>
+            <td class="">0</td>
+            <td class="">1.13</td>  
+            <td class="">.235</td>           
+            <td class="">139</td>
+            <td class="">202</td> 
+        </tr>
+            <tr>
+            <td class="">
+            Silvino Bracho</td>
+            <td>Águilas</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="sp">2.08</td>
+            <td class="">25</td>
+            <td class="">0</td>
+            <td class="">11</td>
+            <td class="">26.0</td>
+            <td class="">24</td>
+            <td class="">9</td>
+            <td class="">6</td>
+            <td class="">2</td>
+            <td class="">4</td>
+            <td class="">17</td>
+            <td class="">0</td>
+            <td class="">1.08</td>  
+            <td class="">.245</td>           
+            <td class="">255</td>
+            <td class="">360</td> 
+        </tr>
+        </table>
+    <small>* Lanza a la Zurda</small>
+</div>    </div>
+    <div class="tab-pane fade" id="adv_pit-tab-pane" role="tabpanel" aria-labelledby="adv_pit-tab" tabindex="0">
+        <div class="table-responsive my-3">
+    <table class="table table-sm table-hover table-stats table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+                JUGADOR
+                                            
+                </a>
+            </th>
+            <th>EQUIPO</th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="qs">
+                QS
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="bqr">
+                BQR
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="bqrs">
+                BQRS
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="babip">
+                BABIP
+                                </a>
+            </th>            
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="fip">
+                FIP
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ts">
+                TS
+                                </a>
+            </th>                
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sam">
+                SAM
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="go_ao">
+                GO/AO
+                                </a>
+            </th>                                       
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="p_ip">
+                P/IP
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="so_bb">
+                K/BB
+                                </a>
+            </th>   
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="s_pct">
+                K%
+                                </a>
+            </th>                                    
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="bb_pct">
+                BB%
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="w_9">
+                BB/9
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hr_9">
+                HR/9
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="k_9">
+                K/9
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="h_9">
+                H/9
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ir">
+                IR
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="irs">
+                IRS
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="np_pa">
+                NP/AL
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="w_pa">
+                BB/AL
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="so_al">
+                K/AL
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hr_pa">
+                HR/AL
+                                </a>
+            </th>
+        </tr>
+        </thead>
+                <tr>
+            <td class="">
+            Mayckol Guaipe</td>
+            <td>Tigres</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.---</td>
+            <td class="">-2.41</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">-.--</td>
+            <td class="">18.00</td>
+            <td class="">-.--</td>
+            <td class="">.500</td>
+            <td class="">.000</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">27.00</td>
+            <td class="">0.00</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">6.000</td>
+            <td class="">.000</td>
+            <td class="">1.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            DJ Johnson</td>
+            <td>Leones</td>            
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">.250</td>
+            <td class="">5.29</td>
+            <td class="">55</td>
+            <td class="">9</td>
+            <td class="">1.11</td>
+            <td class="">16.83</td>
+            <td class="">0.67</td>
+            <td class="">.560</td>
+            <td class="">.167</td>
+            <td class="">7.04</td>
+            <td class="">0.00</td>
+            <td class="">4.70</td>
+            <td class="">7.04</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">3.583</td>
+            <td class="">.167</td>
+            <td class="">.111</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Ronald Herrera</td>
+            <td>Leones</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.500</td>
+            <td class="">2.59</td>
+            <td class="">7</td>
+            <td class="">4</td>
+            <td class="">0.00</td>
+            <td class="">16.00</td>
+            <td class="">-.--</td>
+            <td class="">.560</td>
+            <td class="">.000</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">18.00</td>
+            <td class="">9.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.200</td>
+            <td class="">.000</td>
+            <td class="">.400</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Gleyvin Pineda</td>
+            <td>Tiburones</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.500</td>
+            <td class="">3.59</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">0.00</td>
+            <td class="">24.00</td>
+            <td class="">-.--</td>
+            <td class="">.630</td>
+            <td class="">.000</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">27.00</td>
+            <td class="">3</td>
+            <td class="">2</td>
+            <td class="">4.000</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Wandisson Charles</td>
+            <td>Navegantes</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.143</td>
+            <td class="">2.18</td>
+            <td class="">36</td>
+            <td class="">13</td>
+            <td class="">1.00</td>
+            <td class="">12.00</td>
+            <td class="">-.--</td>
+            <td class="">.680</td>
+            <td class="">.000</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">6.35</td>
+            <td class="">3.18</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">3.778</td>
+            <td class="">.000</td>
+            <td class="">.222</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Alfonso Hernández</td>
+            <td>Bravos</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.294</td>
+            <td class="">2.16</td>
+            <td class="">58</td>
+            <td class="">17</td>
+            <td class="">1.40</td>
+            <td class="">16.86</td>
+            <td class="">4.00</td>
+            <td class="">.660</td>
+            <td class="">.074</td>
+            <td class="">2.57</td>
+            <td class="">0.00</td>
+            <td class="">10.29</td>
+            <td class="">6.43</td>
+            <td class="">4</td>
+            <td class="">2</td>
+            <td class="">4.370</td>
+            <td class="">.074</td>
+            <td class="">.296</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Frainger Aranguren</td>
+            <td>Bravos</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.000</td>
+            <td class="">4.59</td>
+            <td class="">8</td>
+            <td class="">2</td>
+            <td class="">-.--</td>
+            <td class="">17.00</td>
+            <td class="">1.00</td>
+            <td class="">.650</td>
+            <td class="">.333</td>
+            <td class="">9.00</td>
+            <td class="">0.00</td>
+            <td class="">9.00</td>
+            <td class="">0.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">5.667</td>
+            <td class="">.333</td>
+            <td class="">.333</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Wilser Barrios</td>
+            <td>Cardenales</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.333</td>
+            <td class="">4.59</td>
+            <td class="">7</td>
+            <td class="">1</td>
+            <td class="">1.00</td>
+            <td class="">19.00</td>
+            <td class="">1.00</td>
+            <td class="">.580</td>
+            <td class="">.200</td>
+            <td class="">9.00</td>
+            <td class="">0.00</td>
+            <td class="">9.00</td>
+            <td class="">9.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.800</td>
+            <td class="">.200</td>
+            <td class="">.200</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Carlos Betancourt</td>
+            <td>Tigres</td>            
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">.500</td>
+            <td class="">3.09</td>
+            <td class="">18</td>
+            <td class="">3</td>
+            <td class="">0.00</td>
+            <td class="">23.00</td>
+            <td class="">2.00</td>
+            <td class="">.520</td>
+            <td class="">.111</td>
+            <td class="">4.50</td>
+            <td class="">0.00</td>
+            <td class="">9.00</td>
+            <td class="">13.50</td>
+            <td class="">5</td>
+            <td class="">5</td>
+            <td class="">5.111</td>
+            <td class="">.111</td>
+            <td class="">.222</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jesus Valles</td>
+            <td>Cardenales</td>            
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">.385</td>
+            <td class="">3.97</td>
+            <td class="">22</td>
+            <td class="">3</td>
+            <td class="">1.00</td>
+            <td class="">19.88</td>
+            <td class="">1.00</td>
+            <td class="">.640</td>
+            <td class="">.067</td>
+            <td class="">3.38</td>
+            <td class="">0.00</td>
+            <td class="">3.38</td>
+            <td class="">16.88</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.533</td>
+            <td class="">.067</td>
+            <td class="">.067</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Joander Suarez</td>
+            <td>Caribes</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.125</td>
+            <td class="">5.84</td>
+            <td class="">19</td>
+            <td class="">0</td>
+            <td class="">0.75</td>
+            <td class="">12.38</td>
+            <td class="">0.00</td>
+            <td class="">.700</td>
+            <td class="">.100</td>
+            <td class="">3.38</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">3.38</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.300</td>
+            <td class="">.100</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Edgardo Henriquez</td>
+            <td>Tiburones</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.214</td>
+            <td class="">2.26</td>
+            <td class="">44</td>
+            <td class="">18</td>
+            <td class="">0.83</td>
+            <td class="">14.50</td>
+            <td class="">3.50</td>
+            <td class="">.690</td>
+            <td class="">.087</td>
+            <td class="">3.00</td>
+            <td class="">0.00</td>
+            <td class="">10.50</td>
+            <td class="">4.50</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.783</td>
+            <td class="">.087</td>
+            <td class="">.304</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Ignacio Briceno</td>
+            <td>Águilas</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.500</td>
+            <td class="">12.59</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">-.--</td>
+            <td class="">42.00</td>
+            <td class="">0.00</td>
+            <td class="">.570</td>
+            <td class="">.333</td>
+            <td class="">27.00</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">27.00</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">4.667</td>
+            <td class="">.333</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Yerlin Rodriguez</td>
+            <td>Tiburones</td>            
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">.---</td>
+            <td class="">6.59</td>
+            <td class="">15</td>
+            <td class="">7</td>
+            <td class="">-.--</td>
+            <td class="">30.60</td>
+            <td class="">1.67</td>
+            <td class="">.530</td>
+            <td class="">.300</td>
+            <td class="">16.20</td>
+            <td class="">0.00</td>
+            <td class="">27.00</td>
+            <td class="">0.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">5.100</td>
+            <td class="">.300</td>
+            <td class="">.500</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Angel Hernandez</td>
+            <td>Tiburones</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.500</td>
+            <td class="">1.59</td>
+            <td class="">7</td>
+            <td class="">3</td>
+            <td class="">1.00</td>
+            <td class="">16.00</td>
+            <td class="">-.--</td>
+            <td class="">.500</td>
+            <td class="">.000</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">9.00</td>
+            <td class="">18.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.200</td>
+            <td class="">.000</td>
+            <td class="">.200</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Juan Amarante</td>
+            <td>Navegantes</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.000</td>
+            <td class="">1.59</td>
+            <td class="">4</td>
+            <td class="">2</td>
+            <td class="">1.00</td>
+            <td class="">9.00</td>
+            <td class="">-.--</td>
+            <td class="">.780</td>
+            <td class="">.000</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">9.00</td>
+            <td class="">0.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.000</td>
+            <td class="">.000</td>
+            <td class="">.333</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Wilber Rodriguez</td>
+            <td>Águilas</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.000</td>
+            <td class="">4.59</td>
+            <td class="">9</td>
+            <td class="">4</td>
+            <td class="">0.00</td>
+            <td class="">17.00</td>
+            <td class="">1.00</td>
+            <td class="">.590</td>
+            <td class="">.250</td>
+            <td class="">9.00</td>
+            <td class="">0.00</td>
+            <td class="">9.00</td>
+            <td class="">0.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">4.250</td>
+            <td class="">.250</td>
+            <td class="">.250</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Christian Allegretti</td>
+            <td>Tiburones</td>            
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">.000</td>
+            <td class="">21.59</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">1.00</td>
+            <td class="">48.00</td>
+            <td class="">0.00</td>
+            <td class="">.500</td>
+            <td class="">.500</td>
+            <td class="">54.00</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">0.00</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">4.000</td>
+            <td class="">.500</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Carlos Guzman</td>
+            <td>Tigres</td>            
+            <td class="">0</td>
+            <td class="">7</td>
+            <td class="">0</td>
+            <td class="">.258</td>
+            <td class="">2.21</td>
+            <td class="">174</td>
+            <td class="">43</td>
+            <td class="">0.92</td>
+            <td class="">14.96</td>
+            <td class="">8.67</td>
+            <td class="">.670</td>
+            <td class="">.032</td>
+            <td class="">1.09</td>
+            <td class="">0.00</td>
+            <td class="">9.49</td>
+            <td class="">5.84</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">3.926</td>
+            <td class="">.032</td>
+            <td class="">.277</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jaiker Garcia</td>
+            <td>Navegantes</td>            
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">.143</td>
+            <td class="">4.28</td>
+            <td class="">85</td>
+            <td class="">28</td>
+            <td class="">0.47</td>
+            <td class="">16.97</td>
+            <td class="">1.10</td>
+            <td class="">.600</td>
+            <td class="">.200</td>
+            <td class="">7.71</td>
+            <td class="">0.00</td>
+            <td class="">8.49</td>
+            <td class="">3.09</td>
+            <td class="">5</td>
+            <td class="">3</td>
+            <td class="">3.960</td>
+            <td class="">.200</td>
+            <td class="">.220</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Alex Martinez</td>
+            <td>Tiburones</td>            
+            <td class="">0</td>
+            <td class="">8</td>
+            <td class="">1</td>
+            <td class="">.314</td>
+            <td class="">2.83</td>
+            <td class="">130</td>
+            <td class="">31</td>
+            <td class="">0.59</td>
+            <td class="">18.00</td>
+            <td class="">2.38</td>
+            <td class="">.610</td>
+            <td class="">.103</td>
+            <td class="">3.93</td>
+            <td class="">0.00</td>
+            <td class="">9.33</td>
+            <td class="">7.85</td>
+            <td class="">8</td>
+            <td class="">3</td>
+            <td class="">4.231</td>
+            <td class="">.103</td>
+            <td class="">.244</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Cristian Hernandez</td>
+            <td>Caribes</td>            
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">.200</td>
+            <td class="">3.83</td>
+            <td class="">68</td>
+            <td class="">11</td>
+            <td class="">0.54</td>
+            <td class="">16.08</td>
+            <td class="">1.25</td>
+            <td class="">.630</td>
+            <td class="">.118</td>
+            <td class="">4.32</td>
+            <td class="">0.00</td>
+            <td class="">5.40</td>
+            <td class="">5.40</td>
+            <td class="">7</td>
+            <td class="">3</td>
+            <td class="">3.941</td>
+            <td class="">.118</td>
+            <td class="">.147</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Yilber Díaz</td>
+            <td>Caribes</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.226</td>
+            <td class="">4.19</td>
+            <td class="">118</td>
+            <td class="">37</td>
+            <td class="">1.27</td>
+            <td class="">15.42</td>
+            <td class="">2.88</td>
+            <td class="">.650</td>
+            <td class="">.119</td>
+            <td class="">4.32</td>
+            <td class="">1.08</td>
+            <td class="">12.42</td>
+            <td class="">4.86</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">3.836</td>
+            <td class="">.119</td>
+            <td class="">.343</td>
+            <td class="">.030</td>
+        </tr>
+            <tr>
+            <td class="">
+            Julio Rodriguez</td>
+            <td>Navegantes</td>            
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">.150</td>
+            <td class="">6.86</td>
+            <td class="">40</td>
+            <td class="">7</td>
+            <td class="">1.43</td>
+            <td class="">16.36</td>
+            <td class="">0.43</td>
+            <td class="">.520</td>
+            <td class="">.212</td>
+            <td class="">8.59</td>
+            <td class="">0.00</td>
+            <td class="">3.68</td>
+            <td class="">3.68</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">3.636</td>
+            <td class="">.212</td>
+            <td class="">.091</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Ricardo Rodríguez</td>
+            <td>Leones</td>            
+            <td class="">0</td>
+            <td class="">8</td>
+            <td class="">3</td>
+            <td class="">.306</td>
+            <td class="">3.38</td>
+            <td class="">174</td>
+            <td class="">51</td>
+            <td class="">1.25</td>
+            <td class="">16.06</td>
+            <td class="">2.20</td>
+            <td class="">.620</td>
+            <td class="">.101</td>
+            <td class="">3.80</td>
+            <td class="">0.00</td>
+            <td class="">8.37</td>
+            <td class="">7.23</td>
+            <td class="">11</td>
+            <td class="">2</td>
+            <td class="">3.838</td>
+            <td class="">.101</td>
+            <td class="">.222</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Yujanyer Herrera</td>
+            <td>Cardenales</td>            
+            <td class="">0</td>
+            <td class="">16</td>
+            <td class="">1</td>
+            <td class="">.200</td>
+            <td class="">5.73</td>
+            <td class="">84</td>
+            <td class="">13</td>
+            <td class="">2.22</td>
+            <td class="">17.74</td>
+            <td class="">0.70</td>
+            <td class="">.570</td>
+            <td class="">.179</td>
+            <td class="">7.71</td>
+            <td class="">0.00</td>
+            <td class="">5.40</td>
+            <td class="">5.40</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">3.696</td>
+            <td class="">.179</td>
+            <td class="">.125</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Bryan Mata</td>
+            <td>Navegantes</td>            
+            <td class="">1</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">.255</td>
+            <td class="">3.15</td>
+            <td class="">243</td>
+            <td class="">67</td>
+            <td class="">2.04</td>
+            <td class="">14.83</td>
+            <td class="">4.86</td>
+            <td class="">.660</td>
+            <td class="">.050</td>
+            <td class="">1.83</td>
+            <td class="">0.52</td>
+            <td class="">8.91</td>
+            <td class="">6.82</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">3.662</td>
+            <td class="">.050</td>
+            <td class="">.245</td>
+            <td class="">.014</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Christian Suarez</td>
+            <td>Tigres</td>            
+            <td class="">0</td>
+            <td class="">15</td>
+            <td class="">2</td>
+            <td class="">.276</td>
+            <td class="">3.89</td>
+            <td class="">186</td>
+            <td class="">49</td>
+            <td class="">2.00</td>
+            <td class="">16.48</td>
+            <td class="">2.00</td>
+            <td class="">.660</td>
+            <td class="">.124</td>
+            <td class="">4.70</td>
+            <td class="">0.39</td>
+            <td class="">9.39</td>
+            <td class="">6.65</td>
+            <td class="">16</td>
+            <td class="">5</td>
+            <td class="">3.907</td>
+            <td class="">.124</td>
+            <td class="">.247</td>
+            <td class="">.010</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Brayan Perez</td>
+            <td>Cardenales</td>            
+            <td class="">0</td>
+            <td class="">7</td>
+            <td class="">2</td>
+            <td class="">.300</td>
+            <td class="">2.47</td>
+            <td class="">99</td>
+            <td class="">20</td>
+            <td class="">2.11</td>
+            <td class="">15.15</td>
+            <td class="">4.00</td>
+            <td class="">.690</td>
+            <td class="">.055</td>
+            <td class="">2.03</td>
+            <td class="">0.00</td>
+            <td class="">8.10</td>
+            <td class="">8.10</td>
+            <td class="">19</td>
+            <td class="">6</td>
+            <td class="">3.673</td>
+            <td class="">.055</td>
+            <td class="">.218</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Silvino Bracho</td>
+            <td>Águilas</td>            
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">.278</td>
+            <td class="">3.86</td>
+            <td class="">187</td>
+            <td class="">34</td>
+            <td class="">0.73</td>
+            <td class="">13.85</td>
+            <td class="">4.25</td>
+            <td class="">.710</td>
+            <td class="">.039</td>
+            <td class="">1.38</td>
+            <td class="">0.69</td>
+            <td class="">5.88</td>
+            <td class="">8.31</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">3.495</td>
+            <td class="">.039</td>
+            <td class="">.165</td>
+            <td class="">.019</td>
+        </tr>
+        </table>
+    <small>* Lanza a la Zurda</small>
 </div> 
- </div>
+    </div>
 </div>
- <nav aria-label="navigation">
- <ul class="pagination pagination-sm justify-content-center">
- <!-- Botón Anterior -->
- <li class="page-item disabled">
- <a class="page-link" href="#" onclick="event.preventDefault();">« Anterior</a>
- </li>
- <!-- Números de página -->
- <li class="page-item active">
- <a class="page-link" href="#" onclick="event.preventDefault(); ">
- 1 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
- 2 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(3);">
- 3 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(4);">
- 4 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(5);">
- 5 </a>
- </li>
- <li class="page-item disabled">
- <a class="page-link" href="#" onclick="event.preventDefault();">...</a>
- </li>
- <li class="page-item">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(9);">9</a>
- </li>
- <!-- Botón Siguiente -->
- <li class="page-item">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
- Siguiente »
- </a>
- </li>
- </ul>
- </nav>
- <div class="d-flex justify-content-center mt-2">
- <small class="text-muted">
- Página 1 de 9 </small>
- </div>
-</div> 
+
+        <nav aria-label="navigation">
+            <ul class="pagination pagination-sm justify-content-center">
+
+                <!-- Botón Anterior -->
+                                    <li class="page-item disabled">
+                        <a class="page-link" href="#" onclick="event.preventDefault();">&laquo; Anterior</a>
+                    </li>
+                
+                <!-- Números de página -->
+                                    <li class="page-item active">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); ">
+                            1                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
+                            2                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(3);">
+                            3                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(4);">
+                            4                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(5);">
+                            5                        </a>
+                    </li>
+                                                            <li class="page-item disabled">
+                            <a class="page-link" href="#" onclick="event.preventDefault();">...</a>
+                        </li>
+                                        <li class="page-item">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(9);">9</a>
+                    </li>
+                
+                <!-- Botón Siguiente -->
+                                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
+                            Siguiente &raquo;
+                        </a>
+                    </li>
+                
+            </ul>
+        </nav>
+
+        <div class="d-flex justify-content-center mt-2">
+            <small class="text-muted">
+                Página 1 de 9            </small>
+        </div>
+
+                    
+     
+</div>  
+
+<script>
+
+$(".sort_by").click(function(e) {
+
+    let tab = $("#TabList li button.active").attr('id');
+    let previous_sort_by = 'era';
+    let previous_order = 'ASC';
+    let order = null, sort_by = this.dataset.sort;
+
+    if(previous_sort_by == sort_by){
+        if(previous_order == 'ASC'){
+            order = 'DESC';
+        } else if(previous_order == 'DESC'){
+            order = 'ASC';
+        }
+    }
+
+    update_stats(null, sort_by, order, tab);
+
+});
+
+$(".page-link").click(function(e) {
+
+    let tab = $("#TabList li button.active").attr('id');
+    let sort_by = 'era';
+    let order = 'ASC';
+
+    let array = this.dataset.link.split("&");
+    var obj = {};
+    
+    for (var i = 0; i < array.length; i++) {
+        var split = array[i].split('=');
+        obj[split[0].trim()] = split[1].trim();
+    }
+
+    update_stats(obj.page, sort_by, order, tab);
+
+});
+
+$("#frm").change(function(e) {
+
+    e.preventDefault();
+    
+    update_stats(null, null, null, null);
+
+});
+
+function loadPage(page) {
+    let tab = $("#TabList li button.active").attr('id');
+    update_stats(page, 'era', 'ASC', tab);
+}
+
+function update_stats(page, sort_by, order, tab){
+
+    if ($("#split option:selected").val() != 'none' && $("#qualified").is(':checked')) {  
+        $('#qualified').attr('checked', false);
+    }
+
+    if ($("#qualified").is(":checked")){
+        $('#split option').removeAttr('selected').filter('[value=none]').attr('selected', true);
+        $('#split').prop('disabled', 'disabled');
+    } else {
+        $('#split').prop('disabled', false);
+    }
+
+    data = $("#frm").serialize();
+
+    if ($("#qualified").is(":checked")){
+        data = data + '&qualified=true';
+        $('#qualified').attr('checked', true);
+    } else {
+        data = data + '&qualified=false';
+        $('#qualified').attr('checked', false);
+    }
+
+    if(page > 0){
+        data = data + '&page=' + page;
+    }
+
+    if(sort_by != null){
+        data = data + '&sort_by=' + sort_by;
+    }
+    
+    if(order != null){
+        data = data + '&order=' + order;
+    }
+
+    var url = "resources/views/leaders.php";
+    let height = $('#content').height();
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+            beforeSend: function() {
+                $('#ajax').height(height);
+                $('#ajax').show();
+                $('#content').hide();
+            },
+            success: function(data)
+            {
+                $('#content').html(data);                
+                $('#ajax').hide();
+                if(tab != null){                    
+                    $('#' + tab).tab('show');
+                }
+                $('#content').show(); 
+            }
+    }); 
+}
+</script>

@@ -1,781 +1,3002 @@
+
 <div id="result">
- <form id="frm">
- <div class="row g-1 align-items-center mb-1">
- <div class="col-auto">
- <select class="form-select" name="season_id">
- <option value="2015">2015</option>
- <option value="2016">2016</option>
- <option value="2017">2017</option>
- <option value="2018">2018</option>
- <option value="2019">2019</option>
- <option value="2020">2020</option>
- <option value="2021">2021</option>
- <option value="2022">2022</option>
- <option value="2023">2023</option>
- <option value="2024">2024</option>
- <option value="2025" selected="">2025</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="team_id">
- <option value="0">LVBP</option>
- <option value="692">Aguilas del Zulia</option>
- <option value="697">Bravos de Margarita</option>
- <option value="693">Cardenales de Lara</option>
- <option value="694">Caribes de Anzoátegui</option>
- <option value="695">Leones del Caracas</option>
- <option value="696">Navegantes del Magallanes</option>
- <option value="698">Tiburones de la Guaira</option>
- <option value="699">Tigres de Aragua</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="game_type">
- <option value="R" selected="">Regular</option>
- <option value="D">Play Offs/Comodín</option>
- <option value="L">Semifinal</option>
- <option value="W">Final</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="type">
- <option selected="" value="hittings">Bateo</option>
- <option value="pitchings">Pitcheo</option>
- <option value="fieldings">Defensiva</option>
- </select>
- </div>
- <div class="col-auto">
- <select class="form-select" name="split" id="split">
- <option value="none">seleccione un split</option>
- <optgroup label="Juego">
- <option value="h">En Casa</option>
- <option value="a">Visitante</option>
- </optgroup>
- <optgroup label="Mes">
- <option value="10">Octubre</option>
- <option value="11">Noviembre</option>
- <option value="12">Diciembre</option>
- <option value="1">Enero</option>
- </optgroup>
- <optgroup label="Al Bate">
- <option value="l">Bateo a la Zurda</option>
- <option value="r">Bateo Derecha</option>
- <option value="vl">vs Zurdos</option>
- <option value="vr">vs Derechos</option>
- </optgroup>
- <optgroup label="Orden">
- <option value="b1">Bateando como 1er. Bate</option>
- <option value="b2">Bateando como 2do. Bate</option>
- <option value="b3">Bateando como 3er. Bate</option>
- <option value="b4">Bateando como 4to. Bate</option>
- <option value="b5">Bateando como 5to. Bate</option>
- <option value="b6">Bateando como 6to. Bate</option>
- <option value="b7">Bateando como 7mo. Bate</option>
- <option value="b8">Bateando como 8vo. Bate</option>
- <option value="b9">Bateando como 9no. Bate</option>
- </optgroup>
- <optgroup label="Posición">
- <option value="p1">Bateando cuando ha jugado P</option>
- <option value="p2">Bateando cuando ha jugado C</option>
- <option value="p3">Bateando cuando ha jugado 1b</option>
- <option value="p4">Bateando cuando ha jugado 2b</option>
- <option value="p5">Bateando cuando ha jugado 3b</option>
- <option value="p6">Bateando cuando ha jugado ss</option>
- <option value="p7">Bateando cuando ha jugado LF</option>
- <option value="p8">Bateando cuando ha jugado CF</option>
- <option value="p9">Bateando cuando ha jugado RF</option>
- <option value="pD">Bateando cuando ha jugado DH</option>
- <option value="pH">Bateando de Emergente (BE/PH)</option>
- <option value="pR">Bateando como Corredor Emergente PR/CE</option>
- </optgroup>
- <optgroup label="Inning">
- <option value="lo">Abriendo Inning</option>
- <option value="i01">Bateando en el 1er. Inning</option>
- <option value="i02">Bateando en el 2do. Inning</option>
- <option value="i03">Bateando en el 3er. Inning</option>
- <option value="i04">Bateando en el 4to. Inning</option>
- <option value="i05">Bateando en el 5to. Inning</option>
- <option value="i06">Bateando en el 6to. Inning</option>
- <option value="i07">Bateando en el 7mo. Inning</option>
- <option value="i08">Bateando en el 8vo. Inning</option>
- <option value="i09">Bateando en el 9no. Inning</option>
- <option value="ix">Bateando en Extra Inning</option>
- <option value="ig01">Bateando desde el 1er al 6to Inn.</option>
- <option value="ig07">Bateando desde el 7mo en adelante.</option>
- <option value="ig08">Bateando desde el 8vo en adelante.</option>
- <option value="ig09">Bateando desde el 9no. en adelante.</option>
- </optgroup>
- <optgroup label="Corredores">
- <option value="r0">Con bases vacias</option>
- <option value="r123">Con bases llenas o 3 en bases</option>
- <option value="r1">Con Corredor en 1ra Base</option>
- <option value="r12">Con Corredores en 1ra Base y 2da. Base</option>
- <option value="r13">Con Corredores en 1ra Base y 3ra. Base</option>
- <option value="r2">Con Corredor en 2da Base</option>
- <option value="r23">Con Corredores en 2da y 3ra Base</option>
- <option value="r3">Con corredor en 3ra Base</option>
- <option value="ron">Con alguien en base</option>
- <option value="ron2">Con alguien en base y 2 outs</option>
- <option value="risp">Con Corredor en Posición de anotar</option>
- <option value="risp2">Con Corredor en Posición de anotar y 2 Outs</option>
- <option value="r3l2">Con corredor en 3ra Base y menos de 2 outs</option>
- </optgroup>
- <optgroup label="Outs">
- <option value="o0">Bateando sin outs</option>
- <option value="o1">Bateando con 1 out</option>
- <option value="o2">Bateando con 2 outs</option>
- <option value="lc">Bateando Tarde/Cerrando</option>
- </optgroup>
- <optgroup label="Cuenta">
- <option value="fp">Bateando al 1er. Pitcheo</option>
- <option value="ac">Bateando Arriba en la cuenta</option>
- <option value="bc">Bateando abajo en la cuenta</option>
- <option value="ec">Bateando en cualquier cuenta</option>
- <option value="2s">Bateando con 2 Strike</option>
- <option value="fc">Bateando en 3-2</option>
- </optgroup>
- </select>
- </div> 
- <div class="col-auto">
- <div class="form-check form-check-inline">
- <input class="form-check-input" type="checkbox" id="qualified" name="qualified">
- <label class="form-check-label" for="qualified" id="qualified_label">Con Mínimos Legales</label>
- </div>
- </div> 
- </div> 
+
+    <form id="frm">
+    <div class="row g-1 align-items-center mb-1">
+
+        <div class="col-auto">
+            <select class="form-select" name="season_id">
+                                    <option value="2015">2015</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                  
+            </select>
+        </div>
+    
+        <div class="col-auto">
+            <select class="form-select" name="team_id">
+                <option value="0" >LVBP</option>
+                <option value="692" >Aguilas del Zulia</option>
+                <option value="697" >Bravos de Margarita</option>
+                <option value="693" >Cardenales de Lara</option>
+                <option value="694" >Caribes de Anzoátegui</option>
+                <option value="695" >Leones del Caracas</option>
+                <option value="696" >Navegantes del Magallanes</option>
+                <option value="698" >Tiburones de la Guaira</option>
+                <option value="699" >Tigres de Aragua</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <select class="form-select" name="game_type">
+                <option value="R"  selected>Regular</option>
+                <option value="D" >Play Offs/Comodín</option>
+                <option value="L" >Semifinal</option>
+                <option value="W" >Final</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <select class="form-select" name="type">
+                <option  selected value="hittings"  selected>Bateo</option>
+                <option  value="pitchings" >Pitcheo</option>
+                <option  value="fieldings" >Defensiva</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <select class="form-select" name="split" id="split" >
+                <option value="none">seleccione un split</option>
+                <optgroup label="Juego">
+                    <option value="h" >En Casa</option>
+                    <option value="a" >Visitante</option>
+                </optgroup>
+                <optgroup label="Mes">
+                    <option value="10" >Octubre</option>
+                    <option value="11" >Noviembre</option>
+                    <option value="12" >Diciembre</option>
+                    <option value="1" >Enero</option>
+                </optgroup>
+                <optgroup label="Al Bate">
+                    <option value="l" >Bateo a la Zurda</option>
+                    <option value="r" >Bateo Derecha</option>
+                    <option value="vl" >vs Zurdos</option>
+                    <option value="vr" >vs Derechos</option>
+                </optgroup>
+                <optgroup label="Orden">
+                    <option value="b1" >Bateando como 1er. Bate</option>
+                    <option value="b2" >Bateando como 2do. Bate</option>
+                    <option value="b3" >Bateando como 3er. Bate</option>
+                    <option value="b4" >Bateando como 4to. Bate</option>
+                    <option value="b5" >Bateando como 5to. Bate</option>
+                    <option value="b6" >Bateando como 6to. Bate</option>
+                    <option value="b7" >Bateando como 7mo. Bate</option>
+                    <option value="b8" >Bateando como 8vo. Bate</option>
+                    <option value="b9" >Bateando como 9no. Bate</option>
+                </optgroup>
+                <optgroup label="Posición">
+                    <option value="p1" >Bateando cuando ha jugado P</option>
+                    <option value="p2" >Bateando cuando ha jugado C</option>
+                    <option value="p3" >Bateando cuando ha jugado 1b</option>
+                    <option value="p4" >Bateando cuando ha jugado 2b</option>
+                    <option value="p5" >Bateando cuando ha jugado 3b</option>
+                    <option value="p6" >Bateando cuando ha jugado ss</option>
+                    <option value="p7" >Bateando cuando ha jugado LF</option>
+                    <option value="p8" >Bateando cuando ha jugado CF</option>
+                    <option value="p9" >Bateando cuando ha jugado RF</option>
+                    <option value="pD" >Bateando cuando ha jugado DH</option>
+                    <option value="pH" >Bateando de Emergente (BE/PH)</option>
+                    <option value="pR" >Bateando como Corredor Emergente PR/CE</option>
+                </optgroup>
+                <optgroup label="Inning">
+                    <option value="lo" >Abriendo Inning</option>
+                    <option value="i01" >Bateando en el 1er. Inning</option>
+                    <option value="i02" >Bateando en el 2do. Inning</option>
+                    <option value="i03" >Bateando en el 3er. Inning</option>
+                    <option value="i04" >Bateando en el 4to. Inning</option>
+                    <option value="i05" >Bateando en el 5to. Inning</option>
+                    <option value="i06" >Bateando en el 6to. Inning</option>
+                    <option value="i07" >Bateando en el 7mo. Inning</option>
+                    <option value="i08" >Bateando en el 8vo. Inning</option>
+                    <option value="i09" >Bateando en el 9no. Inning</option>
+                    <option value="ix" >Bateando en Extra Inning</option>
+                    <option value="ig01" >Bateando desde el 1er al 6to Inn.</option>
+                    <option value="ig07" >Bateando desde el 7mo en adelante.</option>
+                    <option value="ig08" >Bateando desde el 8vo en adelante.</option>
+                    <option value="ig09" >Bateando desde el 9no. en adelante.</option>
+                </optgroup>
+                <optgroup label="Corredores">
+                    <option value="r0" >Con bases vacias</option>
+                    <option value="r123" >Con bases llenas o 3 en bases</option>
+                    <option value="r1" >Con Corredor en 1ra Base</option>
+                    <option value="r12" >Con Corredores en 1ra Base y 2da. Base</option>
+                    <option value="r13" >Con Corredores en 1ra Base y 3ra. Base</option>
+                    <option value="r2" >Con Corredor en 2da Base</option>
+                    <option value="r23" >Con Corredores en 2da y 3ra Base</option>
+                    <option value="r3" >Con corredor en 3ra Base</option>
+                    <option value="ron" >Con alguien en base</option>
+                    <option value="ron2" >Con alguien en base y 2 outs</option>
+                    <option value="risp" >Con Corredor en Posición de anotar</option>
+                    <option value="risp2" >Con Corredor en Posición de anotar y 2 Outs</option>
+                    <option value="r3l2" >Con corredor en 3ra Base y menos de 2 outs</option>
+                </optgroup>
+                <optgroup label="Outs">
+                    <option value="o0" >Bateando sin outs</option>
+                    <option value="o1" >Bateando con 1 out</option>
+                    <option value="o2" >Bateando con 2 outs</option>
+                    <option value="lc" >Bateando Tarde/Cerrando</option>
+                </optgroup>
+                <optgroup label="Cuenta">
+                    <option value="fp" >Bateando al 1er. Pitcheo</option>
+                    <option value="ac" >Bateando Arriba en la cuenta</option>
+                    <option value="bc" >Bateando abajo en la cuenta</option>
+                    <option value="ec" >Bateando en cualquier cuenta</option>
+                    <option value="2s" >Bateando con 2 Strike</option>
+                    <option value="fc" >Bateando en 3-2</option>
+                </optgroup>
+            </select>
+        </div>                    
+
+        <div class="col-auto">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="qualified" name="qualified" >
+                <label class="form-check-label" for="qualified" id="qualified_label">Con Mínimos Legales</label>
+            </div>
+        </div> 
+    </div> 
 </form><ul class="nav nav-tabs mt-3" id="TabList" role="tablist">
- <li class="nav-item" role="presentation">
- <button class="tab-btn btn-sm nav-link active" id="bat-tab" data-bs-toggle="tab" data-bs-target="#bat-tab-pane" type="button" role="tab" aria-controls="bat-tab-pane" aria-selected="true">Bateo</button>
- </li>
- <li class="nav-item" role="presentation">
- <button class="tab-btn btn-sm nav-link" id="adv_bat-tab" data-bs-toggle="tab" data-bs-target="#adv_bat-tab-pane" type="button" role="tab" aria-controls="adv_bat-tab-pane" aria-selected="false">Avanzadas de Bateo</button>
- </li>
- <li class="nav-item" role="presentation">
- <button class="tab-btn btn-sm nav-link" id="bal-tab" data-bs-toggle="tab" data-bs-target="#bal-tab-pane" type="button" role="tab" aria-controls="bal-tab-pane" aria-selected="false">Pelotas Bateadas</button>
- </li>
+    <li class="nav-item" role="presentation">
+        <button class="tab-btn btn-sm nav-link active" id="bat-tab" data-bs-toggle="tab" data-bs-target="#bat-tab-pane" type="button" role="tab" aria-controls="bat-tab-pane" aria-selected="true">Bateo</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="tab-btn btn-sm nav-link" id="adv_bat-tab" data-bs-toggle="tab" data-bs-target="#adv_bat-tab-pane" type="button" role="tab" aria-controls="adv_bat-tab-pane" aria-selected="false">Avanzadas de Bateo</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="tab-btn btn-sm nav-link" id="bal-tab" data-bs-toggle="tab" data-bs-target="#bal-tab-pane" type="button" role="tab" aria-controls="bal-tab-pane" aria-selected="false">Pelotas Bateadas</button>
+    </li>
 </ul>
 <div class="tab-content" id="TabListContent">
- <div class="tab-pane fade show active" id="bat-tab-pane" role="tabpanel" aria-labelledby="bat-tab" tabindex="0">
- <div class="table-responsive my-3">
- <table class="table table-sm table-hover table-stats table-striped table-bordered">
- <thead>
- <tr>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
- JUGADOR
- </a>
- </th>
- <th>EQUIPO</th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="g">
- JJ
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ab">
- VB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="r">
- CA
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="h">
- H
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="d">
- 2B
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="t">
- 3B
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr">
- HR
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="rbi">
- CI
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="tb">
- TB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bb">
- BB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="so">
- K
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sb">
- BR
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sac">
- SAC
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sf">
- SF
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="avg">
- AVE
- <i class="bi bi-chevron-down"></i>
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="obp">
- PEB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="slg">
- SLG
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ops">
- OPS
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hbp">
- GP
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="tpa">
- AL
- </a>
- </th>
- </tr>
- </thead>
- <tbody><tr>
- <td class="">
- Gabriel Rodriguez <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
- </td> 
- <td>Águilas</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">2</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="sp">1.000</td>
- <td class="">1.000</td>
- <td class="">1.000</td> 
- <td class="">2.000</td>
- <td class="">0</td>
- <td class="">1</td>
- </tr>
- <tr>
- <td class="">
- * Deward Tovar <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
- </td> 
- <td>Cardenales</td>
- <td class="">2</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="sp">1.000</td>
- <td class="">1.000</td>
- <td class="">1.000</td> 
- <td class="">2.000</td>
- <td class="">0</td>
- <td class="">2</td>
- </tr>
- <tr>
- <td class="">
- Jhostynxon Garcia <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
- </td> 
- <td>Navegantes</td>
- <td class="">3</td>
- <td class="">9</td>
- <td class="">1</td>
- <td class="">5</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">6</td>
- <td class="">1</td>
- <td class="">3</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="sp">.556</td>
- <td class="">.600</td>
- <td class="">.667</td> 
- <td class="">1.267</td>
- <td class="">0</td>
- <td class="">10</td>
- </tr>
- </tbody></table>
- <small>* Batea a la Zurda | # Batea Ambas</small>
-</div> </div>
- <div class="tab-pane fade" id="adv_bat-tab-pane" role="tabpanel" aria-labelledby="adv_bat-tab" tabindex="0">
- <div class="table-responsive my-3">
- <table class="table table-sm table-hover table-stats table-striped table-bordered">
- <thead>
- <tr>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
- JUGADOR
- </a>
- </th> 
- <th>EQUIPO</th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="woba">
- wOBA
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="babip">
- BABIP
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gpa">
- GPA
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="bb_pct">
- BB%
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="s_pa">
- K%
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w_so">
- BB/K
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="iso">
- ISO
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sb_pct">
- BR%
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="rc">
- RC
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="rp">
- RP
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ab_hr">
- AB/HR
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gidp">
- GDP
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="np">
- NP
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ppa">
- PPA
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="xbh">
- XBH
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ts">
- TS
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="sam">
- SAM
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="np_pa">
- NP/AL
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="w_pa">
- BB/AL
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="s_pa">
- K/AL
- </a>
- </th> 
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="hr_pa">
- HR/AL
- </a>
- </th> 
- </tr>
- </thead>
- <tbody><tr>
- <td class="">
- Gabriel Rodriguez <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
- </td> 
- <td>Águilas</td> 
- <td class="">.941</td>
- <td class="">1.000</td>
- <td class="">.700</td>
- <td class="">.000</td>
- <td class="">.000</td>
- <td class="">.---</td>
- <td class="">.000</td>
- <td class="">.---</td>
- <td class="">1</td>
- <td class="">2</td>
- <td class="">-.--</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">1</td> 
- <td class="">0</td>
- <td class="">1.000</td>
- <td class="">.000</td> 
- <td class="">.000</td>
- <td class="">.000</td>
- </tr>
- <tr>
- <td class="">
- * Deward Tovar <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
- </td> 
- <td>Cardenales</td> 
- <td class="">.860</td>
- <td class="">1.000</td>
- <td class="">.700</td>
- <td class="">.500</td>
- <td class="">.000</td>
- <td class="">.---</td>
- <td class="">.000</td>
- <td class="">.---</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">-.--</td>
- <td class="">0</td>
- <td class="">7</td>
- <td class="">2</td>
- <td class="">0</td>
- <td class="">2</td> 
- <td class="">0</td>
- <td class="">3.500</td>
- <td class="">.500</td> 
- <td class="">.000</td>
- <td class="">.000</td>
- </tr>
- <tr>
- <td class="">
- Jhostynxon Garcia <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
- </td> 
- <td>Navegantes</td> 
- <td class="">.583</td>
- <td class="">.833</td>
- <td class="">.437</td>
- <td class="">.100</td>
- <td class="">.300</td>
- <td class="">.333</td>
- <td class="">.111</td>
- <td class="">.---</td>
- <td class="">3.6</td>
- <td class="">1</td>
- <td class="">-.--</td>
- <td class="">0</td>
- <td class="">46</td>
- <td class="">10</td>
- <td class="">1</td>
- <td class="">22</td> 
- <td class="">4</td>
- <td class="">4.600</td>
- <td class="">.100</td> 
- <td class="">.300</td>
- <td class="">.000</td>
- </tr>
- </tbody></table>
- <small>* Batea a la Zurda | # Batea Ambas</small>
+    <div class="tab-pane fade show active" id="bat-tab-pane" role="tabpanel" aria-labelledby="bat-tab" tabindex="0">
+        <div class="table-responsive my-3">
+    <table class="table table-sm table-hover table-stats table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+                JUGADOR
+                                            
+                </a>
+            </th>
+            <th>EQUIPO</th>         
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="g">
+                JJ
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ab">
+                VB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="r">
+                CA
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="h">
+                H
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="d">
+                2B
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="t">
+                3B
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hr">
+                HR
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="rbi">
+                CI
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="tb">
+                TB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="bb">
+                BB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="so">
+                K
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sb">
+                BR
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sac">
+                SAC
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sf">
+                SF
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="avg">
+                AVE
+                    
+                    <i class="bi bi-chevron-down"></i>
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="obp">
+                PEB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="slg">
+                SLG
+                                </a>
+            </th>            
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ops">
+                OPS
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hbp">
+                GP
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="tpa">
+                AL
+                                </a>
+            </th>
+        </tr>
+        </thead>
+                <tr>
+            <td class="">
+            Gabriel Rodriguez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td> 
+            <td>Águilas</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">1.000</td>
+            <td class="">1.000</td>
+            <td class="">1.000</td>            
+            <td class="">2.000</td>
+            <td class="">0</td>
+            <td class="">1</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Deward Tovar                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">1.000</td>
+            <td class="">1.000</td>
+            <td class="">1.000</td>            
+            <td class="">2.000</td>
+            <td class="">0</td>
+            <td class="">2</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jhostynxon Garcia                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td> 
+            <td>Navegantes</td>
+            <td class="">3</td>
+            <td class="">9</td>
+            <td class="">1</td>
+            <td class="">5</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.556</td>
+            <td class="">.600</td>
+            <td class="">.667</td>            
+            <td class="">1.267</td>
+            <td class="">0</td>
+            <td class="">10</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Ramón Cabrera                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td> 
+            <td>Bravos</td>
+            <td class="">5</td>
+            <td class="">13</td>
+            <td class="">1</td>
+            <td class="">7</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">10</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.538</td>
+            <td class="">.538</td>
+            <td class="">.769</td>            
+            <td class="">1.307</td>
+            <td class="">0</td>
+            <td class="">13</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jackson Chourio                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td> 
+            <td>Águilas</td>
+            <td class="">7</td>
+            <td class="">30</td>
+            <td class="">10</td>
+            <td class="">12</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">5</td>
+            <td class="">17</td>
+            <td class="">4</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.400</td>
+            <td class="">.486</td>
+            <td class="">.567</td>            
+            <td class="">1.053</td>
+            <td class="">1</td>
+            <td class="">35</td>
+        </tr>
+            <tr>
+            <td class="">
+            Gorkys Hernández                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td> 
+            <td>Tigres</td>
+            <td class="">55</td>
+            <td class="">206</td>
+            <td class="">46</td>
+            <td class="">77</td>
+            <td class="">7</td>
+            <td class="">3</td>
+            <td class="">3</td>
+            <td class="">23</td>
+            <td class="">99</td>
+            <td class="">38</td>
+            <td class="">40</td>
+            <td class="">14</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="sp">.374</td>
+            <td class="">.480</td>
+            <td class="">.481</td>            
+            <td class="">.961</td>
+            <td class="">5</td>
+            <td class="">252</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Ildemaro Vargas                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">38</td>
+            <td class="">165</td>
+            <td class="">27</td>
+            <td class="">61</td>
+            <td class="">11</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">28</td>
+            <td class="">90</td>
+            <td class="">10</td>
+            <td class="">16</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="sp">.370</td>
+            <td class="">.414</td>
+            <td class="">.545</td>            
+            <td class="">.959</td>
+            <td class="">4</td>
+            <td class="">181</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jesús Bastidas                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">SS</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">21</td>
+            <td class="">84</td>
+            <td class="">16</td>
+            <td class="">31</td>
+            <td class="">9</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">21</td>
+            <td class="">49</td>
+            <td class="">2</td>
+            <td class="">12</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="sp">.369</td>
+            <td class="">.406</td>
+            <td class="">.583</td>            
+            <td class="">.989</td>
+            <td class="">6</td>
+            <td class="">96</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jadher Areinamo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td> 
+            <td>Tiburones</td>
+            <td class="">36</td>
+            <td class="">143</td>
+            <td class="">34</td>
+            <td class="">52</td>
+            <td class="">6</td>
+            <td class="">1</td>
+            <td class="">13</td>
+            <td class="">43</td>
+            <td class="">99</td>
+            <td class="">14</td>
+            <td class="">20</td>
+            <td class="">5</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="sp">.364</td>
+            <td class="">.420</td>
+            <td class="">.692</td>            
+            <td class="">1.112</td>
+            <td class="">2</td>
+            <td class="">163</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Yohendrick Piñango                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">24</td>
+            <td class="">91</td>
+            <td class="">24</td>
+            <td class="">33</td>
+            <td class="">8</td>
+            <td class="">0</td>
+            <td class="">8</td>
+            <td class="">31</td>
+            <td class="">65</td>
+            <td class="">15</td>
+            <td class="">21</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">2</td>
+            <td class="sp">.363</td>
+            <td class="">.444</td>
+            <td class="">.714</td>            
+            <td class="">1.158</td>
+            <td class="">0</td>
+            <td class="">110</td>
+        </tr>
+            <tr>
+            <td class="">
+            Ronald Acuña Jr.                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td> 
+            <td>Tiburones</td>
+            <td class="">16</td>
+            <td class="">53</td>
+            <td class="">13</td>
+            <td class="">19</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">12</td>
+            <td class="">33</td>
+            <td class="">16</td>
+            <td class="">6</td>
+            <td class="">11</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="sp">.358</td>
+            <td class="">.507</td>
+            <td class="">.623</td>            
+            <td class="">1.130</td>
+            <td class="">1</td>
+            <td class="">71</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Yonny Hernández                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">47</td>
+            <td class="">157</td>
+            <td class="">27</td>
+            <td class="">56</td>
+            <td class="">6</td>
+            <td class="">2</td>
+            <td class="">3</td>
+            <td class="">30</td>
+            <td class="">75</td>
+            <td class="">21</td>
+            <td class="">17</td>
+            <td class="">7</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="sp">.357</td>
+            <td class="">.442</td>
+            <td class="">.478</td>            
+            <td class="">.920</td>
+            <td class="">3</td>
+            <td class="">182</td>
+        </tr>
+            <tr>
+            <td class="">
+            Andrés Chaparro                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">1B</span>
+            </td> 
+            <td>Águilas</td>
+            <td class="">23</td>
+            <td class="">77</td>
+            <td class="">7</td>
+            <td class="">27</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">10</td>
+            <td class="">32</td>
+            <td class="">12</td>
+            <td class="">15</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="sp">.351</td>
+            <td class="">.435</td>
+            <td class="">.416</td>            
+            <td class="">.851</td>
+            <td class="">1</td>
+            <td class="">92</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Alexi Amarista                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td> 
+            <td>Bravos</td>
+            <td class="">54</td>
+            <td class="">224</td>
+            <td class="">35</td>
+            <td class="">77</td>
+            <td class="">17</td>
+            <td class="">1</td>
+            <td class="">5</td>
+            <td class="">43</td>
+            <td class="">111</td>
+            <td class="">12</td>
+            <td class="">19</td>
+            <td class="">5</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="sp">.344</td>
+            <td class="">.378</td>
+            <td class="">.496</td>            
+            <td class="">.874</td>
+            <td class="">4</td>
+            <td class="">246</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Danry Vasquez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">40</td>
+            <td class="">144</td>
+            <td class="">27</td>
+            <td class="">49</td>
+            <td class="">7</td>
+            <td class="">0</td>
+            <td class="">7</td>
+            <td class="">29</td>
+            <td class="">77</td>
+            <td class="">24</td>
+            <td class="">21</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.340</td>
+            <td class="">.441</td>
+            <td class="">.535</td>            
+            <td class="">.976</td>
+            <td class="">2</td>
+            <td class="">172</td>
+        </tr>
+            <tr>
+            <td class="">
+            Victor Bericoto                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td> 
+            <td>Leones</td>
+            <td class="">31</td>
+            <td class="">106</td>
+            <td class="">12</td>
+            <td class="">36</td>
+            <td class="">8</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">15</td>
+            <td class="">50</td>
+            <td class="">8</td>
+            <td class="">28</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="sp">.340</td>
+            <td class="">.379</td>
+            <td class="">.472</td>            
+            <td class="">.851</td>
+            <td class="">0</td>
+            <td class="">117</td>
+        </tr>
+            <tr>
+            <td class="">
+            Wilfredo Tovar                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td> 
+            <td>Leones</td>
+            <td class="">55</td>
+            <td class="">222</td>
+            <td class="">34</td>
+            <td class="">75</td>
+            <td class="">16</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">20</td>
+            <td class="">96</td>
+            <td class="">23</td>
+            <td class="">23</td>
+            <td class="">5</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="sp">.338</td>
+            <td class="">.406</td>
+            <td class="">.432</td>            
+            <td class="">.838</td>
+            <td class="">3</td>
+            <td class="">250</td>
+        </tr>
+            <tr>
+            <td class="">
+            Ali Castillo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">1B</span>
+            </td> 
+            <td>Águilas</td>
+            <td class="">53</td>
+            <td class="">195</td>
+            <td class="">33</td>
+            <td class="">66</td>
+            <td class="">7</td>
+            <td class="">1</td>
+            <td class="">4</td>
+            <td class="">22</td>
+            <td class="">87</td>
+            <td class="">23</td>
+            <td class="">14</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="sp">.338</td>
+            <td class="">.412</td>
+            <td class="">.446</td>            
+            <td class="">.858</td>
+            <td class="">2</td>
+            <td class="">222</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Símon Muzziotti                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td> 
+            <td>Águilas</td>
+            <td class="">43</td>
+            <td class="">151</td>
+            <td class="">24</td>
+            <td class="">51</td>
+            <td class="">10</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">19</td>
+            <td class="">72</td>
+            <td class="">13</td>
+            <td class="">24</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="sp">.338</td>
+            <td class="">.396</td>
+            <td class="">.477</td>            
+            <td class="">.873</td>
+            <td class="">3</td>
+            <td class="">170</td>
+        </tr>
+            <tr>
+            <td class="">
+            Leobaldo Cabrera                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td> 
+            <td>Tigres</td>
+            <td class="">38</td>
+            <td class="">89</td>
+            <td class="">12</td>
+            <td class="">30</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">18</td>
+            <td class="">36</td>
+            <td class="">11</td>
+            <td class="">22</td>
+            <td class="">3</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="sp">.337</td>
+            <td class="">.412</td>
+            <td class="">.404</td>            
+            <td class="">.816</td>
+            <td class="">1</td>
+            <td class="">103</td>
+        </tr>
+            <tr>
+            <td class="">
+            Yojhan Quevedo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">C</span>
+            </td> 
+            <td>Cardenales</td>
+            <td class="">16</td>
+            <td class="">39</td>
+            <td class="">6</td>
+            <td class="">13</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">15</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="sp">.333</td>
+            <td class="">.341</td>
+            <td class="">.385</td>            
+            <td class="">.726</td>
+            <td class="">0</td>
+            <td class="">43</td>
+        </tr>
+            <tr>
+            <td class="">
+            Gersel Pitre                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td> 
+            <td>Leones</td>
+            <td class="">3</td>
+            <td class="">9</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.333</td>
+            <td class="">.333</td>
+            <td class="">.333</td>            
+            <td class="">.666</td>
+            <td class="">0</td>
+            <td class="">9</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Cesar Idrogo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td> 
+            <td>Bravos</td>
+            <td class="">17</td>
+            <td class="">36</td>
+            <td class="">2</td>
+            <td class="">12</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">13</td>
+            <td class="">1</td>
+            <td class="">8</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.333</td>
+            <td class="">.351</td>
+            <td class="">.361</td>            
+            <td class="">.712</td>
+            <td class="">0</td>
+            <td class="">37</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jose Fernandez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td> 
+            <td>Caribes</td>
+            <td class="">4</td>
+            <td class="">12</td>
+            <td class="">3</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">5</td>
+            <td class="">7</td>
+            <td class="">2</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="sp">.333</td>
+            <td class="">.375</td>
+            <td class="">.583</td>            
+            <td class="">.958</td>
+            <td class="">0</td>
+            <td class="">16</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Harold Castro                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td> 
+            <td>Leones</td>
+            <td class="">44</td>
+            <td class="">187</td>
+            <td class="">34</td>
+            <td class="">62</td>
+            <td class="">10</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">25</td>
+            <td class="">90</td>
+            <td class="">8</td>
+            <td class="">46</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="sp">.332</td>
+            <td class="">.357</td>
+            <td class="">.481</td>            
+            <td class="">.838</td>
+            <td class="">1</td>
+            <td class="">200</td>
+        </tr>
+            <tr>
+            <td class="">
+            Balbino Fuenmayor                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td> 
+            <td>Caribes</td>
+            <td class="">53</td>
+            <td class="">209</td>
+            <td class="">29</td>
+            <td class="">69</td>
+            <td class="">9</td>
+            <td class="">0</td>
+            <td class="">17</td>
+            <td class="">48</td>
+            <td class="">129</td>
+            <td class="">18</td>
+            <td class="">55</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.330</td>
+            <td class="">.394</td>
+            <td class="">.617</td>            
+            <td class="">1.011</td>
+            <td class="">4</td>
+            <td class="">231</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Carlos Rodríguez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td> 
+            <td>Navegantes</td>
+            <td class="">38</td>
+            <td class="">158</td>
+            <td class="">28</td>
+            <td class="">52</td>
+            <td class="">6</td>
+            <td class="">1</td>
+            <td class="">4</td>
+            <td class="">23</td>
+            <td class="">72</td>
+            <td class="">16</td>
+            <td class="">14</td>
+            <td class="">2</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="sp">.329</td>
+            <td class="">.392</td>
+            <td class="">.456</td>            
+            <td class="">.848</td>
+            <td class="">1</td>
+            <td class="">180</td>
+        </tr>
+            <tr>
+            <td class="">
+            José A. Martínez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td> 
+            <td>Tigres</td>
+            <td class="">42</td>
+            <td class="">150</td>
+            <td class="">15</td>
+            <td class="">49</td>
+            <td class="">8</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">26</td>
+            <td class="">66</td>
+            <td class="">20</td>
+            <td class="">28</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="sp">.327</td>
+            <td class="">.409</td>
+            <td class="">.440</td>            
+            <td class="">.849</td>
+            <td class="">1</td>
+            <td class="">171</td>
+        </tr>
+            <tr>
+            <td class="">
+            Leobaldo Piña                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td> 
+            <td>Tigres</td>
+            <td class="">33</td>
+            <td class="">107</td>
+            <td class="">15</td>
+            <td class="">35</td>
+            <td class="">6</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">18</td>
+            <td class="">52</td>
+            <td class="">14</td>
+            <td class="">22</td>
+            <td class="">2</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="sp">.327</td>
+            <td class="">.415</td>
+            <td class="">.486</td>            
+            <td class="">.901</td>
+            <td class="">2</td>
+            <td class="">125</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Juniel Querecuto                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">SS</span>
+            </td> 
+            <td>Tiburones</td>
+            <td class="">44</td>
+            <td class="">166</td>
+            <td class="">25</td>
+            <td class="">54</td>
+            <td class="">10</td>
+            <td class="">2</td>
+            <td class="">3</td>
+            <td class="">24</td>
+            <td class="">77</td>
+            <td class="">13</td>
+            <td class="">28</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">2</td>
+            <td class="sp">.325</td>
+            <td class="">.374</td>
+            <td class="">.464</td>            
+            <td class="">.838</td>
+            <td class="">1</td>
+            <td class="">185</td>
+        </tr>
+        </table>
+    <small>* Batea a la Zurda | # Batea Ambas</small>
+</div>    </div>
+    <div class="tab-pane fade" id="adv_bat-tab-pane" role="tabpanel" aria-labelledby="adv_bat-tab" tabindex="0">
+        <div class="table-responsive my-3">
+    <table class="table table-sm table-hover table-stats table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+                JUGADOR
+                                            
+                </a>
+            </th> 
+            <th>EQUIPO</th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="woba">
+                wOBA
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="babip">
+                BABIP
+                                </a>
+            </th>            
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gpa">
+                GPA
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="bb_pct">
+                BB%
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="s_pa">
+                K%
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="w_so">
+                BB/K
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="iso">
+                ISO
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sb_pct">
+                BR%
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="rc">
+                RC
+                                </a>
+            </th>                              
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="rp">
+                RP
+                                </a>
+            </th>                
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ab_hr">
+                AB/HR
+                                </a>
+            </th>                                    
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gidp">
+                GDP
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="np">
+                NP
+                                </a>
+            </th>          
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ppa">
+                PPA
+                                </a>
+            </th>                                     
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="xbh">
+                XBH
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ts">
+                TS
+                                </a>
+            </th> 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="sam">
+                SAM
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="np_pa">
+                NP/AL
+                                </a>
+            </th>                        
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="w_pa">
+                BB/AL
+                                </a>
+            </th>                                 
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="s_pa">
+                K/AL
+                                </a>
+            </th>  
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="hr_pa">
+                HR/AL
+                                </a>
+            </th> 
+        </tr>
+        </thead>
+                <tr>
+            <td class="">
+            Gabriel Rodriguez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>    
+            <td>Águilas</td>        
+            <td class="">.941</td>
+            <td class="">1.000</td>
+            <td class="">.700</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+            <td class="">.---</td>
+            <td class="">.000</td>
+            <td class="">.---</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">-.--</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1</td>            
+            <td class="">0</td>
+            <td class="">1.000</td>
+            <td class="">.000</td>         
+            <td class="">.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Deward Tovar                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.860</td>
+            <td class="">1.000</td>
+            <td class="">.700</td>
+            <td class="">.500</td>
+            <td class="">.000</td>
+            <td class="">.---</td>
+            <td class="">.000</td>
+            <td class="">.---</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">-.--</td>
+            <td class="">0</td>
+            <td class="">7</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">2</td>            
+            <td class="">0</td>
+            <td class="">3.500</td>
+            <td class="">.500</td>         
+            <td class="">.000</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jhostynxon Garcia                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>    
+            <td>Navegantes</td>        
+            <td class="">.583</td>
+            <td class="">.833</td>
+            <td class="">.437</td>
+            <td class="">.100</td>
+            <td class="">.300</td>
+            <td class="">.333</td>
+            <td class="">.111</td>
+            <td class="">.---</td>
+            <td class="">3.6</td>
+            <td class="">1</td>
+            <td class="">-.--</td>
+            <td class="">0</td>
+            <td class="">46</td>
+            <td class="">10</td>
+            <td class="">1</td>
+            <td class="">22</td>            
+            <td class="">4</td>
+            <td class="">4.600</td>
+            <td class="">.100</td>         
+            <td class="">.300</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Ramón Cabrera                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>    
+            <td>Bravos</td>        
+            <td class="">.582</td>
+            <td class="">.667</td>
+            <td class="">.434</td>
+            <td class="">.000</td>
+            <td class="">.231</td>
+            <td class="">.000</td>
+            <td class="">.231</td>
+            <td class="">.---</td>
+            <td class="">5.38</td>
+            <td class="">2</td>
+            <td class="">13.00</td>
+            <td class="">0</td>
+            <td class="">51</td>
+            <td class="">13</td>
+            <td class="">1</td>
+            <td class="">26</td>            
+            <td class="">7</td>
+            <td class="">3.923</td>
+            <td class="">.000</td>         
+            <td class="">.231</td>
+            <td class="">.077</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jackson Chourio                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>    
+            <td>Águilas</td>        
+            <td class="">.483</td>
+            <td class="">.440</td>
+            <td class="">.360</td>
+            <td class="">.114</td>
+            <td class="">.114</td>
+            <td class="">1.000</td>
+            <td class="">.167</td>
+            <td class="">1.000</td>
+            <td class="">8</td>
+            <td class="">14</td>
+            <td class="">30.00</td>
+            <td class="">0</td>
+            <td class="">139</td>
+            <td class="">35</td>
+            <td class="">3</td>
+            <td class="">71</td>            
+            <td class="">14</td>
+            <td class="">3.971</td>
+            <td class="">.114</td>         
+            <td class="">.114</td>
+            <td class="">.029</td>
+        </tr>
+            <tr>
+            <td class="">
+            Gorkys Hernández                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>    
+            <td>Tigres</td>        
+            <td class="">.450</td>
+            <td class="">.451</td>
+            <td class="">.336</td>
+            <td class="">.151</td>
+            <td class="">.159</td>
+            <td class="">.950</td>
+            <td class="">.107</td>
+            <td class="">.737</td>
+            <td class="">46.66</td>
+            <td class="">66</td>
+            <td class="">68.67</td>
+            <td class="">6</td>
+            <td class="">1140</td>
+            <td class="">252</td>
+            <td class="">13</td>
+            <td class="">379</td>            
+            <td class="">80</td>
+            <td class="">4.524</td>
+            <td class="">.151</td>         
+            <td class="">.159</td>
+            <td class="">.012</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Ildemaro Vargas                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.430</td>
+            <td class="">.379</td>
+            <td class="">.323</td>
+            <td class="">.055</td>
+            <td class="">.088</td>
+            <td class="">.625</td>
+            <td class="">.176</td>
+            <td class="">1.000</td>
+            <td class="">36.51</td>
+            <td class="">49</td>
+            <td class="">27.50</td>
+            <td class="">5</td>
+            <td class="">611</td>
+            <td class="">181</td>
+            <td class="">17</td>
+            <td class="">283</td>            
+            <td class="">29</td>
+            <td class="">3.376</td>
+            <td class="">.055</td>         
+            <td class="">.088</td>
+            <td class="">.033</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jesús Bastidas                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">SS</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.434</td>
+            <td class="">.384</td>
+            <td class="">.328</td>
+            <td class="">.021</td>
+            <td class="">.125</td>
+            <td class="">.167</td>
+            <td class="">.214</td>
+            <td class="">.000</td>
+            <td class="">18.8</td>
+            <td class="">34</td>
+            <td class="">28.00</td>
+            <td class="">0</td>
+            <td class="">345</td>
+            <td class="">96</td>
+            <td class="">12</td>
+            <td class="">190</td>            
+            <td class="">33</td>
+            <td class="">3.594</td>
+            <td class="">.021</td>         
+            <td class="">.125</td>
+            <td class="">.031</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jadher Areinamo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>    
+            <td>Tiburones</td>        
+            <td class="">.465</td>
+            <td class="">.345</td>
+            <td class="">.362</td>
+            <td class="">.086</td>
+            <td class="">.123</td>
+            <td class="">.700</td>
+            <td class="">.329</td>
+            <td class="">.833</td>
+            <td class="">41.62</td>
+            <td class="">64</td>
+            <td class="">11.00</td>
+            <td class="">3</td>
+            <td class="">511</td>
+            <td class="">163</td>
+            <td class="">20</td>
+            <td class="">255</td>            
+            <td class="">43</td>
+            <td class="">3.135</td>
+            <td class="">.086</td>         
+            <td class="">.123</td>
+            <td class="">.080</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Yohendrick Piñango                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.492</td>
+            <td class="">.391</td>
+            <td class="">.378</td>
+            <td class="">.136</td>
+            <td class="">.191</td>
+            <td class="">.714</td>
+            <td class="">.352</td>
+            <td class="">1.000</td>
+            <td class="">29.43</td>
+            <td class="">47</td>
+            <td class="">11.38</td>
+            <td class="">2</td>
+            <td class="">428</td>
+            <td class="">110</td>
+            <td class="">16</td>
+            <td class="">187</td>            
+            <td class="">36</td>
+            <td class="">3.891</td>
+            <td class="">.136</td>         
+            <td class="">.191</td>
+            <td class="">.073</td>
+        </tr>
+            <tr>
+            <td class="">
+            Ronald Acuña Jr.                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>    
+            <td>Tiburones</td>        
+            <td class="">.483</td>
+            <td class="">.341</td>
+            <td class="">.384</td>
+            <td class="">.225</td>
+            <td class="">.085</td>
+            <td class="">2.667</td>
+            <td class="">.264</td>
+            <td class="">1.000</td>
+            <td class="">16.74</td>
+            <td class="">21</td>
+            <td class="">13.25</td>
+            <td class="">1</td>
+            <td class="">252</td>
+            <td class="">71</td>
+            <td class="">6</td>
+            <td class="">95</td>            
+            <td class="">16</td>
+            <td class="">3.549</td>
+            <td class="">.225</td>         
+            <td class="">.085</td>
+            <td class="">.056</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Yonny Hernández                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.429</td>
+            <td class="">.387</td>
+            <td class="">.318</td>
+            <td class="">.115</td>
+            <td class="">.093</td>
+            <td class="">1.235</td>
+            <td class="">.121</td>
+            <td class="">.700</td>
+            <td class="">32.44</td>
+            <td class="">54</td>
+            <td class="">52.33</td>
+            <td class="">6</td>
+            <td class="">642</td>
+            <td class="">182</td>
+            <td class="">11</td>
+            <td class="">280</td>            
+            <td class="">25</td>
+            <td class="">3.527</td>
+            <td class="">.115</td>         
+            <td class="">.093</td>
+            <td class="">.016</td>
+        </tr>
+            <tr>
+            <td class="">
+            Andrés Chaparro                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">1B</span>
+            </td>    
+            <td>Águilas</td>        
+            <td class="">.396</td>
+            <td class="">.413</td>
+            <td class="">.300</td>
+            <td class="">.130</td>
+            <td class="">.163</td>
+            <td class="">.800</td>
+            <td class="">.065</td>
+            <td class="">.---</td>
+            <td class="">14.02</td>
+            <td class="">16</td>
+            <td class="">77.00</td>
+            <td class="">3</td>
+            <td class="">324</td>
+            <td class="">92</td>
+            <td class="">3</td>
+            <td class="">164</td>            
+            <td class="">34</td>
+            <td class="">3.522</td>
+            <td class="">.130</td>         
+            <td class="">.163</td>
+            <td class="">.011</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Alexi Amarista                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>    
+            <td>Bravos</td>        
+            <td class="">.391</td>
+            <td class="">.350</td>
+            <td class="">.294</td>
+            <td class="">.049</td>
+            <td class="">.077</td>
+            <td class="">.632</td>
+            <td class="">.152</td>
+            <td class="">.556</td>
+            <td class="">41.86</td>
+            <td class="">73</td>
+            <td class="">44.80</td>
+            <td class="">4</td>
+            <td class="">937</td>
+            <td class="">246</td>
+            <td class="">23</td>
+            <td class="">481</td>            
+            <td class="">59</td>
+            <td class="">3.809</td>
+            <td class="">.049</td>         
+            <td class="">.077</td>
+            <td class="">.020</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Danry Vasquez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.445</td>
+            <td class="">.362</td>
+            <td class="">.332</td>
+            <td class="">.140</td>
+            <td class="">.122</td>
+            <td class="">1.143</td>
+            <td class="">.194</td>
+            <td class="">.---</td>
+            <td class="">33.46</td>
+            <td class="">49</td>
+            <td class="">20.57</td>
+            <td class="">5</td>
+            <td class="">610</td>
+            <td class="">172</td>
+            <td class="">14</td>
+            <td class="">276</td>            
+            <td class="">45</td>
+            <td class="">3.547</td>
+            <td class="">.140</td>         
+            <td class="">.122</td>
+            <td class="">.041</td>
+        </tr>
+            <tr>
+            <td class="">
+            Victor Bericoto                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>    
+            <td>Leones</td>        
+            <td class="">.387</td>
+            <td class="">.436</td>
+            <td class="">.289</td>
+            <td class="">.068</td>
+            <td class="">.239</td>
+            <td class="">.286</td>
+            <td class="">.132</td>
+            <td class="">1.000</td>
+            <td class="">19.3</td>
+            <td class="">25</td>
+            <td class="">53.00</td>
+            <td class="">6</td>
+            <td class="">445</td>
+            <td class="">117</td>
+            <td class="">10</td>
+            <td class="">223</td>            
+            <td class="">65</td>
+            <td class="">3.803</td>
+            <td class="">.068</td>         
+            <td class="">.239</td>
+            <td class="">.017</td>
+        </tr>
+            <tr>
+            <td class="">
+            Wilfredo Tovar                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td>    
+            <td>Leones</td>        
+            <td class="">.392</td>
+            <td class="">.372</td>
+            <td class="">.291</td>
+            <td class="">.092</td>
+            <td class="">.092</td>
+            <td class="">1.000</td>
+            <td class="">.095</td>
+            <td class="">.556</td>
+            <td class="">38.4</td>
+            <td class="">53</td>
+            <td class="">222.00</td>
+            <td class="">3</td>
+            <td class="">893</td>
+            <td class="">250</td>
+            <td class="">18</td>
+            <td class="">382</td>            
+            <td class="">52</td>
+            <td class="">3.572</td>
+            <td class="">.092</td>         
+            <td class="">.092</td>
+            <td class="">.004</td>
+        </tr>
+            <tr>
+            <td class="">
+            Ali Castillo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">1B</span>
+            </td>    
+            <td>Águilas</td>        
+            <td class="">.399</td>
+            <td class="">.348</td>
+            <td class="">.297</td>
+            <td class="">.104</td>
+            <td class="">.063</td>
+            <td class="">1.643</td>
+            <td class="">.108</td>
+            <td class="">.000</td>
+            <td class="">35.52</td>
+            <td class="">51</td>
+            <td class="">48.75</td>
+            <td class="">7</td>
+            <td class="">730</td>
+            <td class="">222</td>
+            <td class="">12</td>
+            <td class="">343</td>            
+            <td class="">36</td>
+            <td class="">3.288</td>
+            <td class="">.104</td>         
+            <td class="">.063</td>
+            <td class="">.018</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Símon Muzziotti                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>    
+            <td>Águilas</td>        
+            <td class="">.395</td>
+            <td class="">.381</td>
+            <td class="">.297</td>
+            <td class="">.076</td>
+            <td class="">.141</td>
+            <td class="">.542</td>
+            <td class="">.139</td>
+            <td class="">1.000</td>
+            <td class="">28.1</td>
+            <td class="">40</td>
+            <td class="">50.33</td>
+            <td class="">2</td>
+            <td class="">612</td>
+            <td class="">170</td>
+            <td class="">14</td>
+            <td class="">309</td>            
+            <td class="">51</td>
+            <td class="">3.600</td>
+            <td class="">.076</td>         
+            <td class="">.141</td>
+            <td class="">.018</td>
+        </tr>
+            <tr>
+            <td class="">
+            Leobaldo Cabrera                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>    
+            <td>Tigres</td>        
+            <td class="">.388</td>
+            <td class="">.433</td>
+            <td class="">.286</td>
+            <td class="">.107</td>
+            <td class="">.214</td>
+            <td class="">.500</td>
+            <td class="">.067</td>
+            <td class="">.500</td>
+            <td class="">14.76</td>
+            <td class="">29</td>
+            <td class="">89.00</td>
+            <td class="">4</td>
+            <td class="">438</td>
+            <td class="">103</td>
+            <td class="">4</td>
+            <td class="">183</td>            
+            <td class="">49</td>
+            <td class="">4.252</td>
+            <td class="">.107</td>         
+            <td class="">.214</td>
+            <td class="">.010</td>
+        </tr>
+            <tr>
+            <td class="">
+            Yojhan Quevedo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">C</span>
+            </td>    
+            <td>Cardenales</td>        
+            <td class="">.334</td>
+            <td class="">.342</td>
+            <td class="">.250</td>
+            <td class="">.023</td>
+            <td class="">.047</td>
+            <td class="">.500</td>
+            <td class="">.051</td>
+            <td class="">.---</td>
+            <td class="">5.25</td>
+            <td class="">12</td>
+            <td class="">-.--</td>
+            <td class="">1</td>
+            <td class="">120</td>
+            <td class="">43</td>
+            <td class="">2</td>
+            <td class="">77</td>            
+            <td class="">10</td>
+            <td class="">2.791</td>
+            <td class="">.023</td>         
+            <td class="">.047</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Gersel Pitre                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>    
+            <td>Leones</td>        
+            <td class="">.314</td>
+            <td class="">.375</td>
+            <td class="">.233</td>
+            <td class="">.000</td>
+            <td class="">.111</td>
+            <td class="">.000</td>
+            <td class="">.000</td>
+            <td class="">.---</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">-.--</td>
+            <td class="">0</td>
+            <td class="">25</td>
+            <td class="">9</td>
+            <td class="">0</td>
+            <td class="">12</td>            
+            <td class="">1</td>
+            <td class="">2.778</td>
+            <td class="">.000</td>         
+            <td class="">.111</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Cesar Idrogo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>    
+            <td>Bravos</td>        
+            <td class="">.336</td>
+            <td class="">.429</td>
+            <td class="">.248</td>
+            <td class="">.027</td>
+            <td class="">.216</td>
+            <td class="">.125</td>
+            <td class="">.028</td>
+            <td class="">.000</td>
+            <td class="">4.57</td>
+            <td class="">5</td>
+            <td class="">-.--</td>
+            <td class="">1</td>
+            <td class="">156</td>
+            <td class="">37</td>
+            <td class="">1</td>
+            <td class="">74</td>            
+            <td class="">22</td>
+            <td class="">4.216</td>
+            <td class="">.027</td>         
+            <td class="">.216</td>
+            <td class="">.000</td>
+        </tr>
+            <tr>
+            <td class="">
+            Jose Fernandez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td>    
+            <td>Caribes</td>        
+            <td class="">.394</td>
+            <td class="">.300</td>
+            <td class="">.315</td>
+            <td class="">.125</td>
+            <td class="">.188</td>
+            <td class="">.667</td>
+            <td class="">.250</td>
+            <td class="">.000</td>
+            <td class="">3</td>
+            <td class="">7</td>
+            <td class="">12.00</td>
+            <td class="">1</td>
+            <td class="">65</td>
+            <td class="">16</td>
+            <td class="">1</td>
+            <td class="">23</td>            
+            <td class="">4</td>
+            <td class="">4.062</td>
+            <td class="">.125</td>         
+            <td class="">.188</td>
+            <td class="">.063</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Harold Castro                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>    
+            <td>Leones</td>        
+            <td class="">.376</td>
+            <td class="">.406</td>
+            <td class="">.281</td>
+            <td class="">.040</td>
+            <td class="">.230</td>
+            <td class="">.174</td>
+            <td class="">.150</td>
+            <td class="">.500</td>
+            <td class="">32.31</td>
+            <td class="">53</td>
+            <td class="">31.17</td>
+            <td class="">6</td>
+            <td class="">743</td>
+            <td class="">200</td>
+            <td class="">16</td>
+            <td class="">409</td>            
+            <td class="">107</td>
+            <td class="">3.715</td>
+            <td class="">.040</td>         
+            <td class="">.230</td>
+            <td class="">.030</td>
+        </tr>
+            <tr>
+            <td class="">
+            Balbino Fuenmayor                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>    
+            <td>Caribes</td>        
+            <td class="">.434</td>
+            <td class="">.380</td>
+            <td class="">.332</td>
+            <td class="">.078</td>
+            <td class="">.238</td>
+            <td class="">.327</td>
+            <td class="">.287</td>
+            <td class="">.---</td>
+            <td class="">49.44</td>
+            <td class="">60</td>
+            <td class="">12.29</td>
+            <td class="">6</td>
+            <td class="">753</td>
+            <td class="">231</td>
+            <td class="">26</td>
+            <td class="">445</td>            
+            <td class="">145</td>
+            <td class="">3.260</td>
+            <td class="">.078</td>         
+            <td class="">.238</td>
+            <td class="">.074</td>
+        </tr>
+            <tr>
+            <td class="">
+            * Carlos Rodríguez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>    
+            <td>Navegantes</td>        
+            <td class="">.386</td>
+            <td class="">.340</td>
+            <td class="">.290</td>
+            <td class="">.089</td>
+            <td class="">.078</td>
+            <td class="">1.143</td>
+            <td class="">.127</td>
+            <td class="">1.000</td>
+            <td class="">28.14</td>
+            <td class="">47</td>
+            <td class="">39.50</td>
+            <td class="">7</td>
+            <td class="">637</td>
+            <td class="">180</td>
+            <td class="">11</td>
+            <td class="">283</td>            
+            <td class="">35</td>
+            <td class="">3.539</td>
+            <td class="">.089</td>         
+            <td class="">.078</td>
+            <td class="">.022</td>
+        </tr>
+            <tr>
+            <td class="">
+            José A. Martínez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>    
+            <td>Tigres</td>        
+            <td class="">.387</td>
+            <td class="">.387</td>
+            <td class="">.294</td>
+            <td class="">.117</td>
+            <td class="">.164</td>
+            <td class="">.714</td>
+            <td class="">.113</td>
+            <td class="">1.000</td>
+            <td class="">26.79</td>
+            <td class="">38</td>
+            <td class="">50.00</td>
+            <td class="">7</td>
+            <td class="">668</td>
+            <td class="">171</td>
+            <td class="">11</td>
+            <td class="">273</td>            
+            <td class="">66</td>
+            <td class="">3.906</td>
+            <td class="">.117</td>         
+            <td class="">.164</td>
+            <td class="">.018</td>
+        </tr>
+            <tr>
+            <td class="">
+            Leobaldo Piña                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td>    
+            <td>Tigres</td>        
+            <td class="">.415</td>
+            <td class="">.390</td>
+            <td class="">.308</td>
+            <td class="">.112</td>
+            <td class="">.176</td>
+            <td class="">.636</td>
+            <td class="">.159</td>
+            <td class="">1.000</td>
+            <td class="">21.06</td>
+            <td class="">30</td>
+            <td class="">35.67</td>
+            <td class="">5</td>
+            <td class="">504</td>
+            <td class="">125</td>
+            <td class="">10</td>
+            <td class="">192</td>            
+            <td class="">38</td>
+            <td class="">4.032</td>
+            <td class="">.112</td>         
+            <td class="">.176</td>
+            <td class="">.024</td>
+        </tr>
+            <tr>
+            <td class="">
+            # Juniel Querecuto                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">SS</span>
+            </td>    
+            <td>Tiburones</td>        
+            <td class="">.379</td>
+            <td class="">.372</td>
+            <td class="">.284</td>
+            <td class="">.070</td>
+            <td class="">.151</td>
+            <td class="">.464</td>
+            <td class="">.139</td>
+            <td class="">.333</td>
+            <td class="">28.82</td>
+            <td class="">46</td>
+            <td class="">55.33</td>
+            <td class="">5</td>
+            <td class="">662</td>
+            <td class="">185</td>
+            <td class="">15</td>
+            <td class="">351</td>            
+            <td class="">69</td>
+            <td class="">3.578</td>
+            <td class="">.070</td>         
+            <td class="">.151</td>
+            <td class="">.016</td>
+        </tr>
+        </table>
+    <small>* Batea a la Zurda | # Batea Ambas</small>
 </div>
- </div>
- <div class="tab-pane fade" id="bal-tab-pane" role="tabpanel" aria-labelledby="bal-tab" tabindex="0">
- <div class="table-responsive my-3">
- <table class="table table-sm table-hover table-stats table-striped table-bordered">
- <thead>
- <tr>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
- JUGADOR
- </a>
- </th> 
- <th>EQUIPO</th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ab">
- AB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="h">
- H
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="lh">
- LHIT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="lo">
- LOUT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ld">
- LD
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="fh">
- FHIT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="fo">
- FOUT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="fb">
- FB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gh">
- GHIT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="go">
- GOUT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gb">
- GB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="poh">
- POPHIT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="po">
- POPOUT
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gbfb_ratio">
- GB/FB
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="ld_pct">
- LD%
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="gb_pct">
- GB%
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="fb_pct">
- FB%
- </a>
- </th>
- <th>
- <a href="#" onclick="event.preventDefault();" class="sort_by" data-sort="po_pct">
- POP%
- </a>
- </th>
- </tr>
- </thead>
- <tbody><tr>
- <td class="">
- Gabriel Rodriguez <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
- </td> 
- <td>Águilas</td> 
- <td class="">1</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">-</td>
- <td class="">0%</td>
- <td class="">100%</td>
- <td class="">0%</td> 
- <td class="">0%</td> 
- </tr>
- <tr>
- <td class="">
- * Deward Tovar <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
- </td> 
- <td>Cardenales</td> 
- <td class="">1</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">-</td>
- <td class="">100%</td>
- <td class="">0%</td>
- <td class="">0%</td> 
- <td class="">0%</td> 
- </tr>
- <tr>
- <td class="">
- Jhostynxon Garcia <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
- </td> 
- <td>Navegantes</td> 
- <td class="">9</td>
- <td class="">5</td>
- <td class="">2</td>
- <td class="">0</td>
- <td class="">2</td>
- <td class="">0</td>
- <td class="">1</td>
- <td class="">1</td>
- <td class="">3</td>
- <td class="">0</td>
- <td class="">3</td>
- <td class="">0</td>
- <td class="">0</td>
- <td class="">3.00</td>
- <td class="">33.3%</td>
- <td class="">50%</td>
- <td class="">16.7%</td> 
- <td class="">0%</td> 
- </tr>
- </tbody></table>
- <small>* Batea a la Zurda | # Batea Ambas</small>
+
+
+
+ 
+    </div>
+    <div class="tab-pane fade" id="bal-tab-pane" role="tabpanel" aria-labelledby="bal-tab" tabindex="0">
+        <div class="table-responsive my-3">
+    <table class="table table-sm table-hover table-stats table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="full_name">
+                JUGADOR
+                                            
+                </a>
+            </th> 
+            <th>EQUIPO</th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ab">
+                AB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="h">
+                H
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="lh">
+                LHIT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="lo">
+                LOUT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ld">
+                LD
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="fh">
+                FHIT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="fo">
+                FOUT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="fb">
+                FB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gh">
+                GHIT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="go">
+                GOUT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gb">
+                GB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="poh">
+                POPHIT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="po">
+                POPOUT
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gbfb_ratio">
+                GB/FB
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="ld_pct">
+                LD%
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="gb_pct">
+                GB%
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="fb_pct">
+                FB%
+                                </a>
+            </th>
+            <th>
+                <a href='#' onclick="event.preventDefault();" class="sort_by" data-sort="po_pct">
+                POP%
+                                </a>
+            </th>
+        </tr>
+        </thead>
+                <tr>
+            <td class="">
+            Gabriel Rodriguez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>  
+            <td>Águilas</td>           
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">-</td>
+            <td class="">0%</td>
+            <td class="">100%</td>
+            <td class="">0%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Deward Tovar                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">-</td>
+            <td class="">100%</td>
+            <td class="">0%</td>
+            <td class="">0%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Jhostynxon Garcia                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>  
+            <td>Navegantes</td>           
+            <td class="">9</td>
+            <td class="">5</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.00</td>
+            <td class="">33.3%</td>
+            <td class="">50%</td>
+            <td class="">16.7%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            # Ramón Cabrera                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>  
+            <td>Bravos</td>           
+            <td class="">13</td>
+            <td class="">7</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">2</td>
+            <td class="">2</td>
+            <td class="">4</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">0.75</td>
+            <td class="">30%</td>
+            <td class="">30%</td>
+            <td class="">40%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Jackson Chourio                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>  
+            <td>Águilas</td>           
+            <td class="">30</td>
+            <td class="">12</td>
+            <td class="">5</td>
+            <td class="">2</td>
+            <td class="">7</td>
+            <td class="">4</td>
+            <td class="">4</td>
+            <td class="">8</td>
+            <td class="">3</td>
+            <td class="">8</td>
+            <td class="">11</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">1.38</td>
+            <td class="">26.9%</td>
+            <td class="">42.3%</td>
+            <td class="">30.8%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Gorkys Hernández                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>  
+            <td>Tigres</td>           
+            <td class="">206</td>
+            <td class="">77</td>
+            <td class="">29</td>
+            <td class="">7</td>
+            <td class="">36</td>
+            <td class="">9</td>
+            <td class="">26</td>
+            <td class="">35</td>
+            <td class="">36</td>
+            <td class="">58</td>
+            <td class="">94</td>
+            <td class="">3</td>
+            <td class="">1</td>
+            <td class="">2.69</td>
+            <td class="">21.3%</td>
+            <td class="">55.6%</td>
+            <td class="">20.7%</td>            
+            <td class="">0.6%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            # Ildemaro Vargas                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">165</td>
+            <td class="">61</td>
+            <td class="">29</td>
+            <td class="">7</td>
+            <td class="">36</td>
+            <td class="">6</td>
+            <td class="">24</td>
+            <td class="">30</td>
+            <td class="">26</td>
+            <td class="">48</td>
+            <td class="">74</td>
+            <td class="">0</td>
+            <td class="">11</td>
+            <td class="">2.47</td>
+            <td class="">23.8%</td>
+            <td class="">49%</td>
+            <td class="">19.9%</td>            
+            <td class="">7.3%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Jesús Bastidas                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">SS</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">84</td>
+            <td class="">31</td>
+            <td class="">18</td>
+            <td class="">3</td>
+            <td class="">21</td>
+            <td class="">3</td>
+            <td class="">22</td>
+            <td class="">25</td>
+            <td class="">10</td>
+            <td class="">16</td>
+            <td class="">26</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">1.04</td>
+            <td class="">27.6%</td>
+            <td class="">34.2%</td>
+            <td class="">32.9%</td>            
+            <td class="">5.3%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Jadher Areinamo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>  
+            <td>Tiburones</td>           
+            <td class="">143</td>
+            <td class="">52</td>
+            <td class="">20</td>
+            <td class="">6</td>
+            <td class="">26</td>
+            <td class="">16</td>
+            <td class="">30</td>
+            <td class="">46</td>
+            <td class="">16</td>
+            <td class="">27</td>
+            <td class="">43</td>
+            <td class="">0</td>
+            <td class="">11</td>
+            <td class="">0.93</td>
+            <td class="">20.6%</td>
+            <td class="">34.1%</td>
+            <td class="">36.5%</td>            
+            <td class="">8.7%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Yohendrick Piñango                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">91</td>
+            <td class="">33</td>
+            <td class="">17</td>
+            <td class="">4</td>
+            <td class="">21</td>
+            <td class="">11</td>
+            <td class="">13</td>
+            <td class="">24</td>
+            <td class="">5</td>
+            <td class="">20</td>
+            <td class="">25</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">1.04</td>
+            <td class="">28.4%</td>
+            <td class="">33.8%</td>
+            <td class="">32.4%</td>            
+            <td class="">5.4%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Ronald Acuña Jr.                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>  
+            <td>Tiburones</td>           
+            <td class="">53</td>
+            <td class="">19</td>
+            <td class="">8</td>
+            <td class="">3</td>
+            <td class="">11</td>
+            <td class="">5</td>
+            <td class="">10</td>
+            <td class="">15</td>
+            <td class="">6</td>
+            <td class="">15</td>
+            <td class="">21</td>
+            <td class="">0</td>
+            <td class="">1</td>
+            <td class="">1.40</td>
+            <td class="">22.9%</td>
+            <td class="">43.8%</td>
+            <td class="">31.3%</td>            
+            <td class="">2.1%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            # Yonny Hernández                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">157</td>
+            <td class="">56</td>
+            <td class="">32</td>
+            <td class="">6</td>
+            <td class="">38</td>
+            <td class="">4</td>
+            <td class="">21</td>
+            <td class="">25</td>
+            <td class="">20</td>
+            <td class="">52</td>
+            <td class="">72</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">2.88</td>
+            <td class="">27%</td>
+            <td class="">51.1%</td>
+            <td class="">17.7%</td>            
+            <td class="">4.3%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Andrés Chaparro                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">1B</span>
+            </td>  
+            <td>Águilas</td>           
+            <td class="">77</td>
+            <td class="">27</td>
+            <td class="">13</td>
+            <td class="">4</td>
+            <td class="">17</td>
+            <td class="">7</td>
+            <td class="">13</td>
+            <td class="">20</td>
+            <td class="">7</td>
+            <td class="">15</td>
+            <td class="">22</td>
+            <td class="">0</td>
+            <td class="">5</td>
+            <td class="">1.10</td>
+            <td class="">26.6%</td>
+            <td class="">34.4%</td>
+            <td class="">31.3%</td>            
+            <td class="">7.8%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Alexi Amarista                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">2B</span>
+            </td>  
+            <td>Bravos</td>           
+            <td class="">224</td>
+            <td class="">77</td>
+            <td class="">41</td>
+            <td class="">6</td>
+            <td class="">47</td>
+            <td class="">15</td>
+            <td class="">59</td>
+            <td class="">74</td>
+            <td class="">21</td>
+            <td class="">59</td>
+            <td class="">80</td>
+            <td class="">0</td>
+            <td class="">10</td>
+            <td class="">1.08</td>
+            <td class="">22.3%</td>
+            <td class="">37.9%</td>
+            <td class="">35.1%</td>            
+            <td class="">4.7%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Danry Vasquez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">144</td>
+            <td class="">49</td>
+            <td class="">29</td>
+            <td class="">9</td>
+            <td class="">38</td>
+            <td class="">7</td>
+            <td class="">20</td>
+            <td class="">27</td>
+            <td class="">13</td>
+            <td class="">41</td>
+            <td class="">54</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">2.00</td>
+            <td class="">30.9%</td>
+            <td class="">43.9%</td>
+            <td class="">22%</td>            
+            <td class="">3.3%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Victor Bericoto                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>  
+            <td>Leones</td>           
+            <td class="">106</td>
+            <td class="">36</td>
+            <td class="">16</td>
+            <td class="">3</td>
+            <td class="">19</td>
+            <td class="">7</td>
+            <td class="">11</td>
+            <td class="">18</td>
+            <td class="">13</td>
+            <td class="">29</td>
+            <td class="">42</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">2.33</td>
+            <td class="">23.5%</td>
+            <td class="">51.9%</td>
+            <td class="">22.2%</td>            
+            <td class="">2.5%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Wilfredo Tovar                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td>  
+            <td>Leones</td>           
+            <td class="">222</td>
+            <td class="">75</td>
+            <td class="">33</td>
+            <td class="">15</td>
+            <td class="">48</td>
+            <td class="">15</td>
+            <td class="">35</td>
+            <td class="">50</td>
+            <td class="">26</td>
+            <td class="">64</td>
+            <td class="">90</td>
+            <td class="">1</td>
+            <td class="">12</td>
+            <td class="">1.80</td>
+            <td class="">23.9%</td>
+            <td class="">44.8%</td>
+            <td class="">24.9%</td>            
+            <td class="">6%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Ali Castillo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">1B</span>
+            </td>  
+            <td>Águilas</td>           
+            <td class="">195</td>
+            <td class="">66</td>
+            <td class="">29</td>
+            <td class="">12</td>
+            <td class="">41</td>
+            <td class="">7</td>
+            <td class="">31</td>
+            <td class="">38</td>
+            <td class="">29</td>
+            <td class="">63</td>
+            <td class="">92</td>
+            <td class="">1</td>
+            <td class="">11</td>
+            <td class="">2.42</td>
+            <td class="">22.4%</td>
+            <td class="">50.3%</td>
+            <td class="">20.8%</td>            
+            <td class="">6%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Símon Muzziotti                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">RF</span>
+            </td>  
+            <td>Águilas</td>           
+            <td class="">151</td>
+            <td class="">51</td>
+            <td class="">22</td>
+            <td class="">6</td>
+            <td class="">28</td>
+            <td class="">13</td>
+            <td class="">28</td>
+            <td class="">41</td>
+            <td class="">16</td>
+            <td class="">37</td>
+            <td class="">53</td>
+            <td class="">0</td>
+            <td class="">8</td>
+            <td class="">1.29</td>
+            <td class="">21.5%</td>
+            <td class="">40.8%</td>
+            <td class="">31.5%</td>            
+            <td class="">6.2%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Leobaldo Cabrera                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>  
+            <td>Tigres</td>           
+            <td class="">89</td>
+            <td class="">30</td>
+            <td class="">16</td>
+            <td class="">3</td>
+            <td class="">19</td>
+            <td class="">1</td>
+            <td class="">15</td>
+            <td class="">16</td>
+            <td class="">13</td>
+            <td class="">15</td>
+            <td class="">28</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">1.75</td>
+            <td class="">27.5%</td>
+            <td class="">40.6%</td>
+            <td class="">23.2%</td>            
+            <td class="">8.7%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Yojhan Quevedo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">C</span>
+            </td>  
+            <td>Cardenales</td>           
+            <td class="">39</td>
+            <td class="">13</td>
+            <td class="">6</td>
+            <td class="">7</td>
+            <td class="">13</td>
+            <td class="">1</td>
+            <td class="">8</td>
+            <td class="">9</td>
+            <td class="">6</td>
+            <td class="">8</td>
+            <td class="">14</td>
+            <td class="">0</td>
+            <td class="">4</td>
+            <td class="">1.56</td>
+            <td class="">32.5%</td>
+            <td class="">35%</td>
+            <td class="">22.5%</td>            
+            <td class="">10%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Gersel Pitre                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>  
+            <td>Leones</td>           
+            <td class="">9</td>
+            <td class="">3</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">2</td>
+            <td class="">1</td>
+            <td class="">3</td>
+            <td class="">4</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2.00</td>
+            <td class="">25%</td>
+            <td class="">50%</td>
+            <td class="">25%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            # Cesar Idrogo                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>  
+            <td>Bravos</td>           
+            <td class="">36</td>
+            <td class="">12</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">5</td>
+            <td class="">5</td>
+            <td class="">6</td>
+            <td class="">11</td>
+            <td class="">17</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">3.40</td>
+            <td class="">21.4%</td>
+            <td class="">60.7%</td>
+            <td class="">17.9%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Jose Fernandez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td>  
+            <td>Caribes</td>           
+            <td class="">12</td>
+            <td class="">4</td>
+            <td class="">1</td>
+            <td class="">1</td>
+            <td class="">2</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">3</td>
+            <td class="">3</td>
+            <td class="">3</td>
+            <td class="">6</td>
+            <td class="">0</td>
+            <td class="">0</td>
+            <td class="">2.00</td>
+            <td class="">18.2%</td>
+            <td class="">54.5%</td>
+            <td class="">27.3%</td>            
+            <td class="">0%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Harold Castro                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">LF</span>
+            </td>  
+            <td>Leones</td>           
+            <td class="">187</td>
+            <td class="">62</td>
+            <td class="">36</td>
+            <td class="">3</td>
+            <td class="">39</td>
+            <td class="">12</td>
+            <td class="">30</td>
+            <td class="">42</td>
+            <td class="">14</td>
+            <td class="">43</td>
+            <td class="">57</td>
+            <td class="">0</td>
+            <td class="">7</td>
+            <td class="">1.36</td>
+            <td class="">26.9%</td>
+            <td class="">39.3%</td>
+            <td class="">29%</td>            
+            <td class="">4.8%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Balbino Fuenmayor                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>  
+            <td>Caribes</td>           
+            <td class="">209</td>
+            <td class="">69</td>
+            <td class="">31</td>
+            <td class="">9</td>
+            <td class="">40</td>
+            <td class="">19</td>
+            <td class="">19</td>
+            <td class="">38</td>
+            <td class="">19</td>
+            <td class="">49</td>
+            <td class="">68</td>
+            <td class="">0</td>
+            <td class="">8</td>
+            <td class="">1.79</td>
+            <td class="">26%</td>
+            <td class="">44.2%</td>
+            <td class="">24.7%</td>            
+            <td class="">5.2%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            * Carlos Rodríguez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">CF</span>
+            </td>  
+            <td>Navegantes</td>           
+            <td class="">158</td>
+            <td class="">52</td>
+            <td class="">19</td>
+            <td class="">7</td>
+            <td class="">26</td>
+            <td class="">10</td>
+            <td class="">28</td>
+            <td class="">38</td>
+            <td class="">23</td>
+            <td class="">51</td>
+            <td class="">74</td>
+            <td class="">0</td>
+            <td class="">11</td>
+            <td class="">1.95</td>
+            <td class="">17.4%</td>
+            <td class="">49.7%</td>
+            <td class="">25.5%</td>            
+            <td class="">7.4%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            José A. Martínez                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">DH</span>
+            </td>  
+            <td>Tigres</td>           
+            <td class="">150</td>
+            <td class="">49</td>
+            <td class="">21</td>
+            <td class="">8</td>
+            <td class="">29</td>
+            <td class="">11</td>
+            <td class="">17</td>
+            <td class="">28</td>
+            <td class="">17</td>
+            <td class="">46</td>
+            <td class="">63</td>
+            <td class="">0</td>
+            <td class="">2</td>
+            <td class="">2.25</td>
+            <td class="">23.8%</td>
+            <td class="">51.6%</td>
+            <td class="">23%</td>            
+            <td class="">1.6%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            Leobaldo Piña                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">3B</span>
+            </td>  
+            <td>Tigres</td>           
+            <td class="">107</td>
+            <td class="">35</td>
+            <td class="">17</td>
+            <td class="">2</td>
+            <td class="">19</td>
+            <td class="">6</td>
+            <td class="">8</td>
+            <td class="">14</td>
+            <td class="">12</td>
+            <td class="">36</td>
+            <td class="">48</td>
+            <td class="">0</td>
+            <td class="">6</td>
+            <td class="">3.43</td>
+            <td class="">21.8%</td>
+            <td class="">55.2%</td>
+            <td class="">16.1%</td>            
+            <td class="">6.9%</td>        
+        </tr>
+            <tr>
+            <td class="">
+            # Juniel Querecuto                <span style="color:#9a9a9a !important; padding-left:10px !important; font-weight: bold; font-size: 12px;">SS</span>
+            </td>  
+            <td>Tiburones</td>           
+            <td class="">166</td>
+            <td class="">54</td>
+            <td class="">27</td>
+            <td class="">4</td>
+            <td class="">31</td>
+            <td class="">6</td>
+            <td class="">35</td>
+            <td class="">41</td>
+            <td class="">21</td>
+            <td class="">47</td>
+            <td class="">68</td>
+            <td class="">0</td>
+            <td class="">3</td>
+            <td class="">1.66</td>
+            <td class="">21.7%</td>
+            <td class="">47.6%</td>
+            <td class="">28.7%</td>            
+            <td class="">2.1%</td>        
+        </tr>
+        </table>
+    <small>* Batea a la Zurda | # Batea Ambas</small>
 </div>
- </div>
+
+
+
+ 
+    </div>
 </div>
- <nav aria-label="navigation">
- <ul class="pagination pagination-sm justify-content-center">
- <!-- Botón Anterior -->
- <li class="page-item disabled">
- <a class="page-link" href="#" onclick="event.preventDefault();">« Anterior</a>
- </li>
- <!-- Números de página -->
- <li class="page-item active">
- <a class="page-link" href="#" onclick="event.preventDefault(); ">
- 1 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
- 2 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(3);">
- 3 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(4);">
- 4 </a>
- </li>
- <li class="page-item ">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(5);">
- 5 </a>
- </li>
- <li class="page-item disabled">
- <a class="page-link" href="#" onclick="event.preventDefault();">...</a>
- </li>
- <li class="page-item">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(7);">7</a>
- </li>
- <!-- Botón Siguiente -->
- <li class="page-item">
- <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
- Siguiente »
- </a>
- </li>
- </ul>
- </nav>
- <div class="d-flex justify-content-center mt-2">
- <small class="text-muted">
- Página 1 de 7 </small>
- </div>
-</div> 
+
+        <nav aria-label="navigation">
+            <ul class="pagination pagination-sm justify-content-center">
+
+                <!-- Botón Anterior -->
+                                    <li class="page-item disabled">
+                        <a class="page-link" href="#" onclick="event.preventDefault();">&laquo; Anterior</a>
+                    </li>
+                
+                <!-- Números de página -->
+                                    <li class="page-item active">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); ">
+                            1                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
+                            2                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(3);">
+                            3                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(4);">
+                            4                        </a>
+                    </li>
+                                    <li class="page-item ">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(5);">
+                            5                        </a>
+                    </li>
+                                                            <li class="page-item disabled">
+                            <a class="page-link" href="#" onclick="event.preventDefault();">...</a>
+                        </li>
+                                        <li class="page-item">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(7);">7</a>
+                    </li>
+                
+                <!-- Botón Siguiente -->
+                                    <li class="page-item">
+                        <a class="page-link" href="#" onclick="event.preventDefault(); loadPage(2);">
+                            Siguiente &raquo;
+                        </a>
+                    </li>
+                
+            </ul>
+        </nav>
+
+        <div class="d-flex justify-content-center mt-2">
+            <small class="text-muted">
+                Página 1 de 7            </small>
+        </div>
+
+                    
+     
+</div>  
+
+<script>
+
+$(".sort_by").click(function(e) {
+
+    let tab = $("#TabList li button.active").attr('id');
+    let previous_sort_by = 'avg';
+    let previous_order = 'DESC';
+    let order = null, sort_by = this.dataset.sort;
+
+    if(previous_sort_by == sort_by){
+        if(previous_order == 'ASC'){
+            order = 'DESC';
+        } else if(previous_order == 'DESC'){
+            order = 'ASC';
+        }
+    }
+
+    update_stats(null, sort_by, order, tab);
+
+});
+
+$(".page-link").click(function(e) {
+
+    let tab = $("#TabList li button.active").attr('id');
+    let sort_by = 'avg';
+    let order = 'DESC';
+
+    let array = this.dataset.link.split("&");
+    var obj = {};
+    
+    for (var i = 0; i < array.length; i++) {
+        var split = array[i].split('=');
+        obj[split[0].trim()] = split[1].trim();
+    }
+
+    update_stats(obj.page, sort_by, order, tab);
+
+});
+
+$("#frm").change(function(e) {
+
+    e.preventDefault();
+    
+    update_stats(null, null, null, null);
+
+});
+
+function loadPage(page) {
+    let tab = $("#TabList li button.active").attr('id');
+    update_stats(page, 'avg', 'DESC', tab);
+}
+
+function update_stats(page, sort_by, order, tab){
+
+    if ($("#split option:selected").val() != 'none' && $("#qualified").is(':checked')) {  
+        $('#qualified').attr('checked', false);
+    }
+
+    if ($("#qualified").is(":checked")){
+        $('#split option').removeAttr('selected').filter('[value=none]').attr('selected', true);
+        $('#split').prop('disabled', 'disabled');
+    } else {
+        $('#split').prop('disabled', false);
+    }
+
+    data = $("#frm").serialize();
+
+    if ($("#qualified").is(":checked")){
+        data = data + '&qualified=true';
+        $('#qualified').attr('checked', true);
+    } else {
+        data = data + '&qualified=false';
+        $('#qualified').attr('checked', false);
+    }
+
+    if(page > 0){
+        data = data + '&page=' + page;
+    }
+
+    if(sort_by != null){
+        data = data + '&sort_by=' + sort_by;
+    }
+    
+    if(order != null){
+        data = data + '&order=' + order;
+    }
+
+    var url = "resources/views/leaders.php";
+    let height = $('#content').height();
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+            beforeSend: function() {
+                $('#ajax').height(height);
+                $('#ajax').show();
+                $('#content').hide();
+            },
+            success: function(data)
+            {
+                $('#content').html(data);                
+                $('#ajax').hide();
+                if(tab != null){                    
+                    $('#' + tab).tab('show');
+                }
+                $('#content').show(); 
+            }
+    }); 
+}
+</script>

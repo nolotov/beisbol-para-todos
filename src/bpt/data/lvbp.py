@@ -67,14 +67,29 @@ def _parse_player_cell(td) -> dict:
     return {"jugador": raw, "posicion": pos, "mano": hand}
 
 
+def _table_parts(table) -> tuple[list[str], list]:
+    """(encabezados, filas de datos) de una tabla.
+
+    El servidor envía <thead> pero NO <tbody> (el navegador lo agrega solo al mostrarla),
+    así que las filas de datos son todos los <tr> con <td> fuera del <thead>.
+    """
+    thead = table.find("thead")
+    head_row = thead.find("tr") if thead else table.find("tr")
+    headers = [c.get_text(strip=True) for c in head_row.find_all(["th", "td"])]
+    rows = [tr for tr in table.find_all("tr")
+            if tr is not head_row and tr.find("td") is not None
+            and (thead is None or tr.find_parent("thead") is None)]
+    return headers, rows
+
+
 def parse_leaders(html: str) -> pd.DataFrame:
     """Une todas las tablas del fragmento en un DataFrame (una fila por jugador)."""
     soup = BeautifulSoup(html, "html.parser")
     merged: pd.DataFrame | None = None
     for table in soup.find_all("table"):
-        headers = [th.get_text(strip=True) for th in table.find("thead").find_all(["th", "td"])]
+        headers, trs = _table_parts(table)
         rows = []
-        for tr in table.find("tbody").find_all("tr"):
+        for tr in trs:
             tds = tr.find_all("td")
             if len(tds) != len(headers):
                 continue
@@ -252,9 +267,9 @@ def parse_collectives(html: str, panes: tuple[str, ...]) -> pd.DataFrame:
         table = pane.find("table") if pane else None
         if table is None:
             continue
-        headers = [th.get_text(strip=True) for th in table.find("thead").find_all(["th", "td"])]
+        headers, trs = _table_parts(table)
         rows = []
-        for tr in table.find("tbody").find_all("tr"):
+        for tr in trs:
             cells = [td.get_text(" ", strip=True) for td in tr.find_all("td")]
             if len(cells) != len(headers):
                 continue
