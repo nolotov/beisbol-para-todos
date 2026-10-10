@@ -14,6 +14,10 @@ cd $HOME\Documents\workspace\beisbol-para-todos
 
 ## Uso
 
+> En Windows, si **Smart App Control** bloquea `bpt.exe`, usa `python -m bpt` en su lugar
+> (por ejemplo `python -m bpt lvbp-equipos --temporada 2025`). No desactives Smart App Control:
+> una vez apagado no se puede volver a encender sin reinstalar Windows.
+
 ```powershell
 # Tarjeta de percentiles Statcast (1080x1350, lista para IG/X)
 bpt card "Tarik Skubal" --tipo pitcher --anio 2025
