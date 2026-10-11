@@ -1,0 +1,66 @@
+# Resultados de postemporada MLB: cada mañana genera las tarjetas de los juegos de ayer
+# y el resumen.json, y los deja como artefacto descargable del run.
+#
+# El cron solo corre cuando este archivo está en la rama por defecto (main).
+# Mientras tanto se puede lanzar a mano desde la pestaña Actions ("Run workflow").
+name: Resultados MLB
+
+on:
+  schedule:
+    # 13:47 UTC ≈ 10:47 en Santiago (los juegos terminan de madrugada en hora de Chile).
+    # Solo octubre y noviembre: fuera de la postemporada no hace nada útil.
+    - cron: "47 13 * 10,11 *"
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fecha oficial MLB (YYYY-MM-DD). Vacío = ayer en hora del Este"
+        required: false
+      fase:
+        description: "L=Campeonato, D=Divisional, F=Comodín, W=Mundial, todas"
+        required: false
+        default: "L"
+
+permissions:
+  contents: read
+
+jobs:
+  resultados:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        run: pip install -e ".[dev]"
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Generar tarjetas y resumen
+        id: gen
+        env:
+          FECHA: ${{ inputs.fecha }}
+          FASE: ${{ inputs.fase || 'L' }}
+        run: |
+          ARGS="--fase $FASE"
+          if [ -n "$FECHA" ]; then ARGS="$ARGS --fecha $FECHA"; fi
+          python -m bpt mlb-resultados $ARGS | tee salida.txt
+          echo "carpeta=$(ls -d output/resultados/mlb/*/ | tail -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Resumen del run
+        run: |
+          echo '### Resultados MLB' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resultados-mlb-${{ github.run_number }}
+          path: ${{ steps.gen.outputs.carpeta }}
+          retention-days: 30

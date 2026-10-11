@@ -58,6 +58,26 @@ Fuente: `stats.lvbp.com` (datos de TuJonrón). Una petición por segundo y cach�
 > ⚠️ En las tablas de pitcheo de la LVBP, la columna "K%" es el **% de strikes** (S/NP). El K% real
 > lo calculamos con `K/AL`. Está cubierto por un test.
 
+### MLB: resultados de postemporada
+
+```powershell
+# Juegos de ayer (hora del Este) de las Series de Campeonato: tarjetas + resumen.json
+bpt mlb-resultados
+
+# Una fecha concreta, o toda la postemporada
+bpt mlb-resultados --fecha 2026-10-11
+bpt mlb-resultados --fecha 2026-10-11 --fase todas      # L, D, F, W o todas
+```
+
+Sale en `output/resultados/mlb/AAAA-MM-DD/`: una tarjeta por juego finalizado (marcador, pizarra
+por entradas, decisiones de pitcheo y estado de la serie) y un `resumen.json` con las cifras del
+día, que es la entrada del agente redactor. Los juegos pospuestos o sin terminar quedan en
+`pendientes`. Fuente: MLB Stats API (`statsapi.mlb.com`), sin logos ni gráfica de MLB.
+
+**Automático:** `.github/workflows/resultados-mlb.yml` lo corre cada mañana de octubre y noviembre
+y deja la carpeta del día como artefacto del run. El cron solo se activa cuando el workflow está
+en `main`; antes se puede lanzar a mano desde Actions.
+
 ### Etiquetas de métricas
 
 Todas las tarjetas aceptan `--etiquetas`:
@@ -78,6 +98,7 @@ Las tarjetas salen en `output/cards/`. Los datos crudos se cachean en `data/raw/
 ```
 src/bpt/
   theme.py               # paleta "Dashboard de dugout", estilo matplotlib y firma @mbp.deportes
+  resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
   glossary.py            # glosario de métricas: sigla, nombre en español, pista y explicación
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
   data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga

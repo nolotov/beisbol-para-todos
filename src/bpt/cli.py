@@ -8,6 +8,8 @@ Ejemplos:
     bpt lvbp-equipos --temporada 2025            # portada + las 8 tarjetas de equipo
     bpt lvbp-equipos --temporada 2025 --equipo MAG
     bpt lvbp-previas                              # previas 2026-27 (content/previas_2026-27.json)
+    bpt mlb-resultados                            # Series de Campeonato: juegos de ayer
+    bpt mlb-resultados --fecha 2026-10-11 --fase todas
 """
 from __future__ import annotations
 
@@ -139,6 +141,24 @@ def cmd_lvbp_previews(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_mlb_results(args: argparse.Namespace) -> int:
+    from bpt import resultados
+    fecha = args.fecha or resultados.ayer_mlb()
+    tipo = None if args.fase == "todas" else args.fase
+    r = resultados.generar(fecha, temporada=args.temporada, tipo=tipo, salida=Path(args.salida),
+                           handle=args.handle, refresh=not args.cache)
+    carpeta = Path(args.salida) / fecha
+    for j in r["juegos"]:
+        serie = j["estado_serie"]["texto"] if j["estado_serie"] else ""
+        print(f"[ok] {j['serie_corto']} J{j['juego_n']}: {j['titular']}  ({serie})")
+    for p in r["pendientes"]:
+        print(f"[--] {p['serie']} J{p['juego_n']} {p['partido']}: {p['estado']}")
+    if not r["juegos"] and not r["pendientes"]:
+        print(f"[--] No hubo juegos de esa fase el {fecha}")
+    print(f"Resumen: {carpeta / 'resumen.json'}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="bpt", description="Beisbol Para Todos - toolkit de datos")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -187,6 +207,19 @@ def main(argv: list[str] | None = None) -> int:
                     help="mixto: español + sigla | espanol | siglas")
     lvbp_common(te)
     te.set_defaults(func=cmd_lvbp_teams)
+
+    mr = sub.add_parser("mlb-resultados",
+                        help="Tarjetas de resultados de postemporada MLB + resumen.json")
+    mr.add_argument("--fecha", default=None,
+                    help="YYYY-MM-DD (fecha oficial MLB). Por defecto: ayer en hora del Este")
+    mr.add_argument("--fase", choices=["L", "D", "F", "W", "todas"], default="L",
+                    help="L=Series de Campeonato (defecto), D=Divisional, F=Comodín, W=Mundial")
+    mr.add_argument("--temporada", type=int, default=None)
+    mr.add_argument("--salida", default="output/resultados/mlb")
+    mr.add_argument("--handle", default=theme.HANDLE)
+    mr.add_argument("--cache", action="store_true",
+                    help="Usar la caché local en vez de descargar de nuevo")
+    mr.set_defaults(func=cmd_mlb_results)
 
     pv = sub.add_parser("lvbp-previas", help="Tarjetas previas de temporada por equipo")
     pv.add_argument("--contenido", default="content/previas_2026-27.json",

@@ -13,6 +13,7 @@ dependencies = [
   "pybaseball>=2.2.7",
   "requests>=2.31",
   "beautifulsoup4>=4.12",
+  "tzdata; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
