@@ -32,3 +32,11 @@ def test_cli_genera_png(tmp_path):
     assert rc == 0
     pngs = list(tmp_path.glob("*.png"))
     assert len(pngs) == 1 and pngs[0].stat().st_size > 10_000
+
+
+def test_backend_sin_ventanas():
+    import matplotlib
+
+    import bpt  # noqa: F401
+
+    assert matplotlib.get_backend().lower() == "agg"
