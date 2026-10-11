@@ -57,6 +57,12 @@ GLOSARIO: dict[str, Metric] = {
               "Hits más boletos permitidos por inning lanzado."),
     "avg_opp": M("AVG opp", "Promedio en contra", "le batean para",
                  "Promedio de bateo que le hacen los rivales."),
+    "game_score": M("GS", "Game Score", "nota de la salida",
+                    "Nota de una salida en la loma: parte de 40, suma outs y ponches y resta hits, "
+                    "boletos, carreras y jonrones. Una apertura de 60 es buena; de 70 en adelante, dominante."),
+    "ci": M("CI", "Carreras impulsadas", "impulsadas", "Carreras que entraron por la acción del bateador."),
+    "tb": M("BT", "Bases totales", "bases por sus hits",
+            "Suma de bases de sus hits: sencillo 1, doble 2, triple 3, jonrón 4."),
     "sv": M("SV", "Salvados", "juegos salvados", "Juegos salvados."),
     "hr9": M("HR/9", "Jonrones x 9 IP", "jonrones permitidos",
              "Jonrones permitidos por cada 9 innings."),

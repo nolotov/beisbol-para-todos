@@ -59,7 +59,7 @@ def test_estado_pospuesto(sched):
 
 
 def test_generar_tarjetas_y_resumen(sched, tmp_path):
-    r = resultados.generar("2026-10-12", salida=tmp_path, schedule=sched)
+    r = resultados.generar("2026-10-12", salida=tmp_path, schedule=sched, con_figuras=False)
     carpeta = tmp_path / "2026-10-12"
     assert (carpeta / "resumen.json").exists()
     assert len(r["juegos"]) == 1 and r["pendientes"] == []
@@ -71,7 +71,7 @@ def test_generar_tarjetas_y_resumen(sched, tmp_path):
 
 
 def test_generar_con_pendientes(sched, tmp_path):
-    r = resultados.generar("2026-10-15", salida=tmp_path, schedule=sched)
+    r = resultados.generar("2026-10-15", salida=tmp_path, schedule=sched, con_figuras=False)
     assert r["juegos"] == []
     assert r["pendientes"][0]["partido"] == "MIL @ LAD"
 
@@ -121,7 +121,8 @@ def test_dos_divisionales_simultaneas_no_se_mezclan(tmp_path):
     assert lad.para_ganar == 3
     assert phi.texto == "Serie empatada 2-2"
 
-    r = resultados.generar("2026-10-07", tipo="D", salida=tmp_path, schedule=sched)
+    r = resultados.generar("2026-10-07", tipo="D", salida=tmp_path, schedule=sched,
+                           con_figuras=False)
     textos = {j["titular"]: j["estado_serie"]["texto"] for j in r["juegos"]}
     assert textos["LAD le gana 2-1 a ATL"] == "LAD lidera 2-1"
 

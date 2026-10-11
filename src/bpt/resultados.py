@@ -6,12 +6,15 @@ que salen de la API (marcador, pizarra, decisiones, estado de la serie) y nada d
 from __future__ import annotations
 
 import json
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from bpt import theme
-from bpt.data import mlb_stats
+
+from bpt.data import mlb_box, mlb_stats
+from bpt.viz.figures_card import render_figures_card
 from bpt.viz.result_card import render_result_card, titular
 
 # La fecha oficial de MLB va en hora del Este: corremos "ayer" según Nueva York.
@@ -25,11 +28,13 @@ def ayer_mlb(ahora: datetime | None = None) -> str:
 
 def generar(fecha: str, temporada: int | None = None, tipo: str | None = "L",
             salida: Path = Path("output/resultados/mlb"), handle: str = theme.HANDLE,
-            refresh: bool = True, schedule: dict | None = None) -> dict:
+            refresh: bool = True, schedule: dict | None = None,
+            boxscores: dict[int, dict] | None = None, con_figuras: bool = True) -> dict:
     """Genera las tarjetas de los juegos finalizados en `fecha` y escribe resumen.json.
 
     `tipo`: L = Series de Campeonato (por defecto), D, F, W o None para toda la postemporada.
-    `schedule`: inyectable para tests/offline; si es None se descarga.
+    `schedule` / `boxscores` (gamePk -> box score): inyectables para tests/offline;
+    si faltan se descargan. Si el box score falla, igual sale la tarjeta del resultado.
     """
     date.fromisoformat(fecha)  # valida formato
     temporada = temporada or int(fecha[:4])
@@ -49,8 +54,19 @@ def generar(fecha: str, temporada: int | None = None, tipo: str | None = "L",
                                "partido": f"{j.visitante.abrev} @ {j.local.abrev}"})
             continue
         s = series.get(mlb_stats.clave_serie(j))
-        nombre = f"{j.serie_corto.lower().replace(' ', '-')}_j{j.juego_n}_{j.visitante.abrev}-{j.local.abrev}.png"
-        card = render_result_card(j, s, carpeta / nombre, handle=handle, temporada=temporada)
+        base = f"{j.serie_corto.lower().replace(' ', '-')}_j{j.juego_n}_{j.visitante.abrev}-{j.local.abrev}"
+        card = render_result_card(j, s, carpeta / f"{base}_1_resultado.png", handle=handle,
+                                  temporada=temporada)
+        tarjetas, figs = [card.name], None
+        if con_figuras:
+            try:
+                box = (boxscores or {}).get(j.game_pk) or mlb_box.fetch_boxscore(j.game_pk)
+                figs = mlb_box.figuras(box)
+                f_card = render_figures_card(j, figs, carpeta / f"{base}_2_figuras.png",
+                                             handle=handle, temporada=temporada)
+                tarjetas.append(f_card.name)
+            except Exception as e:  # noqa: BLE001 - el resultado no debe caer por las figuras
+                print(f"[aviso] Sin figuras para {j.game_pk}: {e}", file=sys.stderr)
         d = j.to_dict()
         d.update({
             "titular": titular(j),
@@ -58,6 +74,8 @@ def generar(fecha: str, temporada: int | None = None, tipo: str | None = "L",
             "perdedor": j.perdedor.abrev,
             "estado_serie": s.to_dict() if s else None,
             "tarjeta": card.name,
+            "tarjetas": tarjetas,
+            "figuras": figs.to_dict() if figs else None,
         })
         items.append(d)
 

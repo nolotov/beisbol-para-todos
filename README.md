@@ -69,9 +69,14 @@ bpt mlb-resultados --fecha 2026-10-11
 bpt mlb-resultados --fecha 2026-10-11 --fase todas      # L, D, F, W o todas
 ```
 
-Sale en `output/resultados/mlb/AAAA-MM-DD/`: una tarjeta por juego finalizado (marcador, pizarra
-por entradas, decisiones de pitcheo y estado de la serie) y un `resumen.json` con las cifras del
-día, que es la entrada del agente redactor. Los juegos pospuestos o sin terminar quedan en
+Sale en `output/resultados/mlb/AAAA-MM-DD/`, dos láminas de carrusel por juego finalizado:
+
+1. `*_1_resultado.png`: marcador, pizarra por entradas, decisiones de pitcheo y estado de la serie.
+2. `*_2_figuras.png`: por equipo, la mejor salida en la loma (**Game Score** v2 de Tango) y la
+   mejor línea al bate (**bases ganadas** = bases totales + boletos + pelotazos + robos), más los
+   jonrones del juego. El criterio va impreso en la tarjeta y en el JSON.
+
+Y un `resumen.json` con las cifras del día, que es la entrada del agente redactor. Los juegos pospuestos o sin terminar quedan en
 `pendientes`. Fuente: MLB Stats API (`statsapi.mlb.com`), sin logos ni gráfica de MLB.
 
 **Automático:** `.github/workflows/resultados-mlb.yml` lo corre cada mañana de octubre y noviembre

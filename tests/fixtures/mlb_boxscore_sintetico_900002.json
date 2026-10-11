@@ -1,0 +1,306 @@
+{
+ "_nota": "FIXTURE SINTÉTICO con la forma de statsapi.mlb.com/api/v1/game/{pk}/boxscore. Nombres y números inventados; corresponde al juego 900002.",
+ "teams": {
+  "away": {
+   "team": {
+    "id": 1,
+    "name": "Los Angeles Dodgers",
+    "abbreviation": "LAD"
+   },
+   "players": {
+    "ID101": {
+     "person": {
+      "id": 101,
+      "fullName": "Bateador LAD Uno"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 5,
+       "hits": 3,
+       "doubles": 1,
+       "triples": 0,
+       "homeRuns": 1,
+       "rbi": 2,
+       "runs": 1,
+       "baseOnBalls": 0,
+       "hitByPitch": 0,
+       "strikeOuts": 0,
+       "stolenBases": 0,
+       "plateAppearances": 5
+      }
+     }
+    },
+    "ID102": {
+     "person": {
+      "id": 102,
+      "fullName": "Bateador LAD Dos"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 4,
+       "hits": 2,
+       "doubles": 0,
+       "triples": 0,
+       "homeRuns": 0,
+       "rbi": 1,
+       "runs": 1,
+       "baseOnBalls": 1,
+       "hitByPitch": 0,
+       "strikeOuts": 0,
+       "stolenBases": 1,
+       "plateAppearances": 5
+      }
+     }
+    },
+    "ID103": {
+     "person": {
+      "id": 103,
+      "fullName": "Bateador LAD Tres"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 5,
+       "hits": 2,
+       "doubles": 0,
+       "triples": 0,
+       "homeRuns": 0,
+       "rbi": 0,
+       "runs": 1,
+       "baseOnBalls": 0,
+       "hitByPitch": 0,
+       "strikeOuts": 2,
+       "stolenBases": 0,
+       "plateAppearances": 5
+      }
+     }
+    },
+    "ID104": {
+     "person": {
+      "id": 104,
+      "fullName": "Bateador LAD Cuatro"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 4,
+       "hits": 2,
+       "doubles": 1,
+       "triples": 0,
+       "homeRuns": 0,
+       "rbi": 0,
+       "runs": 0,
+       "baseOnBalls": 1,
+       "hitByPitch": 0,
+       "strikeOuts": 0,
+       "stolenBases": 0,
+       "plateAppearances": 5
+      }
+     }
+    },
+    "ID111": {
+     "person": {
+      "id": 111,
+      "fullName": "Abridor LAD"
+     },
+     "stats": {
+      "pitching": {
+       "inningsPitched": "6.0",
+       "hits": 4,
+       "runs": 2,
+       "earnedRuns": 2,
+       "baseOnBalls": 1,
+       "strikeOuts": 8,
+       "homeRuns": 2,
+       "numberOfPitches": 98
+      }
+     }
+    },
+    "ID112": {
+     "person": {
+      "id": 112,
+      "fullName": "Relevo LAD A"
+     },
+     "stats": {
+      "pitching": {
+       "inningsPitched": "3.0",
+       "hits": 1,
+       "runs": 0,
+       "earnedRuns": 0,
+       "baseOnBalls": 0,
+       "strikeOuts": 4,
+       "homeRuns": 0,
+       "numberOfPitches": 40
+      }
+     }
+    },
+    "ID113": {
+     "person": {
+      "id": 113,
+      "fullName": "Pitcher Ganador Dos"
+     },
+     "stats": {
+      "pitching": {
+       "inningsPitched": "2.0",
+       "hits": 1,
+       "runs": 0,
+       "earnedRuns": 0,
+       "baseOnBalls": 1,
+       "strikeOuts": 2,
+       "homeRuns": 0,
+       "numberOfPitches": 30
+      }
+     }
+    }
+   },
+   "batters": [
+    101,
+    102,
+    103,
+    104
+   ],
+   "pitchers": [
+    111,
+    112,
+    113
+   ]
+  },
+  "home": {
+   "team": {
+    "id": 1,
+    "name": "Milwaukee Brewers",
+    "abbreviation": "MIL"
+   },
+   "players": {
+    "ID201": {
+     "person": {
+      "id": 201,
+      "fullName": "Bateador MIL Uno"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 5,
+       "hits": 2,
+       "doubles": 0,
+       "triples": 0,
+       "homeRuns": 1,
+       "rbi": 1,
+       "runs": 1,
+       "baseOnBalls": 0,
+       "hitByPitch": 0,
+       "strikeOuts": 0,
+       "stolenBases": 0,
+       "plateAppearances": 5
+      }
+     }
+    },
+    "ID202": {
+     "person": {
+      "id": 202,
+      "fullName": "Bateador MIL Dos"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 4,
+       "hits": 1,
+       "doubles": 0,
+       "triples": 0,
+       "homeRuns": 1,
+       "rbi": 1,
+       "runs": 1,
+       "baseOnBalls": 1,
+       "hitByPitch": 0,
+       "strikeOuts": 0,
+       "stolenBases": 0,
+       "plateAppearances": 5
+      }
+     }
+    },
+    "ID203": {
+     "person": {
+      "id": 203,
+      "fullName": "Bateador MIL Tres"
+     },
+     "stats": {
+      "batting": {
+       "atBats": 4,
+       "hits": 3,
+       "doubles": 0,
+       "triples": 0,
+       "homeRuns": 0,
+       "rbi": 0,
+       "runs": 0,
+       "baseOnBalls": 0,
+       "hitByPitch": 0,
+       "strikeOuts": 1,
+       "stolenBases": 0,
+       "plateAppearances": 4
+      }
+     }
+    },
+    "ID211": {
+     "person": {
+      "id": 211,
+      "fullName": "Abridor MIL"
+     },
+     "stats": {
+      "pitching": {
+       "inningsPitched": "5.1",
+       "hits": 6,
+       "runs": 2,
+       "earnedRuns": 2,
+       "baseOnBalls": 2,
+       "strikeOuts": 5,
+       "homeRuns": 1,
+       "numberOfPitches": 95
+      }
+     }
+    },
+    "ID212": {
+     "person": {
+      "id": 212,
+      "fullName": "Relevo MIL A"
+     },
+     "stats": {
+      "pitching": {
+       "inningsPitched": "4.2",
+       "hits": 2,
+       "runs": 0,
+       "earnedRuns": 0,
+       "baseOnBalls": 1,
+       "strikeOuts": 6,
+       "homeRuns": 0,
+       "numberOfPitches": 60
+      }
+     }
+    },
+    "ID213": {
+     "person": {
+      "id": 213,
+      "fullName": "Pitcher Perdedor Dos"
+     },
+     "stats": {
+      "pitching": {
+       "inningsPitched": "1.0",
+       "hits": 1,
+       "runs": 1,
+       "earnedRuns": 1,
+       "baseOnBalls": 0,
+       "strikeOuts": 1,
+       "homeRuns": 0,
+       "numberOfPitches": 18
+      }
+     }
+    }
+   },
+   "batters": [
+    201,
+    202,
+    203
+   ],
+   "pitchers": [
+    211,
+    212,
+    213
+   ]
+  }
+ }
+}
