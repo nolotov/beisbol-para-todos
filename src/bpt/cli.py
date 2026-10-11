@@ -7,6 +7,7 @@ Ejemplos:
     bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
     bpt lvbp-equipos --temporada 2025            # portada + las 8 tarjetas de equipo
     bpt lvbp-equipos --temporada 2025 --equipo MAG
+    bpt lvbp-previas                              # previas 2026-27 (content/previas_2026-27.json)
 """
 from __future__ import annotations
 
@@ -119,6 +120,25 @@ def cmd_lvbp_teams(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_lvbp_previews(args: argparse.Namespace) -> int:
+    import json
+
+    from bpt.data import lvbp
+    from bpt.viz.preview_card import render_preview_card
+
+    contenido = json.loads(Path(args.contenido).read_text(encoding="utf-8"))
+    anterior = int(contenido["temporada_anterior"])
+    t = lvbp.fetch_team_stats(anterior, refresh=args.refresh)
+    for code, data in contenido["equipos"].items():
+        if args.equipo and code != args.equipo.upper():
+            continue
+        out = Path(args.salida) / f"lvbp_previa_{code.lower()}_{contenido['temporada']}.png"
+        render_preview_card(t, code, data, contenido["temporada"], lvbp.season_label(anterior),
+                            out, handle=args.handle)
+        print(f"[ok] {code}: {out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="bpt", description="Beisbol Para Todos - toolkit de datos")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -167,6 +187,15 @@ def main(argv: list[str] | None = None) -> int:
                     help="mixto: español + sigla | espanol | siglas")
     lvbp_common(te)
     te.set_defaults(func=cmd_lvbp_teams)
+
+    pv = sub.add_parser("lvbp-previas", help="Tarjetas previas de temporada por equipo")
+    pv.add_argument("--contenido", default="content/previas_2026-27.json",
+                    help="JSON con mánager, cambios y la pregunta de cada equipo")
+    pv.add_argument("--equipo", default=None, help="Solo un equipo (CAR, MAG, ...)")
+    pv.add_argument("--salida", default="output/cards")
+    pv.add_argument("--handle", default=theme.HANDLE)
+    pv.add_argument("--refresh", action="store_true")
+    pv.set_defaults(func=cmd_lvbp_previews)
 
     args = p.parse_args(argv)
     return args.func(args)

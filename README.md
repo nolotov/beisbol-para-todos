@@ -44,6 +44,9 @@ bpt lvbp-card "Bryan Mata" --tipo pitcheo --temporada 2025
 bpt lvbp-equipos --temporada 2025            # portada del carrusel + las 8
 bpt lvbp-equipos --temporada 2025 --equipo MAG
 
+# Previas de temporada: números de la anterior + contenido editorial (content/previas_2026-27.json)
+bpt lvbp-previas
+
 # Filtros: --equipo MAG, --fase final, --refresh
 # Logos: si existe assets/logos/{codigo}.png (agu, bra, car, anz, leo, mag, tib, tig),
 # la tarjeta de equipo lo muestra arriba a la derecha. Fuente: lvbp.com. La carpeta no se

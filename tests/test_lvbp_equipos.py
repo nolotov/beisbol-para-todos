@@ -67,3 +67,24 @@ def test_logo_opcional(tabla, tmp_path):
     a, b = Image.open(con).convert("RGB"), Image.open(sin).convert("RGB")
     assert a.size == b.size == (1080, 1350)
     assert a.getpixel((1000, 80)) != b.getpixel((1000, 80))  # el logo aparece arriba a la derecha
+
+
+def test_previas_desde_contenido(tabla, tmp_path, monkeypatch):
+    import json
+    from pathlib import Path
+
+    contenido = json.loads(Path("content/previas_2026-27.json").read_text(encoding="utf-8"))
+    assert set(contenido["equipos"]) == set(lvbp.TEAMS)
+    for code, d in contenido["equipos"].items():
+        assert d["manager"] and len(d["cambios"]) == 3 and d["pregunta"].strip(), code
+        assert d["fuentes"], code  # toda novedad lleva su fuente
+    monkeypatch.setattr(lvbp, "fetch_team_stats", lambda *a, **k: tabla)
+    assert main(["lvbp-previas", "--salida", str(tmp_path)]) == 0
+    assert len(list(tmp_path.glob("lvbp_previa_*_2026-27.png"))) == 8
+
+
+def test_resumen_temporada(tabla):
+    from bpt.viz.preview_card import season_summary
+    car = season_summary(tabla, "CAR")
+    assert (car["G"], car["P"], car["dif"], car["ofensiva_rank"]) == (30, 26, 45, 1)
+    assert season_summary(tabla, "MAG")["pitcheo_rank"] == 1
