@@ -10,6 +10,8 @@ Ejemplos:
     bpt lvbp-previas                              # previas 2026-27 (content/previas_2026-27.json)
     bpt mlb-resultados                            # Series de Campeonato: juegos de ayer
     bpt mlb-resultados --fecha 2026-10-11 --fase todas
+    bpt mlb-resultados --redactar                 # + caption, hilo y guion (ANTHROPIC_API_KEY)
+    bpt redactar --fecha 2026-10-12               # solo textos, sobre un resumen.json ya generado
 """
 from __future__ import annotations
 
@@ -156,7 +158,41 @@ def cmd_mlb_results(args: argparse.Namespace) -> int:
     if not r["juegos"] and not r["pendientes"]:
         print(f"[--] No hubo juegos de esa fase el {fecha}")
     print(f"Resumen: {carpeta / 'resumen.json'}")
+    if args.redactar and r["juegos"]:
+        return _redactar(carpeta, args.modelo)
     return 0
+
+
+def _redactar(carpeta: Path, modelo: str) -> int:
+    from bpt.redactor import agente
+    try:
+        res = agente.redactar_dia(carpeta, modelo=modelo)
+    except RuntimeError as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    for r in res:
+        marca = "ok" if r["validacion"]["ok"] else "!!"
+        print(f"[{marca}] {r['partido']}: {r['estado']} (intentos: {r['intentos']})")
+        for c in r["validacion"]["cifras_sin_respaldo"]:
+            print(f"     cifra sin respaldo: {c}")
+        for a in r["validacion"]["alertas"]:
+            print(f"     {a}")
+    if res:
+        print(f"Textos: {carpeta / 'textos.md'}")
+    else:
+        print("[--] No hay juegos terminados para redactar")
+    return 0
+
+
+def cmd_redactar(args: argparse.Namespace) -> int:
+    from bpt import resultados
+    carpeta = Path(args.carpeta) if args.carpeta else \
+        Path(args.salida) / (args.fecha or resultados.ayer_mlb())
+    if not (carpeta / "resumen.json").exists():
+        print(f"[error] No existe {carpeta / 'resumen.json'}: corre antes bpt mlb-resultados",
+              file=sys.stderr)
+        return 1
+    return _redactar(carpeta, args.modelo)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -219,7 +255,17 @@ def main(argv: list[str] | None = None) -> int:
     mr.add_argument("--handle", default=theme.HANDLE)
     mr.add_argument("--cache", action="store_true",
                     help="Usar la caché local en vez de descargar de nuevo")
+    mr.add_argument("--redactar", action="store_true",
+                    help="Además, redactar caption, hilo y guion con Claude")
+    mr.add_argument("--modelo", default=None, help="Modelo de Claude (defecto: claude-sonnet-5-5)")
     mr.set_defaults(func=cmd_mlb_results)
+
+    rd = sub.add_parser("redactar", help="Textos para redes desde un resumen.json")
+    rd.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")
+    rd.add_argument("--carpeta", default=None, help="Carpeta con resumen.json (ignora --fecha)")
+    rd.add_argument("--salida", default="output/resultados/mlb")
+    rd.add_argument("--modelo", default=None, help="Modelo de Claude (defecto: claude-sonnet-5-5)")
+    rd.set_defaults(func=cmd_redactar)
 
     pv = sub.add_parser("lvbp-previas", help="Tarjetas previas de temporada por equipo")
     pv.add_argument("--contenido", default="content/previas_2026-27.json",

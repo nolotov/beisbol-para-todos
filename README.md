@@ -79,8 +79,27 @@ Sale en `output/resultados/mlb/AAAA-MM-DD/`, dos láminas de carrusel por juego 
 Y un `resumen.json` con las cifras del día, que es la entrada del agente redactor. Los juegos pospuestos o sin terminar quedan en
 `pendientes`. Fuente: MLB Stats API (`statsapi.mlb.com`), sin logos ni gráfica de MLB.
 
+#### Agente redactor
+
+```powershell
+$env:ANTHROPIC_API_KEY = "sk-ant-..."         # o en un archivo .env que NO se versiona
+bpt mlb-resultados --fecha 2026-10-12 --redactar
+bpt redactar --fecha 2026-10-12                # solo textos, sobre un resumen.json existente
+```
+
+Por cada juego escribe el caption de Instagram, un hilo de X de 3-5 tuits y un guion de
+30-45 s con marcas `[LÁMINA 1]`/`[LÁMINA 2]`, en `textos.md` (para leer) y `textos.json`.
+Las reglas de marca están en `src/bpt/redactor/prompt.py`.
+
+El **validador** revisa que toda cifra del texto esté en los datos del juego; si el modelo
+inventa una, se la devuelve para que corrija (1 reintento) y, si insiste, la pieza queda
+"con alertas". También marca lenguaje de apuestas, "el mejor" sin criterio y largos.
+**Nada se publica solo:** todo sale "para revisar". Modelo por defecto: `claude-sonnet-5-5`
+(`--modelo` o la variable `BPT_MODELO` para cambiarlo).
+
 **Automático:** `.github/workflows/resultados-mlb.yml` lo corre cada mañana de octubre y noviembre
-y deja la carpeta del día como artefacto del run. El cron solo se activa cuando el workflow está
+y deja la carpeta del día como artefacto del run. Si el repo tiene el secreto `ANTHROPIC_API_KEY`,
+también redacta, y los textos se ven directo en el resumen del run. El cron solo se activa cuando el workflow está
 en `main`; antes se puede lanzar a mano desde Actions.
 
 ### Etiquetas de métricas
@@ -104,6 +123,7 @@ Las tarjetas salen en `output/cards/`. Los datos crudos se cachean en `data/raw/
 src/bpt/
   theme.py               # paleta "Dashboard de dugout", estilo matplotlib y firma @mbp.deportes
   resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
+  redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
   glossary.py            # glosario de métricas: sigla, nombre en español, pista y explicación
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
   data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga

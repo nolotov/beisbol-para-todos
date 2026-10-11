@@ -27,6 +27,8 @@ jobs:
   resultados:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,12 +54,20 @@ jobs:
           python -m bpt mlb-resultados $ARGS | tee salida.txt
           echo "carpeta=$(ls -d output/resultados/mlb/*/ | tail -1)" >> "$GITHUB_OUTPUT"
 
+      - name: Redactar textos (si hay ANTHROPIC_API_KEY)
+        if: ${{ env.ANTHROPIC_API_KEY != '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m bpt redactar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
       - name: Resumen del run
         run: |
           echo '### Resultados MLB' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           cat salida.txt >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+          TEXTOS="${{ steps.gen.outputs.carpeta }}textos.md"
+          if [ -f "$TEXTOS" ]; then cat "$TEXTOS" >> "$GITHUB_STEP_SUMMARY"; fi
 
       - uses: actions/upload-artifact@v4
         with:
