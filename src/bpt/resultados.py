@@ -48,7 +48,7 @@ def generar(fecha: str, temporada: int | None = None, tipo: str | None = "L",
                                "juego_n": j.juego_n, "estado": j.estado,
                                "partido": f"{j.visitante.abrev} @ {j.local.abrev}"})
             continue
-        s = series.get(j.serie)
+        s = series.get(mlb_stats.clave_serie(j))
         nombre = f"{j.serie_corto.lower().replace(' ', '-')}_j{j.juego_n}_{j.visitante.abrev}-{j.local.abrev}.png"
         card = render_result_card(j, s, carpeta / nombre, handle=handle, temporada=temporada)
         d = j.to_dict()

@@ -39,9 +39,9 @@ def test_extrainnings_y_titular(sched):
 
 
 def test_estado_serie_por_fecha(sched):
-    s1 = mlb_stats.estado_series(sched, hasta="2026-10-11")["NL Championship Series"]
+    s1 = mlb_stats.estado_series(sched, hasta="2026-10-11")["NL Championship Series|LAD-MIL"]
     assert s1.equipos == {"LAD": 0, "MIL": 1} and s1.texto == "MIL lidera 1-0"
-    s2 = mlb_stats.estado_series(sched, hasta="2026-10-12")["NL Championship Series"]
+    s2 = mlb_stats.estado_series(sched, hasta="2026-10-12")["NL Championship Series|LAD-MIL"]
     assert s2.texto == "Serie empatada 1-1" and s2.lider is None
     assert s2.para_ganar == 4 and s2.ganador is None
 
@@ -87,3 +87,41 @@ def test_ayer_en_hora_del_este():
     # 00:30 del 12 en Santiago (UTC-3) = 23:30 del 11 en Nueva York -> ayer = 10 oct
     t = datetime(2026, 10, 12, 0, 30, tzinfo=ZoneInfo("America/Santiago"))
     assert resultados.ayer_mlb(t) == "2026-10-10"
+
+
+def _ds_game(pk, fecha, n, away, home, ganador_local):
+    def eq(ab, score, win):
+        return {"team": {"id": hash(ab) % 1000, "name": ab, "abbreviation": ab},
+                "score": score, "isWinner": win}
+    return {"gamePk": pk, "gameType": "D", "officialDate": fecha,
+            "gameDate": f"{fecha}T20:00:00Z",
+            "status": {"abstractGameState": "Final", "detailedState": "Final"},
+            "seriesDescription": "NL Division Series", "seriesGameNumber": n,
+            "gamesInSeries": 5, "venue": {"name": "Estadio de prueba"},
+            "teams": {"away": eq(away, 1 if ganador_local else 2, not ganador_local),
+                      "home": eq(home, 2 if ganador_local else 1, ganador_local)}}
+
+
+def test_dos_divisionales_simultaneas_no_se_mezclan(tmp_path):
+    """Regresión: las dos NLDS comparten seriesDescription. LAD-ATL va 2-1, PHI-CHC 2-2."""
+    juegos = [
+        _ds_game(1, "2026-10-04", 1, "ATL", "LAD", True),   # LAD
+        _ds_game(2, "2026-10-04", 1, "CHC", "PHI", True),   # PHI
+        _ds_game(3, "2026-10-05", 2, "ATL", "LAD", False),  # ATL
+        _ds_game(4, "2026-10-05", 2, "CHC", "PHI", True),   # PHI
+        _ds_game(5, "2026-10-07", 3, "LAD", "ATL", False),  # LAD
+        _ds_game(6, "2026-10-07", 3, "PHI", "CHC", True),   # CHC
+        _ds_game(7, "2026-10-08", 4, "PHI", "CHC", True),   # CHC
+    ]
+    sched = {"dates": [{"date": "x", "games": juegos}]}
+    series = mlb_stats.estado_series(sched, hasta="2026-10-08", tipo="D")
+    lad = series["NL Division Series|ATL-LAD"]
+    phi = series["NL Division Series|CHC-PHI"]
+    assert lad.equipos == {"ATL": 1, "LAD": 2} and lad.texto == "LAD lidera 2-1"
+    assert lad.para_ganar == 3
+    assert phi.texto == "Serie empatada 2-2"
+
+    r = resultados.generar("2026-10-07", tipo="D", salida=tmp_path, schedule=sched)
+    textos = {j["titular"]: j["estado_serie"]["texto"] for j in r["juegos"]}
+    assert textos["LAD le gana 2-1 a ATL"] == "LAD lidera 2-1"
+

@@ -250,6 +250,16 @@ class EstadoSerie:
         return asdict(self)
 
 
+def clave_serie(j: Juego) -> str:
+    """Identificador único de una serie: fase + los dos equipos.
+
+    No basta con `seriesDescription`: en Comodín y Divisional hay dos series por liga
+    jugándose a la vez con el mismo nombre ("NL Division Series").
+    """
+    a, b = sorted([j.visitante.abrev, j.local.abrev])
+    return f"{j.serie}|{a}-{b}"
+
+
 def _victorias_para_ganar(juegos: list[Juego]) -> int:
     n = max((j.juegos_en_serie for j in juegos), default=7) or 7
     return n // 2 + 1
@@ -257,16 +267,19 @@ def _victorias_para_ganar(juegos: list[Juego]) -> int:
 
 def estado_series(schedule: dict, hasta: str | None = None,
                   tipo: str | None = None) -> dict[str, EstadoSerie]:
-    """Estado de cada serie contando solo juegos finalizados con fecha <= `hasta`."""
+    """Estado de cada serie contando solo juegos finalizados con fecha <= `hasta`.
+
+    La clave del diccionario es `clave_serie(juego)`.
+    """
     juegos = all_games(schedule)
     por_serie: dict[str, list[Juego]] = {}
     for j in juegos:
         if tipo and j.tipo != tipo:
             continue
-        por_serie.setdefault(j.serie, []).append(j)
+        por_serie.setdefault(clave_serie(j), []).append(j)
 
     out: dict[str, EstadoSerie] = {}
-    for serie, js in por_serie.items():
+    for clave, js in por_serie.items():
         abrevs = sorted({j.local.abrev for j in js} | {j.visitante.abrev for j in js})
         wins = {a: 0 for a in abrevs}
         for j in js:
@@ -283,6 +296,6 @@ def estado_series(schedule: dict, hasta: str | None = None,
         else:
             texto = f"{a1} lidera {w1}-{w2}"
         j0 = js[0]
-        out[serie] = EstadoSerie(serie, j0.serie_es, j0.serie_corto, wins, meta,
+        out[clave] = EstadoSerie(j0.serie, j0.serie_es, j0.serie_corto, wins, meta,
                                  a1 if w1 > w2 else None, ganador, texto)
     return out
