@@ -266,7 +266,7 @@ def latinos(box: dict, personas: dict[int, dict], decisiones: dict[str, str | No
     """Todos los latinos que participaron (bateo con al menos una aparición y pitcheo).
 
     Orden: destacados primero; dentro de cada grupo, pitcheo por Game Score y bateo por
-    bases ganadas (los mismos criterios de las figuras).
+    bases ganadas (los mismos criterios de las figuras); en empate, venezolanos primero.
     `decisiones`: {"ganador": nombre, "perdedor": nombre, "salvado": nombre} del juego.
     """
     from bpt.data.mlb_people import pais_latino
@@ -293,7 +293,8 @@ def latinos(box: dict, personas: dict[int, dict], decisiones: dict[str, str | No
             linea = p.texto() + (f"  ·  {dec}" if dec else "")
             out.append(ActuacionLatina(p.nombre, p.equipo, pais[1], pais[0], "pitcheo", linea,
                                        p.game_score, m is not None, m))
-    out.sort(key=lambda a: (not a.destacada, a.rol != "pitcheo", -a.valor))
+    # En empate de valor, el venezolano primero (regla de marca)
+    out.sort(key=lambda a: (not a.destacada, a.rol != "pitcheo", -a.valor, a.codigo != "VEN"))
     return out
 
 

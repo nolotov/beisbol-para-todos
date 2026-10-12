@@ -101,3 +101,10 @@ def test_sin_latinos_no_hay_lamina(box, tmp_path):
                            boxscores={900002: box}, personas={})
     j = r["juegos"][0]
     assert j["latinos"] == [] and len(j["tarjetas"]) == 2
+
+
+def test_en_empate_va_primero_el_venezolano(box, personas):
+    # Bateador LAD Dos (DOM, 4 bases ganadas) y LAD Cuatro (2-4, 2B, BB: 4) empatan
+    personas[104] = {"pais_api": "Venezuela"}
+    bate = [a.nombre for a in mlb_box.latinos(box, personas, DECISIONES) if a.rol == "bateo"]
+    assert bate.index("Bateador LAD Cuatro") < bate.index("Bateador LAD Dos")
