@@ -1,0 +1,99 @@
+# Resultados LVBP: cada mañana arma el carrusel de la jornada de ayer (marcadores +
+# destacados), los extras por juego, el resumen.json, los textos (si hay ANTHROPIC_API_KEY)
+# y lo manda a Telegram (si hay TELEGRAM_BOT_TOKEN).
+#
+# El cron solo corre cuando este archivo está en la rama por defecto (main).
+# Mientras tanto se puede lanzar a mano desde la pestaña Actions ("Run workflow").
+name: Resultados LVBP
+
+on:
+  schedule:
+    # 13:52 UTC ≈ 10:52 en Santiago, 5 minutos después del de MLB.
+    # De octubre a enero: temporada regular y playoffs de la LVBP.
+    - cron: "52 13 * 10,11,12,1 *"
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fecha (YYYY-MM-DD). Vacío = ayer en hora de Venezuela"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: resultados-lvbp
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash   # bash -eo pipefail: un error antes del "| tee" sí hace fallar el paso
+
+jobs:
+  jornada:
+    # Fijo: ubuntu-latest pasa a Ubuntu 26 desde el 19-oct-2026 (en plena postemporada)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        run: pip install -e ".[dev]"
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Generar carrusel de la jornada
+        id: gen
+        env:
+          FECHA: ${{ inputs.fecha }}
+        run: |
+          ARGS=""
+          if [ -n "$FECHA" ]; then ARGS="--fecha $FECHA"; fi
+          python -m bpt lvbp-resultados $ARGS | tee salida.txt
+          echo "carpeta=$(ls -d output/resultados/lvbp/*/ | tail -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Redactar textos (si hay ANTHROPIC_API_KEY)
+        if: ${{ env.ANTHROPIC_API_KEY != '' }}
+        run: python -m bpt redactar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Enviar a Telegram (si hay TELEGRAM_BOT_TOKEN)
+        # Aunque falle el redactor: en ese caso llegan solo las láminas
+        if: ${{ always() && steps.gen.outcome == 'success' && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Avisar por Telegram si algo falló
+        if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode text="⚠️ MBP: falló el workflow de la LVBP. Revisa: ${URL}"
+
+      - name: Resumen del run
+        if: always()
+        run: |
+          echo '### Resultados LVBP' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          TEXTOS="${{ steps.gen.outputs.carpeta }}textos.md"
+          if [ -f "$TEXTOS" ]; then cat "$TEXTOS" >> "$GITHUB_STEP_SUMMARY"; fi
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo '> Sin secreto ANTHROPIC_API_KEY: se generaron las tarjetas, pero no los textos.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: always() && steps.gen.outputs.carpeta != ''
+        with:
+          name: resultados-lvbp-${{ github.run_number }}
+          path: ${{ steps.gen.outputs.carpeta }}
+          retention-days: 30

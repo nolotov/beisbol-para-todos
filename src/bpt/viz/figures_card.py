@@ -22,17 +22,19 @@ def _gs_color(gs: int):
 
 
 def render_figures_card(j: Juego, f: Figuras, out_path: Path,
-                        handle: str = theme.HANDLE, temporada: int | None = None) -> Path:
+                        handle: str = theme.HANDLE, temporada: int | None = None,
+                        encabezado: str | None = None, subtitulo: str | None = None,
+                        fuente: str = FUENTE) -> Path:
     fonts = theme.apply()
     num = fonts["number"]
     fig = plt.figure(figsize=(W, H), dpi=100)
     temporada = temporada or int(j.fecha[:4])
     v, l = j.visitante, j.local
 
-    fig.text(0.06, 0.955, f"MBP  ·  MLB POSTEMPORADA {temporada}  ·  {j.serie_corto}",
+    fig.text(0.06, 0.955, encabezado or f"MBP  ·  MLB POSTEMPORADA {temporada}  ·  {j.serie_corto}",
              fontsize=14, color=theme.ACCENT, va="top", family=num)
     fig.text(0.06, 0.915, "FIGURAS", fontsize=56, weight="bold", color=theme.TEXT, va="top")
-    fig.text(0.06, 0.838, f"Juego {j.juego_n}  ·  {v.abrev} {v.carreras}, {l.abrev} {l.carreras}",
+    fig.text(0.06, 0.838, subtitulo or f"Juego {j.juego_n}  ·  {v.abrev} {v.carreras}, {l.abrev} {l.carreras}",
              fontsize=17, color=theme.MUTED, va="top")
 
     px, pw = 0.04, 0.92
@@ -107,10 +109,10 @@ def render_figures_card(j: Juego, f: Figuras, out_path: Path,
                  color=theme.MUTED, va="center")
 
     # Pie
-    fig.text(0.06, 0.085, "Game Score: nota de la salida (50 promedio, 70+ dominante).  "
+    fig.text(0.06, 0.085, "Game Score (3+ IL): nota de la salida (50 promedio, 70+ dominante).  "
              "Bases ganadas: totales + boletos + pelotazos + robos.", fontsize=9.5,
              color=theme.MUTED, va="center", family=num)
-    fig.text(0.06, 0.055, f"{fecha_es(j.fecha)}  ·  {FUENTE}", fontsize=10,
+    fig.text(0.06, 0.055, f"{fecha_es(j.fecha)}  ·  {fuente}", fontsize=10,
              color=theme.MUTED, va="center", family=num)
     fig.text(0.94, 0.055, handle, fontsize=15, color=theme.TEXT, va="center", ha="right",
              weight="bold")

@@ -86,10 +86,11 @@ class Telegram:
         imagenes = [Path(p) for p in imagenes][:10]
         if not imagenes:
             return
-        if len(imagenes) == 1 and not como_archivo:
+        if len(imagenes) == 1:  # sendMediaGroup exige entre 2 y 10 elementos
+            metodo, campo = ("sendDocument", "document") if como_archivo else ("sendPhoto", "photo")
             with open(imagenes[0], "rb") as f:
-                self._llamar("sendPhoto", {"chat_id": self.chat_id, "caption": leyenda or ""},
-                             {"photo": f})
+                self._llamar(metodo, {"chat_id": self.chat_id, "caption": leyenda or ""},
+                             {campo: f})
             return
         tipo = "document" if como_archivo else "photo"
         media = [{"type": tipo, "media": f"attach://f{i}"} for i in range(len(imagenes))]
@@ -142,6 +143,9 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
     redactados = json.loads(textos_path.read_text(encoding="utf-8")) if textos_path.exists() else []
     por_pk = {r["game_pk"]: r for r in redactados}
 
+    if resumen.get("formato") == "jornada":
+        return _enviar_jornada(carpeta, resumen, por_pk.get("jornada"), tg, originales)
+
     juegos = resumen.get("juegos", [])
     if not juegos:
         pend = resumen.get("pendientes", [])
@@ -171,6 +175,45 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
         for i, tuit in enumerate(hilo, 1):
             tg.texto(f"𝕏 {i}/{len(hilo)}\n\n{tuit}")
         tg.texto("🎙️ GUION (30-45 s)\n\n" + t["guion"])
+    return len(juegos)
+
+
+def _textos(tg: Telegram, t: dict) -> None:
+    tg.texto("📸 INSTAGRAM\n\n" + t["instagram"])
+    hilo = t.get("hilo_x", [])
+    for i, tuit in enumerate(hilo, 1):
+        tg.texto(f"𝕏 {i}/{len(hilo)}\n\n{tuit}")
+    tg.texto("🎙️ GUION (30-45 s)\n\n" + t["guion"])
+
+
+def _enviar_jornada(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
+                    originales: bool) -> int:
+    juegos = resumen.get("juegos", [])
+    liga = resumen.get("liga", "LVBP")
+    if not juegos:
+        pend = resumen.get("pendientes", [])
+        extra = ("\nSin terminar: " + ", ".join(f"{p['partido']} ({p['estado']})" for p in pend)
+                 if pend else "")
+        tg.texto(f"MBP · {liga} {resumen['fecha']}: no hubo juegos terminados.{extra}")
+        return 0
+    marcadores = "\n".join(f"• {j['titular']}" for j in juegos)
+    if r is None:
+        enc = "Sin textos (falta la llave de Claude o falló el redactor): solo láminas."
+    else:
+        enc = encabezado(r, 1, 1).split("\n", 1)[1]   # sin la línea "1/1"
+    tg.texto(f"⚾ {liga} · Jornada del {resumen['fecha']} · {len(juegos)} juego"
+             f"{'s' if len(juegos) != 1 else ''}\n{marcadores}\n\n{enc}\n\n"
+             "Nada se publica sin tu ok. 👇")
+    carrusel = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
+    tg.album(carrusel)
+    if originales and carrusel:
+        tg.album(carrusel, como_archivo=True, leyenda="Carrusel: originales para Instagram")
+    extras = [carpeta / t for t in resumen.get("extras", []) if (carpeta / t).exists()]
+    for k in range(0, len(extras), 10):
+        tg.album(extras[k:k + 10], como_archivo=True,
+                 leyenda="Extras para historias: resultado y figuras de cada juego")
+    if r is not None:
+        _textos(tg, r["textos"])
     return len(juegos)
 
 

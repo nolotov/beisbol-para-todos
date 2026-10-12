@@ -91,7 +91,8 @@ def test_ayer_en_hora_del_este():
 
 def _ds_game(pk, fecha, n, away, home, ganador_local):
     def eq(ab, score, win):
-        return {"team": {"id": hash(ab) % 1000, "name": ab, "abbreviation": ab},
+        ids = {"ATL": 144, "LAD": 119, "CHC": 112, "PHI": 143}  # ids fijos (no hash())
+        return {"team": {"id": ids[ab], "name": ab, "abbreviation": ab},
                 "score": score, "isWinner": win}
     return {"gamePk": pk, "gameType": "D", "officialDate": fecha,
             "gameDate": f"{fecha}T20:00:00Z",

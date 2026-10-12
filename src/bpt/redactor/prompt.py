@@ -136,3 +136,75 @@ def mensaje_usuario(juego: dict, resumen: dict) -> str:
         "Bases ganadas = bases totales + boletos + pelotazos + robos.\n"
         "Responde solo con el JSON de las piezas."
     )
+
+
+# --- LVBP: una pieza por jornada --------------------------------------------------
+
+SISTEMA_JORNADA = """
+
+MODO JORNADA LVBP (manda sobre lo anterior cuando choque)
+Escribes UNA sola pieza para toda la jornada de la Liga Venezolana de Béisbol Profesional, \
+no un juego. Los datos traen todos los juegos terminados del día (`juegos`), los que no \
+terminaron (`pendientes`) y los `destacados` de la jornada con sus `criterios`.
+- Ignora la sección LATINOS: en la LVBP casi todos son venezolanos y no tenemos el país en \
+los datos. No uses "criollo" ni "importado" para nadie.
+- Neutralidad total: la cuenta es para los fanáticos de los 8 equipos. No tomes partido.
+- Nombra a los equipos por su nombre o apodo de siempre: Leones, Navegantes, Cardenales, \
+Tigres, Tiburones, Águilas, Caribes, Bravos.
+- `record` es el récord DESPUÉS del juego: "los Tigres quedan 2-0".
+- Los destacados se eligieron con un criterio: di "lideró la jornada en bases ganadas" o \
+"la mejor salida de la jornada por Game Score", nunca "el mejor" a secas.
+- Si en un juego el ganador fue un relevista, puedes mencionarlo, pero sin inventar el \
+momento en que entró.
+
+PIEZAS (modo jornada)
+- instagram: carrusel de 2 láminas (1: la jornada con todos los marcadores, 2: destacados). \
+Gancho con lo más llamativo de la jornada; luego una línea por juego con el marcador; \
+luego 1 o 2 líneas de destacados; cierra con una pregunta. Máximo 1.200 caracteres.
+- hilo_x: 3 a 5 tuits. El primero resume la jornada; después los marcadores (pueden ir \
+varios en un tuit) y los destacados.
+- guion: 30 a 45 segundos (85 a 105 palabras) con [LÁMINA 1] (marcadores) y [LÁMINA 2] \
+(destacados).
+"""
+
+
+def datos_jornada(resumen: dict) -> dict:
+    """Lo que ve el modelo en modo jornada: marcadores, decisiones, récords y destacados."""
+    juegos = []
+    for j in resumen["juegos"]:
+        juegos.append({
+            "titular": j["titular"],
+            "visitante": {k: j["visitante"][k] for k in ("nombre", "abrev", "carreras", "hits",
+                                                         "errores", "record")},
+            "local": {k: j["local"][k] for k in ("nombre", "abrev", "carreras", "hits",
+                                                 "errores", "record")},
+            "ganador_pitcher": j.get("ganador_pitcher"),
+            "perdedor_pitcher": j.get("perdedor_pitcher"),
+            "salvado_pitcher": j.get("salvado_pitcher"),
+            "entradas": j.get("entradas"),
+            "extra_innings": j.get("extra_innings"),
+            "estadio": j.get("estadio"),
+        })
+    return {
+        "liga": "LVBP",
+        "fecha": resumen["fecha"],
+        "temporada": resumen.get("temporada_label"),
+        "fase": resumen.get("fase"),
+        "juegos": juegos,
+        "pendientes": resumen.get("pendientes", []),
+        "destacados": resumen.get("destacados", {}),
+        "laminas": len(resumen.get("tarjetas", [])),
+        "fuente": resumen.get("fuente"),
+    }
+
+
+def mensaje_jornada(resumen: dict) -> str:
+    glos = {k: glossary.get(k).explicacion for k in _METRICAS}
+    return (
+        "Escribe las piezas para esta jornada de la LVBP. Datos (JSON):\n\n"
+        f"{json.dumps(datos_jornada(resumen), ensure_ascii=False, indent=1)}\n\n"
+        "Explicaciones de métricas que puedes usar (adáptalas, no las copies enteras):\n"
+        f"{json.dumps(glos, ensure_ascii=False, indent=1)}\n\n"
+        "Bases ganadas = bases totales + boletos + pelotazos + robos.\n"
+        "Responde solo con el JSON de las piezas."
+    )
