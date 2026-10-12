@@ -94,6 +94,17 @@ class Validacion:
                 "alertas": self.alertas}
 
 
+def _criollos_mal_usados(texto: str, datos) -> bool:
+    """'Criollos' en una pieza que también nombra a un latino que no es venezolano, en el
+    mismo párrafo o tuit (p. ej. 'Criollos al bate: ... el dominicano Teoscar')."""
+    latinos = (datos or {}).get("latinos") or [] if isinstance(datos, dict) else []
+    otros = [a["nombre"] for a in latinos if a.get("codigo") != "VEN"]
+    for parrafo in re.split(r"\n\s*\n|\n", texto):
+        if re.search(r"\bcriollos?\b", parrafo, re.I) and any(n in parrafo for n in otros):
+            return True
+    return False
+
+
 def validar(textos: dict, datos) -> Validacion:
     permitidos = numeros_permitidos(datos)
     v = Validacion()
@@ -118,6 +129,8 @@ def validar(textos: dict, datos) -> Validacion:
         if m and int(m.group(1)) <= int(m.group(2)):
             v.alertas.append(f"{nombre}: línea al estilo gringo '{m.group(0)}'; va 'se fue de "
                              f"{m.group(2)}-{m.group(1)}'")
+        if _criollos_mal_usados(texto, datos):
+            v.alertas.append(f"{nombre}: 'criollo' junto a un latino que no es venezolano")
         if MEJOR_A_SECAS.search(texto):
             v.alertas.append(f"{nombre}: dice 'el mejor' sin el criterio")
         if nombre.startswith("tuit") and len(texto) > LIMITES["tuit"]:

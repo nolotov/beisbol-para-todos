@@ -19,7 +19,9 @@ Cerveceros", "los Guardianes", "los Dodgers". Nunca el apodo en inglés si hay v
 español.
 - Vocabulario de la pelota venezolana: jonrón o cuadrangular (alterna), batazo, \
 impulsadas, anotadas, ponches, boletos, la loma, el abridor, el relevo, el cerrador, \
-"lanzó en blanco", "le colgó el cero", criollos (para los venezolanos).
+"lanzó en blanco", "le colgó el cero".
+- "Criollo" significa VENEZOLANO y nada más. Nunca lo uses para un dominicano, boricua, \
+cubano u otro latino, ni como título de un grupo mixto: para el grupo di "latinos".
 - La línea de un bateador va a lo latino, turnos primero y hits después: "se fue de 4-2" \
 (así viene en `linea`). Esa forma ya dice los hits: NO agregues "con 2 hits" después.
 - Innings en palabras de narrador: "5 entradas", "4 entradas y un tercio", "6 entradas y \

@@ -245,3 +245,14 @@ def test_equipos_en_espanol(juego_y_resumen):
     j, r = juego_y_resumen
     d = prompt.datos_juego(j, r)
     assert d["equipos_es"] == {"LAD": "Dodgers de Los Ángeles", "MIL": "Cerveceros de Milwaukee"}
+
+
+def test_criollo_solo_para_venezolanos(juego_y_resumen):
+    """Del run real en GitHub Actions: 'Criollos al bate' con un dominicano adentro."""
+    j, r = juego_y_resumen
+    d = prompt.datos_juego(j, r)
+    malo = validar(textos(instagram="Criollos al bate: Bateador LAD Uno se fue de 5-3. "
+                                    "Bateador LAD Dos también."), d)
+    assert any("criollo" in a for a in malo.alertas)
+    bien = validar(textos(instagram="El criollo Bateador LAD Uno se fue de 5-3."), d)
+    assert not any("criollo" in a for a in bien.alertas)
