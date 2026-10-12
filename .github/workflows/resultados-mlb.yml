@@ -39,6 +39,8 @@ jobs:
     timeout-minutes: 15
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     steps:
       - uses: actions/checkout@v6
 
@@ -67,6 +69,19 @@ jobs:
       - name: Redactar textos (si hay ANTHROPIC_API_KEY)
         if: ${{ env.ANTHROPIC_API_KEY != '' }}
         run: python -m bpt redactar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Enviar a Telegram (si hay TELEGRAM_BOT_TOKEN)
+        # Aunque falle el redactor: en ese caso llegan solo las láminas
+        if: ${{ always() && steps.gen.outcome == 'success' && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Avisar por Telegram si algo falló
+        if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode text="⚠️ MBP: falló el workflow de resultados. Revisa: ${URL}"
 
       - name: Resumen del run
         if: always()
