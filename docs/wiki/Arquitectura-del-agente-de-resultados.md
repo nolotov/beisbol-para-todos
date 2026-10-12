@@ -1,7 +1,7 @@
 # Arquitectura del agente de resultados
 
 > Documento técnico de **Beisbol Para Todos** (`bpt`), el toolkit de datos de @mbp.deportes.
-> Versión del sistema: 0.4.1 · Actualizado: 12 de octubre de 2026.
+> Versión del sistema: 0.5.0 · Actualizado: 12 de octubre de 2026.
 
 ## Resumen
 
@@ -180,6 +180,15 @@ El único costo variable es Claude, estimado en pocos dólares mensuales. Es una
 | MLB Stats API | US$ 0 | Uso público, sin llave |
 | Telegram | US$ 0 | API de bots gratuita |
 
+**Prompt caching.** Lo único que se repite entre llamadas es el prompt de sistema (~1.400 tokens; el mínimo cacheable en Sonnet 5.5 es 512). Escribir el caché cuesta 1,25 veces la entrada normal, leerlo el 5 %, y dura 5 minutos. Por eso se activa solo cuando la corrida hará 2 o más llamadas: con 2 juegos el ahorro es de unos US$ 0,002 diarios, porque el costo lo domina la salida. Pasa a ser relevante con volumen alto (temporada regular de MLB, ~15 juegos diarios) o con conversaciones de edición en la Fase 4. Cada pieza registra sus tokens y su costo estimado en `textos.json` y el total diario en `uso.json`, para contrastar la estimación con el consumo real.
+
+| Escenario diario | Sin caché | Con caché | Diferencia |
+| --- | --- | --- | --- |
+| 1 llamada (LVBP, o MLB con 1 juego) | US$ 0,036 | US$ 0,037 | +US$ 0,0007 (por eso no se activa) |
+| 2 llamadas (MLB con 2 juegos) | US$ 0,072 | US$ 0,070 | −US$ 0,002 |
+
+Supuestos de la tabla: 3.000 tokens de entrada (1.400 de sistema) y 3.000 de salida por llamada, a precio de lista de Sonnet 5.5.
+
 Límites conocidos:
 
 - **La MLB Stats API no tiene un contrato de servicio.** Un cambio de esquema rompe la extracción. La mitigación son las pruebas con datos reales y la alerta por Telegram ante fallas.
@@ -228,3 +237,4 @@ Hoja de ruta:
 
 - [Gemini API: precios y planes](https://ai.google.dev/gemini-api/docs/pricing)
 - [Claude: modelos y precios](https://platform.claude.com/docs/en/models/overview)
+- [Claude: prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)

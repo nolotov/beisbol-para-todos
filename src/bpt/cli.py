@@ -206,6 +206,11 @@ def _redactar(carpeta: Path, modelo: str) -> int:
         for a in r["validacion"]["alertas"]:
             print(f"     {a}")
     if res:
+        u = agente.resumen_uso(res)
+        costo = f" · ~US$ {u['costo_usd']:.4f}" if u["costo_usd"] is not None else ""
+        print(f"Uso: {u['entrada'] + u['cache_escrito'] + u['cache_leido']} tokens de entrada "
+              f"({u['cache_leido']} leídos del caché, {u['cache_escrito']} escritos), "
+              f"{u['salida']} de salida{costo}")
         print(f"Textos: {carpeta / 'textos.md'}")
     else:
         print("[--] No hay juegos terminados para redactar")
