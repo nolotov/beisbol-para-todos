@@ -112,6 +112,7 @@ def test_redacta_y_pide_herramienta(juego_y_resumen):
     assert "tools" not in kw and "tool_choice" not in kw
     fmt = kw["output_config"]["format"]
     assert fmt["type"] == "json_schema" and fmt["schema"]["additionalProperties"] is False
+    assert kw["output_config"]["effort"] == "low" and kw["max_tokens"] >= 16000
     assert "Bateador LAD Uno" in kw["messages"][0]["content"]  # le llegan las figuras
     assert "game_pk" not in kw["messages"][0]["content"]       # sin campos técnicos
 

@@ -20,7 +20,10 @@ from bpt.redactor import prompt
 from bpt.redactor.validador import validar
 
 MODELO = os.environ.get("BPT_MODELO", "claude-sonnet-5-5")
-MAX_TOKENS = 2500
+# El razonamiento interno del modelo cuenta dentro de max_tokens: hay que dejar espacio.
+MAX_TOKENS = 16000
+# Esfuerzo de razonamiento: para redactar captions alcanza con "low" (más rápido y barato).
+ESFUERZO = os.environ.get("BPT_ESFUERZO", "low")
 
 
 ORIGEN_LLAVE = "entorno"  # de dónde salió la llave: ".env" o "entorno"
@@ -85,8 +88,11 @@ def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object]:
     try:
         return json.loads(texto), r
     except json.JSONDecodeError as e:
-        raise RuntimeError(f"El modelo no devolvió JSON válido (stop_reason="
-                           f"{getattr(r, 'stop_reason', '?')}): {texto[:200]}") from e
+        motivo = getattr(r, "stop_reason", "?")
+        pista = (" Se quedó sin espacio: sube MAX_TOKENS o baja BPT_ESFUERZO."
+                 if motivo == "max_tokens" else "")
+        raise RuntimeError(f"El modelo no devolvió JSON válido (stop_reason={motivo})."
+                           f"{pista} Inicio: {texto[:200]!r}") from e
 
 
 def _crear(client, mensajes: list[dict], modelo: str):
@@ -94,7 +100,8 @@ def _crear(client, mensajes: list[dict], modelo: str):
         model=modelo,
         max_tokens=MAX_TOKENS,
         system=prompt.SISTEMA,
-        output_config={"format": {"type": "json_schema", "schema": prompt.ESQUEMA}},
+        output_config={"format": {"type": "json_schema", "schema": prompt.ESQUEMA},
+                       "effort": ESFUERZO},
         messages=mensajes,
     )
 
