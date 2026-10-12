@@ -168,3 +168,32 @@ def test_prompt_recibe_latinos(juego_y_resumen):
     # el conteo de latinos es una cifra con respaldo
     v = validar(textos(instagram="7 latinos vieron acción. LAD ganó 3-2."), d)
     assert "7" not in v.cifras_sin_respaldo
+
+
+def test_env_manda_sobre_variable_vieja(monkeypatch, tmp_path, capsys):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-vieja-de-powershell-1111")
+    (tmp_path / ".env").write_text("ANTHROPIC_API_KEY=sk-ant-nueva-del-env-2222\n",
+                                   encoding="utf-8")
+    agente.cargar_env(tmp_path / ".env")
+    import os
+    assert os.environ["ANTHROPIC_API_KEY"].endswith("2222")
+    err = capsys.readouterr().err
+    assert "…1111" in err and "…2222" in err and "vieja" not in err  # nunca la llave completa
+
+
+class AuthenticationError(Exception):
+    """Mismo nombre que la excepción del SDK."""
+
+
+def test_llave_rechazada_da_mensaje_claro(juego_y_resumen, monkeypatch):
+    j, r = juego_y_resumen
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-api03-xxxxxxxxxxxxABCD")
+
+    class Rechaza(ClienteFalso):
+        def create(self, **kw):
+            raise AuthenticationError("invalid x-api-key")
+
+    with pytest.raises(agente.LlaveInvalida) as e:
+        agente.redactar_juego(j, r, client=Rechaza())
+    msg = str(e.value)
+    assert "…ABCD" in msg and "Settings → API keys" in msg and "xxxx" not in msg

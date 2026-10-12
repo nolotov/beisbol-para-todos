@@ -12,6 +12,7 @@ Ejemplos:
     bpt mlb-resultados --fecha 2026-10-11 --fase todas
     bpt mlb-resultados --redactar                 # + caption, hilo y guion (ANTHROPIC_API_KEY)
     bpt redactar --fecha 2026-10-12               # solo textos, sobre un resumen.json ya generado
+    bpt llave                                     # probar la llave de la API (sin gastar)
 """
 from __future__ import annotations
 
@@ -201,6 +202,16 @@ def _redactar(carpeta: Path, modelo: str) -> int:
     return 0
 
 
+def cmd_llave(args: argparse.Namespace) -> int:
+    from bpt.redactor import agente
+    try:
+        print(f"[ok] {agente.verificar_llave()}")
+    except RuntimeError as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def cmd_redactar(args: argparse.Namespace) -> int:
     from bpt import resultados
     carpeta = Path(args.carpeta) if args.carpeta else \
@@ -283,6 +294,9 @@ def main(argv: list[str] | None = None) -> int:
     rd.add_argument("--salida", default="output/resultados/mlb")
     rd.add_argument("--modelo", default=None, help="Modelo de Claude (defecto: claude-sonnet-5-5)")
     rd.set_defaults(func=cmd_redactar)
+
+    ll = sub.add_parser("llave", help="Probar la llave de la API (no gasta créditos)")
+    ll.set_defaults(func=cmd_llave)
 
     pv = sub.add_parser("lvbp-previas", help="Tarjetas previas de temporada por equipo")
     pv.add_argument("--contenido", default="content/previas_2026-27.json",

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 from bpt.redactor import prompt
@@ -22,8 +23,16 @@ MODELO = os.environ.get("BPT_MODELO", "claude-sonnet-5-5")
 MAX_TOKENS = 2500
 
 
+ORIGEN_LLAVE = "entorno"  # de dónde salió la llave: ".env" o "entorno"
+
+
 def cargar_env(path: Path = Path(".env")) -> None:
-    """Carga KEY=VALOR de un archivo .env (no versionado) sin pisar variables ya definidas."""
+    """Carga KEY=VALOR de un archivo .env (no versionado).
+
+    El .env manda sobre el entorno: si en la ventana de PowerShell quedó una variable vieja
+    (por ejemplo de un `$env:ANTHROPIC_API_KEY = ...` de prueba), se reemplaza y se avisa.
+    """
+    global ORIGEN_LLAVE
     if not path.exists():
         return
     for linea in path.read_text(encoding="utf-8-sig").splitlines():
@@ -31,7 +40,23 @@ def cargar_env(path: Path = Path(".env")) -> None:
         if not linea or linea.startswith("#") or "=" not in linea:
             continue
         k, v = linea.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+        k, v = k.strip(), v.strip().strip('"').strip("'")
+        previo = os.environ.get(k)
+        if previo is not None and previo != v and k == "ANTHROPIC_API_KEY":
+            print(f"[aviso] Había otra ANTHROPIC_API_KEY en el entorno ({cola(previo)}); "
+                  f"uso la del .env ({cola(v)})", file=sys.stderr)
+        os.environ[k] = v
+        if k == "ANTHROPIC_API_KEY":
+            ORIGEN_LLAVE = ".env"
+
+
+def cola(llave: str) -> str:
+    """Solo los últimos 4 caracteres, como los muestra la Consola: '…AbCd'."""
+    return f"…{llave[-4:]}" if llave and len(llave) > 8 else "(vacía o muy corta)"
+
+
+class LlaveInvalida(RuntimeError):
+    pass
 
 
 def _cliente():
@@ -45,7 +70,23 @@ def _cliente():
 
 
 def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object, object]:
-    r = client.messages.create(
+    try:
+        r = _crear(client, mensajes, modelo)
+    except Exception as e:  # noqa: BLE001
+        if type(e).__name__ in ("AuthenticationError", "PermissionDeniedError"):
+            llave = os.environ.get("ANTHROPIC_API_KEY", "")
+            raise LlaveInvalida(
+                f"La API rechazó la llave {cola(llave)} (tomada de: {ORIGEN_LLAVE}, "
+                f"{len(llave)} caracteres). Compárala con la lista de Settings → API keys en "
+                "platform.claude.com: si los últimos 4 no coinciden o la llave no aparece, "
+                "crea una nueva y pégala completa en el .env") from None
+        raise
+    bloque = next(b for b in r.content if b.type == "tool_use")
+    return bloque.input, r, bloque
+
+
+def _crear(client, mensajes: list[dict], modelo: str):
+    return client.messages.create(
         model=modelo,
         max_tokens=MAX_TOKENS,
         system=prompt.SISTEMA,
@@ -53,8 +94,22 @@ def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object, obj
         tool_choice={"type": "tool", "name": prompt.TOOL["name"]},
         messages=mensajes,
     )
-    bloque = next(b for b in r.content if b.type == "tool_use")
-    return bloque.input, r, bloque
+
+
+def verificar_llave() -> str:
+    """Prueba la llave con una llamada que no consume créditos (listar modelos)."""
+    client = _cliente()
+    llave = os.environ.get("ANTHROPIC_API_KEY", "")
+    try:
+        modelos = [m.id for m in client.models.list(limit=20)]
+    except Exception as e:  # noqa: BLE001
+        if type(e).__name__ in ("AuthenticationError", "PermissionDeniedError"):
+            raise LlaveInvalida(f"La API rechazó la llave {cola(llave)} (tomada de: "
+                                f"{ORIGEN_LLAVE}, {len(llave)} caracteres)") from None
+        raise
+    ok = MODELO in modelos
+    return (f"Llave {cola(llave)} válida (tomada de: {ORIGEN_LLAVE}). "
+            f"Modelo {MODELO}: {'disponible' if ok else 'NO aparece en tu cuenta'}")
 
 
 def redactar_juego(juego: dict, resumen: dict, client=None, modelo: str | None = None,
