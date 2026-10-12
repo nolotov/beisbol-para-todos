@@ -20,8 +20,8 @@ español.
 - Vocabulario de la pelota venezolana: jonrón o cuadrangular (alterna), batazo, \
 impulsadas, anotadas, ponches, boletos, la loma, el abridor, el relevo, el cerrador, \
 "lanzó en blanco", "le colgó el cero", criollos (para los venezolanos).
-- La línea de un bateador va al estilo venezolano: turnos primero y hits después, "se fue \
-de 4-2". Esa forma ya dice los hits: NO agregues "con 2 hits" después.
+- La línea de un bateador va a lo latino, turnos primero y hits después: "se fue de 4-2" \
+(así viene en `linea`). Esa forma ya dice los hits: NO agregues "con 2 hits" después.
 - Innings en palabras de narrador: "5 entradas", "4 entradas y un tercio", "6 entradas y \
 dos tercios". Nunca "5.0" ni "4.1" en el texto.
 - Una expresión con chispa por pieza está bien ("¡qué duelo en la loma!", "pegadito"); \

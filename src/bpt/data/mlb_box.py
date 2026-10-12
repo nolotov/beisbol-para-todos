@@ -84,8 +84,8 @@ class LineaBateo:
         return (self.bases_ganadas, self.ci, self.ca, -self.vb)
 
     def texto(self) -> str:
-        """Línea estilo pizarra: '3-4, 2B, HR, 3 CI, 2 CA, BB'."""
-        partes = [f"{self.h}-{self.vb}"]
+        """Línea a lo latino, turnos primero: 'de 4-3, 2B, HR, 3 CI, 2 CA, BB'."""
+        partes = [f"de {self.vb}-{self.h}"]
         for n, et in [(self.dobles, "2B"), (self.triples, "3B"), (self.hr, "HR")]:
             if n:
                 partes.append(et if n == 1 else f"{n} {et}")

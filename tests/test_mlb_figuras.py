@@ -64,8 +64,8 @@ def test_figuras(box):
 
 def test_textos_de_linea(box):
     f = mlb_box.figuras(box)
-    assert f.mejor_bateo["LAD"].texto() == "3-5, 2B, HR, 2 CI, 1 CA"
-    assert f.mejor_bateo["MIL"].texto() == "1-4, HR, 1 CI, 1 CA, BB"
+    assert f.mejor_bateo["LAD"].texto() == "de 5-3, 2B, HR, 2 CI, 1 CA"
+    assert f.mejor_bateo["MIL"].texto() == "de 4-1, HR, 1 CI, 1 CA, BB"
     assert f.mejor_pitcheo["MIL"].texto() == "4.2 IL, 2 H, 0 C, 0 CL, 1 BB, 6 K"
 
 

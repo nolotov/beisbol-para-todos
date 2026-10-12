@@ -222,7 +222,8 @@ def test_json_invalido_error_claro(juego_y_resumen):
 
 @pytest.mark.parametrize("frase,alerta", [
     ("Y la diferencia la hizo un jonrón de Turang.", "decidió el juego"),
-    ("Chourio se fue 2-4 con 2 hits.", "redundante"),
+    ("Chourio se fue de 4-2 con 2 hits.", "redundante"),
+    ("Chourio se fue 2-4.", "estilo gringo"),
     ("Skubal ponchó a 7 en 5.0 entradas.", "decimal"),
     ("Misiorowski lanzó 4.1 IL.", "decimal"),
 ])
