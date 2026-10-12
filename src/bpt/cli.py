@@ -13,6 +13,8 @@ Ejemplos:
     bpt mlb-resultados --redactar                 # + caption, hilo y guion (ANTHROPIC_API_KEY)
     bpt redactar --fecha 2026-10-12               # solo textos, sobre un resumen.json ya generado
     bpt llave                                     # probar la llave de la API (sin gastar)
+    bpt telegram-chat                             # ver tu TELEGRAM_CHAT_ID
+    bpt notificar --fecha 2026-10-11              # mandar el paquete del día a Telegram
 """
 from __future__ import annotations
 
@@ -219,6 +221,65 @@ def cmd_llave(args: argparse.Namespace) -> int:
     return 0
 
 
+def _carpeta_mlb(args: argparse.Namespace) -> Path:
+    from bpt import resultados
+    if getattr(args, "carpeta", None):
+        return Path(args.carpeta)
+    return Path(args.salida) / (args.fecha or resultados.ayer_mlb())
+
+
+def cmd_notificar(args: argparse.Namespace) -> int:
+    from bpt.notificar import telegram
+    carpeta = _carpeta_mlb(args)
+    if not (carpeta / "resumen.json").exists():
+        print(f"[error] No existe {carpeta / 'resumen.json'}", file=sys.stderr)
+        return 1
+    try:
+        n = telegram.enviar_dia(carpeta, originales=not args.sin_originales)
+    except telegram.TelegramError as e:
+        print(f"[error] Telegram: {e}", file=sys.stderr)
+        return 1
+    print(f"[ok] Telegram: {n} juego(s) enviado(s)")
+    return 0
+
+
+def cmd_telegram_chat(args: argparse.Namespace) -> int:
+    from bpt.notificar import telegram
+    from bpt.redactor.agente import cargar_env
+    import os
+    cargar_env()
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    if not telegram.es_token_valido(token):
+        print("[error] TELEGRAM_BOT_TOKEN falta o no tiene la forma 123456789:ABC... "
+              "(cópialo completo de @BotFather al .env)", file=sys.stderr)
+        return 1
+    try:
+        chats = telegram.chats_recientes(token)
+    except telegram.TelegramError as e:
+        print(f"[error] Telegram: {e}", file=sys.stderr)
+        return 1
+    if not chats:
+        print("[--] Nadie le ha escrito al bot todavía: ábrelo en Telegram, mándale /start "
+              "y vuelve a correr este comando")
+        return 1
+    for c in chats:
+        quien = c["nombre"] + (f" (@{c['usuario']})" if c["usuario"] else "")
+        print(f"[ok] TELEGRAM_CHAT_ID={c['id']}   <- {c['tipo']}: {quien}")
+    print("Copia esa línea al .env (y como secreto en GitHub)")
+    return 0
+
+
+def cmd_telegram_prueba(args: argparse.Namespace) -> int:
+    from bpt.notificar import telegram
+    try:
+        telegram.Telegram(*telegram.credenciales()).texto(args.texto)
+    except telegram.TelegramError as e:
+        print(f"[error] Telegram: {e}", file=sys.stderr)
+        return 1
+    print("[ok] Mensaje enviado")
+    return 0
+
+
 def cmd_redactar(args: argparse.Namespace) -> int:
     from bpt import resultados
     carpeta = Path(args.carpeta) if args.carpeta else \
@@ -301,6 +362,21 @@ def main(argv: list[str] | None = None) -> int:
     rd.add_argument("--salida", default="output/resultados/mlb")
     rd.add_argument("--modelo", default=None, help="Modelo de Claude (defecto: claude-sonnet-5-5)")
     rd.set_defaults(func=cmd_redactar)
+
+    nt = sub.add_parser("notificar", help="Enviar el paquete del día a Telegram")
+    nt.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")
+    nt.add_argument("--carpeta", default=None, help="Carpeta con resumen.json (ignora --fecha)")
+    nt.add_argument("--salida", default="output/resultados/mlb")
+    nt.add_argument("--sin-originales", action="store_true",
+                    help="No mandar las láminas como archivo (solo el álbum de vista previa)")
+    nt.set_defaults(func=cmd_notificar)
+
+    tc = sub.add_parser("telegram-chat", help="Mostrar el TELEGRAM_CHAT_ID (tras mandarle /start al bot)")
+    tc.set_defaults(func=cmd_telegram_chat)
+
+    tp = sub.add_parser("telegram-prueba", help="Mandarte un mensaje de prueba por Telegram")
+    tp.add_argument("texto", nargs="?", default="⚾ Hola Noe, soy el bot de MBP. ¡Funciono!")
+    tp.set_defaults(func=cmd_telegram_prueba)
 
     ll = sub.add_parser("llave", help="Probar la llave de la API (no gasta créditos)")
     ll.set_defaults(func=cmd_llave)

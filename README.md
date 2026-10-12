@@ -112,6 +112,20 @@ puede lanzar a mano con **Run workflow**, eligiendo fecha y fase. El cron solo v
 Secreto: *Settings → Secrets and variables → Actions → New repository secret*,
 nombre `ANTHROPIC_API_KEY`, valor = la misma llave del `.env`.
 
+#### Telegram: el paquete del día en el celular
+
+Cada mañana el workflow manda por juego: encabezado con estado y alertas, álbum de láminas,
+las láminas originales como archivo (calidad completa para Instagram), el caption, cada tuit
+por separado y el guion. Si no hubo juegos o falla el workflow, también avisa. **No publica
+nada**: tú revisas y publicas.
+
+Configuración (una vez):
+1. En Telegram, habla con **@BotFather** → `/newbot` → nombre y usuario del bot. Copia el token.
+2. Ponlo en el `.env` como `TELEGRAM_BOT_TOKEN=...`, abre tu bot y mándale `/start`.
+3. `bpt telegram-chat` te muestra tu `TELEGRAM_CHAT_ID`: cópialo al `.env`.
+4. `bpt telegram-prueba` para confirmar; `bpt notificar --fecha 2026-10-11` para ver un paquete.
+5. Crea los secretos `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en GitHub.
+
 ### Etiquetas de métricas
 
 Todas las tarjetas aceptan `--etiquetas`:
