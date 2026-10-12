@@ -15,6 +15,7 @@ Ejemplos:
     bpt llave                                     # probar la llave de la API (sin gastar)
     bpt telegram-chat                             # ver tu TELEGRAM_CHAT_ID
     bpt notificar --fecha 2026-10-11              # mandar el paquete del día a Telegram
+    bpt lvbp-resultados --redactar                # jornada LVBP de ayer (hora de Venezuela)
 """
 from __future__ import annotations
 
@@ -228,6 +229,35 @@ def _carpeta_mlb(args: argparse.Namespace) -> Path:
     return Path(args.salida) / (args.fecha or resultados.ayer_mlb())
 
 
+def cmd_lvbp_results(args: argparse.Namespace) -> int:
+    from bpt import lvbp_resultados as L
+    fecha = args.fecha or L.ayer_ven()
+    try:
+        f = date.fromisoformat(fecha)
+    except ValueError:
+        print(f"[error] Fecha inválida: {fecha}. Formato AAAA-MM-DD", file=sys.stderr)
+        return 1
+    if f > datetime.now(L.TZ_VEN).date():
+        print(f"[error] {fecha} es una fecha futura (formato AAAA-MM-DD)", file=sys.stderr)
+        return 1
+    r = L.generar(fecha, salida=Path(args.salida), handle=args.handle, refresh=not args.cache)
+    carpeta = Path(args.salida) / fecha
+    for j in r["juegos"]:
+        v, lo = j["visitante"], j["local"]
+        print(f"[ok] {j['titular']}  ({v['abrev']} {v['record']}, {lo['abrev']} {lo['record']})")
+    for p in r["pendientes"]:
+        print(f"[--] {p['partido']}: {p['estado']}")
+    if not r["juegos"] and not r["pendientes"]:
+        print(f"[--] No hubo juegos de la LVBP el {fecha}")
+    d = r["destacados"]
+    print(f"Destacados: {len(d['bateo'])} al bate, {len(d['pitcheo'])} en la loma, "
+          f"{len(d['jonrones'])} jonrón(es) · Láminas: {', '.join(r['tarjetas']) or '-'}")
+    print(f"Resumen: {carpeta / 'resumen.json'}")
+    if args.redactar and r["juegos"]:
+        return _redactar(carpeta, args.modelo)
+    return 0
+
+
 def cmd_notificar(args: argparse.Namespace) -> int:
     from bpt.notificar import telegram
     carpeta = _carpeta_mlb(args)
@@ -363,10 +393,21 @@ def main(argv: list[str] | None = None) -> int:
     rd.add_argument("--modelo", default=None, help="Modelo de Claude (defecto: claude-sonnet-5-5)")
     rd.set_defaults(func=cmd_redactar)
 
+    lr = sub.add_parser("lvbp-resultados",
+                        help="Carrusel de la jornada LVBP (marcadores + destacados) y resumen.json")
+    lr.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora de Venezuela)")
+    lr.add_argument("--salida", default="output/resultados/lvbp")
+    lr.add_argument("--handle", default=theme.HANDLE)
+    lr.add_argument("--cache", action="store_true", help="Usar la caché local")
+    lr.add_argument("--redactar", action="store_true", help="Además, redactar los textos")
+    lr.add_argument("--modelo", default=None)
+    lr.set_defaults(func=cmd_lvbp_results)
+
     nt = sub.add_parser("notificar", help="Enviar el paquete del día a Telegram")
     nt.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")
     nt.add_argument("--carpeta", default=None, help="Carpeta con resumen.json (ignora --fecha)")
-    nt.add_argument("--salida", default="output/resultados/mlb")
+    nt.add_argument("--salida", default="output/resultados/mlb",
+                    help="output/resultados/mlb o output/resultados/lvbp")
     nt.add_argument("--sin-originales", action="store_true",
                     help="No mandar las láminas como archivo (solo el álbum de vista previa)")
     nt.set_defaults(func=cmd_notificar)

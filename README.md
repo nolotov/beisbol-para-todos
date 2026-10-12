@@ -126,6 +126,28 @@ Configuración (una vez):
 4. `bpt telegram-prueba` para confirmar; `bpt notificar --fecha 2026-10-11` para ver un paquete.
 5. Crea los secretos `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en GitHub.
 
+### LVBP: resultados de la jornada
+
+```powershell
+bpt lvbp-resultados                         # jornada de ayer (hora de Venezuela)
+bpt lvbp-resultados --fecha 2026-10-12 --redactar
+bpt notificar --salida output/resultados/lvbp --fecha 2026-10-12
+```
+
+Un carrusel por jornada en `output/resultados/lvbp/AAAA-MM-DD/`:
+
+1. `lvbp_1_jornada.png`: todos los marcadores, con el récord de cada equipo después del juego
+   y las decisiones (G/P/S).
+2. `lvbp_2_destacados.png`: lo mejor de la jornada al bate (bases ganadas, mínimo 3) y en la
+   loma (Game Score de 50 o más, con 3+ entradas), y los jonrones. Si nadie llega al mínimo,
+   la lámina lo dice: no se inventan destacados.
+3. Extras para historias: `lvbp_extra_*_resultado.png` y `*_figuras.png` de cada juego.
+
+El redactor escribe **un** caption, hilo y guion para toda la jornada, neutral entre los 8
+equipos. Datos: MLB Stats API (liga 135), con nuestras siglas (CAR = Cardenales; la API le dice
+CAR a Caracas) y nombres con tilde. Workflow: `.github/workflows/resultados-lvbp.yml`
+(octubre a enero, ≈10:52 en Santiago), con los mismos secretos.
+
 ### Etiquetas de métricas
 
 Todas las tarjetas aceptan `--etiquetas`:
@@ -146,6 +168,7 @@ Las tarjetas salen en `output/cards/`. Los datos crudos se cachean en `data/raw/
 ```
 src/bpt/
   theme.py               # paleta "Dashboard de dugout", estilo matplotlib y firma @mbp.deportes
+  lvbp_resultados.py     # pipeline de la jornada LVBP: carrusel + resumen.json
   resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
   redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
   glossary.py            # glosario de métricas: sigla, nombre en español, pista y explicación

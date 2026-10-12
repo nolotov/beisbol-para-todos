@@ -72,9 +72,10 @@ def _cliente():
     return anthropic.Anthropic()
 
 
-def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object]:
+def _pedir(client, mensajes: list[dict], modelo: str,
+           sistema: str = prompt.SISTEMA) -> tuple[dict, object]:
     try:
-        r = _crear(client, mensajes, modelo)
+        r = _crear(client, mensajes, modelo, sistema)
     except Exception as e:  # noqa: BLE001
         if type(e).__name__ in ("AuthenticationError", "PermissionDeniedError"):
             llave = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -95,11 +96,11 @@ def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object]:
                            f"{pista} Inicio: {texto[:200]!r}") from e
 
 
-def _crear(client, mensajes: list[dict], modelo: str):
+def _crear(client, mensajes: list[dict], modelo: str, sistema: str = prompt.SISTEMA):
     return client.messages.create(
         model=modelo,
         max_tokens=MAX_TOKENS,
-        system=prompt.SISTEMA,
+        system=sistema,
         output_config={"format": {"type": "json_schema", "schema": prompt.ESQUEMA},
                        "effort": ESFUERZO},
         messages=mensajes,
@@ -122,29 +123,57 @@ def verificar_llave() -> str:
             f"Modelo {MODELO}: {'disponible' if ok else 'NO aparece en tu cuenta'}")
 
 
+def _redactar(datos: dict, mensaje: str, client, modelo: str, reintentos: int,
+              sistema: str = prompt.SISTEMA):
+    """Pide las piezas, valida y reintenta si hay cifras sin respaldo."""
+    mensajes = [{"role": "user", "content": mensaje}]
+    textos, resp = _pedir(client, mensajes, modelo, sistema)
+    val = validar(textos, datos)
+    intentos = 1
+    while val.cifras_sin_respaldo and intentos <= reintentos:
+        mensajes += [
+            {"role": "assistant", "content": resp.content},
+            {"role": "user", "content": (
+                "Estas cifras no aparecen en los datos: "
+                f"{', '.join(val.cifras_sin_respaldo)}. Quítalas o reemplázalas por cifras que "
+                "sí estén en los datos (sin sumas ni cálculos propios) y entrega de nuevo las "
+                "tres piezas completas.")},
+        ]
+        textos, resp = _pedir(client, mensajes, modelo, sistema)
+        val = validar(textos, datos)
+        intentos += 1
+    return textos, val, intentos
+
+
+def redactar_jornada(resumen: dict, client=None, modelo: str | None = None,
+                     reintentos: int = 1) -> dict:
+    """LVBP: un caption, un hilo y un guion para toda la jornada."""
+    client = client or _cliente()
+    modelo = modelo or MODELO
+    datos = prompt.datos_jornada(resumen)
+    textos, val, intentos = _redactar(datos, prompt.mensaje_jornada(resumen), client, modelo,
+                                      reintentos, prompt.SISTEMA + prompt.SISTEMA_JORNADA)
+    n = len(resumen["juegos"])
+    return {
+        "game_pk": "jornada",
+        "partido": f"Jornada LVBP {resumen['fecha']}",
+        "titular": f"LVBP · {n} juego{'s' if n != 1 else ''} el {resumen['fecha']}",
+        "tarjetas": resumen.get("tarjetas", []),
+        "textos": textos,
+        "validacion": val.to_dict(),
+        "estado": "para revisar" if val.ok else "con alertas",
+        "intentos": intentos,
+        "modelo": modelo,
+    }
+
+
 def redactar_juego(juego: dict, resumen: dict, client=None, modelo: str | None = None,
                    reintentos: int = 1) -> dict:
     client = client or _cliente()
     modelo = modelo or MODELO
     datos = prompt.datos_juego(juego, resumen)
-    mensajes = [{"role": "user", "content": prompt.mensaje_usuario(juego, resumen)}]
-    textos, resp = _pedir(client, mensajes, modelo)
-    val = validar(textos, datos)
-    intentos = 1
-
-    while val.cifras_sin_respaldo and intentos <= reintentos:
-        mensajes += [
-            {"role": "assistant", "content": resp.content},
-            {"role": "user", "content": (
-                "Estas cifras no aparecen en los datos del juego: "
-                f"{', '.join(val.cifras_sin_respaldo)}. Quítalas o reemplázalas por cifras que "
-                "sí estén en los datos (sin sumas ni cálculos propios) y entrega de nuevo las "
-                "tres piezas completas.")},
-        ]
-        textos, resp = _pedir(client, mensajes, modelo)
-        val = validar(textos, datos)
-        intentos += 1
-
+    textos, val, intentos = _redactar(datos, prompt.mensaje_usuario(juego, resumen), client,
+                                      modelo, reintentos)
     return {
         "game_pk": juego.get("game_pk"),
         "partido": f"{juego['visitante']['abrev']} @ {juego['local']['abrev']}",
@@ -183,8 +212,11 @@ def redactar_dia(carpeta: Path, client=None, modelo: str | None = None) -> list[
     if not resumen["juegos"]:
         return []
     client = client or _cliente()
-    resultados = [redactar_juego(j, resumen, client=client, modelo=modelo)
-                  for j in resumen["juegos"]]
+    if resumen.get("formato") == "jornada":
+        resultados = [redactar_jornada(resumen, client=client, modelo=modelo)]
+    else:
+        resultados = [redactar_juego(j, resumen, client=client, modelo=modelo)
+                      for j in resumen["juegos"]]
     (carpeta / "textos.json").write_text(
         json.dumps(resultados, ensure_ascii=False, indent=2), encoding="utf-8")
     (carpeta / "textos.md").write_text(

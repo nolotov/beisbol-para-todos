@@ -28,6 +28,20 @@ TITLE_FONTS = ["Barlow Condensed", "Inter", "Segoe UI", "DejaVu Sans"]
 NUMBER_FONTS = ["JetBrains Mono", "Consolas", "DejaVu Sans Mono"]
 
 
+from contextlib import contextmanager
+
+
+@contextmanager
+def acento(color: str):
+    """Cambia el color de acento mientras se dibuja (verde LVBP vs. ámbar MLB)."""
+    global ACCENT
+    previo, ACCENT = ACCENT, color
+    try:
+        yield
+    finally:
+        ACCENT = previo
+
+
 def _first_available(candidates: list[str]) -> str:
     installed = {f.name for f in font_manager.fontManager.ttflist}
     return next((c for c in candidates if c in installed), candidates[-1])
