@@ -15,7 +15,7 @@ PERSONAS = {int(k): v for k, v in json.loads(
 
 GUION_OK = ("[LÁMINA 1] Juego 2 de la Serie de Campeonato. Los Dodgers le ganaron 3-2 a "
             "Milwaukee en 11 entradas y empataron la serie 1-1. " + "Partido apretado. " * 20 +
-            "[LÁMINA 2] El relevo de Milwaukee lanzó 4.2 entradas en blanco, con Game Score de "
+            "[LÁMINA 2] El relevo de Milwaukee lanzó 4 entradas y dos tercios en blanco, con Game Score de "
             "68, la nota de su salida en la loma. ¿Quién se lleva el Juego 3?")
 
 
@@ -218,3 +218,29 @@ def test_json_invalido_error_claro(juego_y_resumen):
 
     with pytest.raises(RuntimeError, match="max_tokens"):
         agente.redactar_juego(j, r, client=Roto())
+
+
+@pytest.mark.parametrize("frase,alerta", [
+    ("Y la diferencia la hizo un jonrón de Turang.", "decidió el juego"),
+    ("Chourio se fue 2-4 con 2 hits.", "redundante"),
+    ("Skubal ponchó a 7 en 5.0 entradas.", "decimal"),
+    ("Misiorowski lanzó 4.1 IL.", "decimal"),
+])
+def test_alertas_del_primer_borrador_real(juego_y_resumen, frase, alerta):
+    """Frases tomadas del primer textos.md real (Juego 1 SCLN 2026)."""
+    j, r = juego_y_resumen
+    v = validar(textos(instagram=frase), prompt.datos_juego(j, r))
+    assert any(alerta in a for a in v.alertas), v.alertas
+
+
+def test_estilo_venezolano_no_alerta(juego_y_resumen):
+    j, r = juego_y_resumen
+    v = validar(textos(instagram="El criollo se fue de 4-2 y el relevo lanzó 4 entradas y "
+                                 "dos tercios en blanco."), prompt.datos_juego(j, r))
+    assert v.ok, v.alertas
+
+
+def test_equipos_en_espanol(juego_y_resumen):
+    j, r = juego_y_resumen
+    d = prompt.datos_juego(j, r)
+    assert d["equipos_es"] == {"LAD": "Dodgers de Los Ángeles", "MIL": "Cerveceros de Milwaukee"}

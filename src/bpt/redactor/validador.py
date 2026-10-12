@@ -25,7 +25,16 @@ MEJOR_A_SECAS = re.compile(r"\bel mejor\b(?![^.\n]{0,40}\b(por|con más|según)\
 _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 _RUIDO = re.compile(r"[#@]\w+|\[L[ÁA]MINA \d+\]", re.I)
 
-LIMITES = {"tuit": 280, "instagram": 1200, "guion_min": 75, "guion_max": 115}
+# Sin jugada por jugada no se puede afirmar qué carrera o batazo decidió el juego
+CAUSAL = re.compile(r"(la diferencia la hizo|decidi[óo] el juego|defini[óo] el juego|"
+                    r"carrera de la (victoria|ventaja)|remontad|dej[óo] en el terreno|"
+                    r"walk-?off|batazo decisivo|jonr[óo]n decisivo)", re.I)
+# "2-4 con 2 hits": redundante
+REDUNDANTE = re.compile(r"\b\d+-\d+,? con \d+ hits?\b", re.I)
+# Innings con decimal en el texto (".0" o ".1"/".2"): deben ir en palabras
+INNING_DECIMAL = re.compile(r"\b\d+\.[012] (entradas?|innings?|IL)\b", re.I)
+
+LIMITES = {"tuit": 280, "instagram": 1200, "guion_min": 75, "guion_max": 110}
 
 
 def _norm(n: str) -> str:
@@ -97,6 +106,12 @@ def validar(textos: dict, datos) -> Validacion:
                 sin_respaldo.append(n)
         if PROHIBIDAS.search(texto):
             v.alertas.append(f"{nombre}: lenguaje de apuestas ('{PROHIBIDAS.search(texto).group(0)}')")
+        for patron, msg in [(CAUSAL, "afirma qué decidió el juego (no hay jugada por jugada)"),
+                            (REDUNDANTE, "línea redundante ('de 4-2' ya dice los hits)"),
+                            (INNING_DECIMAL, "innings con decimal; van en palabras")]:
+            m = patron.search(texto)
+            if m:
+                v.alertas.append(f"{nombre}: {msg}: '{m.group(0)}'")
         if MEJOR_A_SECAS.search(texto):
             v.alertas.append(f"{nombre}: dice 'el mejor' sin el criterio")
         if nombre.startswith("tuit") and len(texto) > LIMITES["tuit"]:

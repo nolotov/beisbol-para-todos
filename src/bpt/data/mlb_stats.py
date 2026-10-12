@@ -51,6 +51,30 @@ SERIES_CORTO = {
 
 HYDRATE = "linescore,decisions,team"
 
+# Nombre de cada equipo como se dice en Venezuela (clave: nombre de la API)
+EQUIPOS_ES = {
+    "Arizona Diamondbacks": "Diamondbacks de Arizona", "Atlanta Braves": "Bravos de Atlanta",
+    "Baltimore Orioles": "Orioles de Baltimore", "Boston Red Sox": "Medias Rojas de Boston",
+    "Chicago Cubs": "Cachorros de Chicago", "Chicago White Sox": "Medias Blancas de Chicago",
+    "Cincinnati Reds": "Rojos de Cincinnati", "Cleveland Guardians": "Guardianes de Cleveland",
+    "Colorado Rockies": "Rockies de Colorado", "Detroit Tigers": "Tigres de Detroit",
+    "Houston Astros": "Astros de Houston", "Kansas City Royals": "Reales de Kansas City",
+    "Los Angeles Angels": "Angelinos de Los Ángeles", "Los Angeles Dodgers": "Dodgers de Los Ángeles",
+    "Miami Marlins": "Marlins de Miami", "Milwaukee Brewers": "Cerveceros de Milwaukee",
+    "Minnesota Twins": "Mellizos de Minnesota", "New York Mets": "Mets de Nueva York",
+    "New York Yankees": "Yankees de Nueva York", "Athletics": "Atléticos",
+    "Oakland Athletics": "Atléticos", "Philadelphia Phillies": "Filis de Filadelfia",
+    "Pittsburgh Pirates": "Piratas de Pittsburgh", "San Diego Padres": "Padres de San Diego",
+    "San Francisco Giants": "Gigantes de San Francisco", "Seattle Mariners": "Marineros de Seattle",
+    "St. Louis Cardinals": "Cardenales de San Luis", "Tampa Bay Rays": "Rays de Tampa Bay",
+    "Texas Rangers": "Rangers de Texas", "Toronto Blue Jays": "Azulejos de Toronto",
+    "Washington Nationals": "Nacionales de Washington",
+}
+
+
+def nombre_es(nombre_api: str) -> str:
+    return EQUIPOS_ES.get(nombre_api, nombre_api)
+
 
 @dataclass
 class Equipo:
