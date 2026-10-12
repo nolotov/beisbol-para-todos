@@ -1,0 +1,525 @@
+{
+ "_nota": "FIXTURE SINTÉTICO con la forma de statsapi.mlb.com/api/v1/schedule (hydrate=linescore,decisions,team). Marcadores y nombres inventados.",
+ "dates": [
+  {
+   "date": "2026-10-11",
+   "games": [
+    {
+     "gamePk": 900001,
+     "gameType": "L",
+     "season": "2026",
+     "gameDate": "2026-10-12T00:08:00Z",
+     "officialDate": "2026-10-11",
+     "status": {
+      "abstractGameState": "Final",
+      "detailedState": "Final"
+     },
+     "seriesDescription": "NL Championship Series",
+     "seriesGameNumber": 1,
+     "gamesInSeries": 7,
+     "ifNecessary": "N",
+     "venue": {
+      "id": 1,
+      "name": "Estadio de prueba"
+     },
+     "teams": {
+      "away": {
+       "team": {
+        "id": 119,
+        "name": "Los Angeles Dodgers",
+        "abbreviation": "LAD"
+       },
+       "score": 1,
+       "isWinner": false
+      },
+      "home": {
+       "team": {
+        "id": 158,
+        "name": "Milwaukee Brewers",
+        "abbreviation": "MIL"
+       },
+       "score": 2,
+       "isWinner": true
+      }
+     },
+     "linescore": {
+      "currentInning": 9,
+      "innings": [
+       {
+        "num": 1,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 1,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 2,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 3,
+        "away": {
+         "runs": 1,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 4,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 5,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 6,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 1,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 7,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 8,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 9,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "hits": 0,
+         "errors": 0
+        }
+       }
+      ],
+      "teams": {
+       "away": {
+        "runs": 1,
+        "hits": 5,
+        "errors": 1
+       },
+       "home": {
+        "runs": 2,
+        "hits": 7,
+        "errors": 0
+       }
+      }
+     },
+     "decisions": {
+      "winner": {
+       "id": 1,
+       "fullName": "Pitcher Ganador Uno"
+      },
+      "loser": {
+       "id": 2,
+       "fullName": "Pitcher Perdedor Uno"
+      },
+      "save": {
+       "id": 3,
+       "fullName": "Cerrador Uno"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "date": "2026-10-12",
+   "games": [
+    {
+     "gamePk": 900002,
+     "gameType": "L",
+     "season": "2026",
+     "gameDate": "2026-10-12T20:08:00Z",
+     "officialDate": "2026-10-12",
+     "status": {
+      "abstractGameState": "Final",
+      "detailedState": "Final"
+     },
+     "seriesDescription": "NL Championship Series",
+     "seriesGameNumber": 2,
+     "gamesInSeries": 7,
+     "ifNecessary": "N",
+     "venue": {
+      "id": 1,
+      "name": "Estadio de prueba"
+     },
+     "teams": {
+      "away": {
+       "team": {
+        "id": 119,
+        "name": "Los Angeles Dodgers",
+        "abbreviation": "LAD"
+       },
+       "score": 3,
+       "isWinner": true
+      },
+      "home": {
+       "team": {
+        "id": 158,
+        "name": "Milwaukee Brewers",
+        "abbreviation": "MIL"
+       },
+       "score": 2,
+       "isWinner": false
+      }
+     },
+     "linescore": {
+      "currentInning": 11,
+      "innings": [
+       {
+        "num": 1,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 2,
+        "away": {
+         "runs": 2,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 3,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 4,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 1,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 5,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 6,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 1,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 7,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 8,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 9,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 10,
+        "away": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       },
+       {
+        "num": 11,
+        "away": {
+         "runs": 1,
+         "hits": 0,
+         "errors": 0
+        },
+        "home": {
+         "runs": 0,
+         "hits": 0,
+         "errors": 0
+        }
+       }
+      ],
+      "teams": {
+       "away": {
+        "runs": 3,
+        "hits": 9,
+        "errors": 0
+       },
+       "home": {
+        "runs": 2,
+        "hits": 6,
+        "errors": 2
+       }
+      }
+     },
+     "decisions": {
+      "winner": {
+       "id": 4,
+       "fullName": "Pitcher Ganador Dos"
+      },
+      "loser": {
+       "id": 5,
+       "fullName": "Pitcher Perdedor Dos"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "date": "2026-10-14",
+   "games": [
+    {
+     "gamePk": 900003,
+     "gameType": "L",
+     "season": "2026",
+     "gameDate": "2026-10-14T23:08:00Z",
+     "officialDate": "2026-10-14",
+     "status": {
+      "abstractGameState": "Preview",
+      "detailedState": "Scheduled"
+     },
+     "seriesDescription": "NL Championship Series",
+     "seriesGameNumber": 3,
+     "gamesInSeries": 7,
+     "ifNecessary": "N",
+     "venue": {
+      "id": 1,
+      "name": "Estadio de prueba"
+     },
+     "teams": {
+      "away": {
+       "team": {
+        "id": 158,
+        "name": "Milwaukee Brewers",
+        "abbreviation": "MIL"
+       }
+      },
+      "home": {
+       "team": {
+        "id": 119,
+        "name": "Los Angeles Dodgers",
+        "abbreviation": "LAD"
+       }
+      }
+     }
+    },
+    {
+     "gamePk": 900004,
+     "gameType": "L",
+     "season": "2026",
+     "gameDate": "2026-10-14T19:08:00Z",
+     "officialDate": "2026-10-14",
+     "status": {
+      "abstractGameState": "Preview",
+      "detailedState": "Postponed: Rain"
+     },
+     "seriesDescription": "NL Championship Series",
+     "seriesGameNumber": 4,
+     "gamesInSeries": 7,
+     "ifNecessary": "N",
+     "venue": {
+      "id": 1,
+      "name": "Estadio de prueba"
+     },
+     "teams": {
+      "away": {
+       "team": {
+        "id": 158,
+        "name": "Milwaukee Brewers",
+        "abbreviation": "MIL"
+       }
+      },
+      "home": {
+       "team": {
+        "id": 119,
+        "name": "Los Angeles Dodgers",
+        "abbreviation": "LAD"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "date": "2026-10-15",
+   "games": [
+    {
+     "gamePk": 900004,
+     "gameType": "L",
+     "season": "2026",
+     "gameDate": "2026-10-15T19:08:00Z",
+     "officialDate": "2026-10-15",
+     "status": {
+      "abstractGameState": "Preview",
+      "detailedState": "Scheduled"
+     },
+     "seriesDescription": "NL Championship Series",
+     "seriesGameNumber": 4,
+     "gamesInSeries": 7,
+     "ifNecessary": "N",
+     "venue": {
+      "id": 1,
+      "name": "Estadio de prueba"
+     },
+     "teams": {
+      "away": {
+       "team": {
+        "id": 158,
+        "name": "Milwaukee Brewers",
+        "abbreviation": "MIL"
+       }
+      },
+      "home": {
+       "team": {
+        "id": 119,
+        "name": "Los Angeles Dodgers",
+        "abbreviation": "LAD"
+       }
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

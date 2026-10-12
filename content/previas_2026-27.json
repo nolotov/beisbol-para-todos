@@ -1,0 +1,94 @@
+{
+  "temporada": "2026-27",
+  "temporada_anterior": 2025,
+  "fuentes_generales": "Datos: LVBP / TuJonrón · Novedades: prensa deportiva venezolana",
+  "equipos": {
+    "CAR": {
+      "manager": "César Izturis",
+      "cambios": [
+        "Seis de sus ocho importados son lanzadores",
+        "Regresa Christian Cosby, su mejor brazo en 2025-26",
+        "Vuelve Rangel Ravelo, histórico importado de la liga"
+      ],
+      "pregunta": "La mejor ofensiva de la liga tuvo un pitcheo 7º en boletos. ¿Alcanza el refuerzo de brazos?",
+      "fuentes": ["https://elinformadorve.com/25/09/2026/deportes/con-el-lanzador-panameno-abdiel-mendoza-los-cardenales-de-lara-completan-su-cuota-de-ocho-importados-seis-de-ellos-monticulistas/",
+                  "https://elemergente.com/2026/09/los-cardenales-incorporan-a-un-brazo-de-talla-mundialista-y-completan-su-cuota-de-importados.html",
+                  "https://lvbp.com/noticias/cesar-izturis-asumio-el-mando-en-cardenales-y-llego-con-10-jugadores/"]
+    },
+    "MAG": {
+      "manager": "Yadier Molina",
+      "cambios": [
+        "Defiende el título: campeón de la 2025-26",
+        "Sus seis importados son lanzadores",
+        "Rougned Odor, suspendido los primeros 13 juegos"
+      ],
+      "pregunta": "El mejor pitcheo de la liga tuvo el promedio más bajo al bate (.267). ¿Le alcanza para repetir?",
+      "fuentes": ["https://www.ntn24.com/noticias-deportes/los-navegantes-del-magallanes-actuales-campeones-del-beisbol-venezolano-confirman-a-sus-importados-para-la-temporada-2026-2027-de-la-lvbp-645478",
+                  "https://elemergente.com/2026/09/el-magallanes-va-por-el-bicampeonato-y-apuesta-por-tener-grandes-estrellas-en-la-temporada-2026-2027.html",
+                  "https://www.magallanesbbc.com.ve/"]
+    },
+    "BRA": {
+      "manager": "Henry Blanco",
+      "cambios": [
+        "Cuatro de sus ocho importados repiten con el equipo",
+        "Seis de los ocho importados son lanzadores",
+        "Celebra su temporada número 20"
+      ],
+      "pregunta": "Pitcheo de podio (3º en efectividad), pero 8º en embasado. ¿Quién se va a embasar en Margarita?",
+      "fuentes": ["https://elemergente.com/2026/09/los-bravos-dan-a-conocer-a-sus-8-importados-y-4-ellos-regresan-al-equipo-que-dirige-henry-blanco.html",
+                  "https://www.bravosdemargarita.com/"]
+    },
+    "AGU": {
+      "manager": "Guillermo Quiroz",
+      "cambios": [
+        "Debuta Guillermo Quiroz como mánager",
+        "Lipso Nava se fue a dirigir a los Leones",
+        "Luis Matos y José Pirela apuntan a llegar durante la temporada"
+      ],
+      "pregunta": "Ganó 7 juegos más de lo que su diferencial merecía. ¿Se repite la suerte o llega la corrección?",
+      "fuentes": ["https://diarioversionfinal.com/deportes/beisbol/aguilas-del-zulia-presentan-su-temporada-2026-2027-con-guillermo-quiroz-al-frente/"]
+    },
+    "ANZ": {
+      "manager": "Asdrúbal Cabrera",
+      "cambios": [
+        "Jacob Teter, MVP de la Liga del Atlántico, a la primera base",
+        "Seis de sus primeros siete importados son lanzadores derechos",
+        "Balbino Fuenmayor sigue como bateador designado"
+      ],
+      "pregunta": "2º en ofensiva, pero último en FIP. ¿Le alcanzan los nuevos brazos derechos?",
+      "fuentes": ["https://elemergente.com/2026/10/caribes-incorpora-a-3-nuevos-importados-y-completa-su-lineup-para-el-dia-inaugural.html"]
+    },
+    "TIG": {
+      "manager": "Miguel Pérez",
+      "cambios": [
+        "Nuevo mánager: Miguel Pérez, ocho temporadas como jugador de Tigres",
+        "Cibney Bello, nuevo coach de pitcheo",
+        "Llega el receptor Ricardo Genovés"
+      ],
+      "pregunta": "El pitcheo que menos dejó embasarse fue 7º en jonrones al bate (30). ¿De dónde sale el poder?",
+      "fuentes": ["https://meridiano.net/beisbol/beisbol-venezolano/lvbp-tigres-de-aragua-le-da-la-bienvenida-a-su-nuevo-manager-y-a-otras-piezas-importantes-202610813290"]
+    },
+    "TIB": {
+      "manager": "Fernando Tatis",
+      "cambios": [
+        "Nuevo mánager: Fernando Tatis",
+        "Jurickson Profar encabeza la importación",
+        "Ocho lanzadores importados para el bullpen"
+      ],
+      "pregunta": "Los que más corrieron (53 bases robadas) fueron 6º en jonrones permitidos. ¿Cierra mejor el bullpen nuevo?",
+      "fuentes": ["https://www.elnacional.com/2026/04/fernando-tatis-llevara-las-riendas-de-los-tiburones-en-la-temporada-2026-2027/",
+                  "https://laprensademonagas.com/jurickson-profar-encabeza-a-los-importados-de-tiburones-de-la-guaira/"]
+    },
+    "LEO": {
+      "manager": "Lipso Nava",
+      "cambios": [
+        "Nuevo mánager: Lipso Nava, que venía de Águilas",
+        "Robinson Chirinos, nuevo gerente deportivo",
+        "Los ocho cupos de importados, para el pitcheo"
+      ],
+      "pregunta": "3º en ofensiva, último en efectividad (5.97). ¿Basta con una importación 100% de lanzadores?",
+      "fuentes": ["https://primicia.com.ve/deportes/leones-del-caracas-nueva-era-lvbp-2026-2027/",
+                  "https://lapatilla.com/2026/05/13/leones-del-caracas-anuncio-a-nuevo-manager-para-la-temporada-2026-2027/"]
+    }
+  }
+}
