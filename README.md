@@ -100,7 +100,13 @@ Las reglas de marca están en `src/bpt/redactor/prompt.py`.
 El **validador** revisa que toda cifra del texto esté en los datos del juego; si el modelo
 inventa una, se la devuelve para que corrija (1 reintento) y, si insiste, la pieza queda
 "con alertas". También marca lenguaje de apuestas, "el mejor" sin criterio y largos.
-**Nada se publica solo:** todo sale "para revisar". Modelo por defecto: `claude-sonnet-5-5`
+**Nada se publica solo:** todo sale "para revisar".
+
+**Uso y costo:** cada pieza guarda en `textos.json` los tokens de entrada, salida y caché y el
+costo estimado con precios de lista; el total del día queda en `uso.json`. **Prompt caching:**
+el prompt de sistema (~1.400 tokens) se cachea solo si la corrida hará 2 o más llamadas
+(`BPT_CACHE=auto`; `si` / `no` para forzarlo). Con una sola llamada, escribir el caché (1,25x)
+sale más caro que no usarlo. Modelo por defecto: `claude-sonnet-5-5`
 (`--modelo` o la variable `BPT_MODELO` para cambiarlo).
 
 **Automático:** `.github/workflows/resultados-mlb.yml` corre cada mañana de octubre y noviembre
