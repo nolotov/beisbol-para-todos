@@ -104,7 +104,7 @@ inventa una, se la devuelve para que corrija (1 reintento) y, si insiste, la pie
 (`--modelo` o la variable `BPT_MODELO` para cambiarlo).
 
 **Automático:** `.github/workflows/resultados-mlb.yml` corre cada mañana de octubre y noviembre
-(≈10:47 en Santiago) con `--fase todas`: genera las 3 láminas por juego, el `resumen.json` y, si
+(06:17 en Santiago) con `--fase todas`: genera las 3 láminas por juego, el `resumen.json` y, si
 el repo tiene el secreto `ANTHROPIC_API_KEY`, los textos. Todo queda como artefacto del run
 (Actions → el run → *Artifacts*) y los textos se leen directo en el resumen del run. También se
 puede lanzar a mano con **Run workflow**, eligiendo fecha y fase. El cron solo vive en `main`.
@@ -146,7 +146,7 @@ Un carrusel por jornada en `output/resultados/lvbp/AAAA-MM-DD/`:
 El redactor escribe **un** caption, hilo y guion para toda la jornada, neutral entre los 8
 equipos. Datos: MLB Stats API (liga 135), con nuestras siglas (CAR = Cardenales; la API le dice
 CAR a Caracas) y nombres con tilde. Workflow: `.github/workflows/resultados-lvbp.yml`
-(octubre a enero, ≈10:52 en Santiago), con los mismos secretos.
+(octubre a enero, 06:22 en Santiago), con los mismos secretos.
 
 ### Etiquetas de métricas
 

@@ -1,4 +1,4 @@
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 # Solo generamos imágenes a archivo: forzamos el backend "Agg" (sin ventanas).
 # En Windows matplotlib escoge TkAgg por defecto y falla si Tcl/Tk no está bien instalado.

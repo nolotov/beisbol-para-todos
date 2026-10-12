@@ -8,9 +8,10 @@ name: Resultados LVBP
 
 on:
   schedule:
-    # 13:52 UTC ≈ 10:52 en Santiago, 5 minutos después del de MLB.
+    # 09:22 UTC = 06:22 en Santiago (UTC-3), 5 minutos después del de MLB. Los juegos de la
+    # LVBP terminan cerca de la medianoche de Santiago (más tarde con lluvia o extrainnings).
     # De octubre a enero: temporada regular y playoffs de la LVBP.
-    - cron: "52 13 * 10,11,12,1 *"
+    - cron: "22 9 * 10,11,12,1 *"
   workflow_dispatch:
     inputs:
       fecha:
