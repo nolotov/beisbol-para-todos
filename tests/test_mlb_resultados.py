@@ -126,3 +126,19 @@ def test_dos_divisionales_simultaneas_no_se_mezclan(tmp_path):
     textos = {j["titular"]: j["estado_serie"]["texto"] for j in r["juegos"]}
     assert textos["LAD le gana 2-1 a ATL"] == "LAD lidera 2-1"
 
+
+
+def test_avisa_si_la_fase_no_coincide(sched, tmp_path, monkeypatch, capsys):
+    from bpt import cli
+    from bpt.data import mlb_stats as ms
+    monkeypatch.setattr(ms, "fetch_postseason", lambda *a, **k: sched)
+    rc = cli.main(["mlb-resultados", "--fecha", "2026-10-11", "--fase", "D",
+                   "--salida", str(tmp_path)])
+    assert rc == 2
+    assert "--fase L (Serie de Campeonato)" in capsys.readouterr().out
+
+
+def test_rechaza_fecha_futura(tmp_path, capsys):
+    from bpt import cli
+    rc = cli.main(["mlb-resultados", "--fecha", "2099-12-10", "--salida", str(tmp_path)])
+    assert rc == 1 and "fecha futura" in capsys.readouterr().err

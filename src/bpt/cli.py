@@ -16,6 +16,7 @@ Ejemplos:
 from __future__ import annotations
 
 import argparse
+from datetime import date, datetime
 import re
 import sys
 from pathlib import Path
@@ -147,6 +148,17 @@ def cmd_mlb_results(args: argparse.Namespace) -> int:
     from bpt import resultados
     fecha = args.fecha or resultados.ayer_mlb()
     tipo = None if args.fase == "todas" else args.fase
+    try:
+        f = date.fromisoformat(fecha)
+    except ValueError:
+        print(f"[error] Fecha inválida: {fecha}. Formato AAAA-MM-DD (año-mes-día)",
+              file=sys.stderr)
+        return 1
+    hoy = datetime.now(resultados.TZ_MLB).date()
+    if f > hoy:
+        print(f"[error] {fecha} es una fecha futura. El formato es AAAA-MM-DD: "
+              f"el 11 de octubre es {f.year}-10-11, no {fecha}", file=sys.stderr)
+        return 1
     r = resultados.generar(fecha, temporada=args.temporada, tipo=tipo, salida=Path(args.salida),
                            handle=args.handle, refresh=not args.cache)
     carpeta = Path(args.salida) / fecha
@@ -156,6 +168,11 @@ def cmd_mlb_results(args: argparse.Namespace) -> int:
     for p in r["pendientes"]:
         print(f"[--] {p['serie']} J{p['juego_n']} {p['partido']}: {p['estado']}")
     if not r["juegos"] and not r["pendientes"]:
+        if r.get("otras_fases"):
+            fases = ", ".join(f"--fase {k} ({v})" for k, v in r["otras_fases"].items())
+            print(f"[!!] No hubo juegos de {r['fase']} el {fecha}, pero sí de otra fase: "
+                  f"usa {fases}")
+            return 2
         print(f"[--] No hubo juegos de esa fase el {fecha}")
     print(f"Resumen: {carpeta / 'resumen.json'}")
     if args.redactar and r["juegos"]:

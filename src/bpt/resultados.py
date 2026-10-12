@@ -42,6 +42,8 @@ def generar(fecha: str, temporada: int | None = None, tipo: str | None = "L",
         schedule = mlb_stats.fetch_postseason(temporada, refresh=refresh)
 
     juegos = mlb_stats.games_on(schedule, fecha, tipo)
+    otras_fases = sorted({j.tipo for j in mlb_stats.games_on(schedule, fecha)} - {tipo}) \
+        if tipo else []
     series = mlb_stats.estado_series(schedule, hasta=fecha, tipo=tipo)
     carpeta = Path(salida) / fecha
     carpeta.mkdir(parents=True, exist_ok=True)
@@ -89,6 +91,8 @@ def generar(fecha: str, temporada: int | None = None, tipo: str | None = "L",
         "juegos": items,
         "pendientes": pendientes,
         "series": {k: v.to_dict() for k, v in series.items()},
+        # Juegos de ese día en otras fases (p. ej. se pidió --fase D en plena SCLN)
+        "otras_fases": {t: mlb_stats.FASES.get(t, t) for t in otras_fases},
     }
     (carpeta / "resumen.json").write_text(json.dumps(resumen, ensure_ascii=False, indent=2),
                                           encoding="utf-8")
