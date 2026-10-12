@@ -62,22 +62,22 @@ en off, con marcas [LÁMINA 1], [LÁMINA 2] y, si existe, [LÁMINA 3] donde camb
 de decir en voz alta.
 """
 
-TOOL = {
-    "name": "entregar_textos",
-    "description": "Entrega las tres piezas de texto del juego.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "instagram": {"type": "string", "description": "Caption de Instagram"},
-            "hilo_x": {"type": "array", "items": {"type": "string"}, "minItems": 3,
-                       "maxItems": 5, "description": "Tuits del hilo, en orden"},
-            "guion": {"type": "string", "description": "Guion de 30-45 s con [LÁMINA n]"},
-            "angulo": {"type": "string",
-                       "description": "En una frase: qué historia cuentan los datos"},
-        },
-        "required": ["instagram", "hilo_x", "guion", "angulo"],
+# Salida estructurada (output_config.format, JSON Schema). Los conteos (3-5 tuits) los
+# revisa el validador: el esquema solo fija la forma.
+ESQUEMA = {
+    "type": "object",
+    "properties": {
+        "instagram": {"type": "string", "description": "Caption de Instagram"},
+        "hilo_x": {"type": "array", "items": {"type": "string"},
+                   "description": "Tuits del hilo, en orden (3 a 5)"},
+        "guion": {"type": "string", "description": "Guion de 30-45 s con [LÁMINA n]"},
+        "angulo": {"type": "string",
+                   "description": "En una frase: qué historia cuentan los datos"},
     },
+    "required": ["instagram", "hilo_x", "guion", "angulo"],
+    "additionalProperties": False,
 }
+
 
 # Métricas que el redactor puede necesitar explicar en una frase
 _METRICAS = ["game_score", "ci", "tb"]
@@ -105,5 +105,5 @@ def mensaje_usuario(juego: dict, resumen: dict) -> str:
         "Explicaciones de métricas que puedes usar (adáptalas, no las copies enteras):\n"
         f"{json.dumps(glos, ensure_ascii=False, indent=1)}\n\n"
         "Bases ganadas = bases totales + boletos + pelotazos + robos.\n"
-        "Entrega con la herramienta entregar_textos."
+        "Responde solo con el JSON de las piezas."
     )

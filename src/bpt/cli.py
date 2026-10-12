@@ -188,6 +188,13 @@ def _redactar(carpeta: Path, modelo: str) -> int:
     except RuntimeError as e:
         print(f"[error] {e}", file=sys.stderr)
         return 1
+    except Exception as e:  # noqa: BLE001 - errores de la API de Claude, sin traceback
+        if type(e).__module__.startswith("anthropic"):
+            detalle = getattr(e, "message", str(e))
+            print(f"[error] La API de Claude respondió {type(e).__name__}: {detalle}",
+                  file=sys.stderr)
+            return 1
+        raise
     for r in res:
         marca = "ok" if r["validacion"]["ok"] else "!!"
         print(f"[{marca}] {r['partido']}: {r['estado']} (intentos: {r['intentos']})")

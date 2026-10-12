@@ -1,7 +1,7 @@
 """Agente redactor: resumen.json -> caption de Instagram, hilo de X y guion de Short.
 
 Flujo por juego:
-1. Pide las tres piezas a Claude con salida estructurada (herramienta obligatoria).
+1. Pide las tres piezas a Claude con salida estructurada (output_config, JSON Schema).
 2. Las valida contra los datos.
 3. Si hay cifras sin respaldo, le devuelve la lista al modelo y le pide corregir (1 vez).
 4. Guarda todo con su validación. Nada se publica solo: el estado es siempre
@@ -69,7 +69,7 @@ def _cliente():
     return anthropic.Anthropic()
 
 
-def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object, object]:
+def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object]:
     try:
         r = _crear(client, mensajes, modelo)
     except Exception as e:  # noqa: BLE001
@@ -81,8 +81,12 @@ def _pedir(client, mensajes: list[dict], modelo: str) -> tuple[dict, object, obj
                 "platform.claude.com: si los últimos 4 no coinciden o la llave no aparece, "
                 "crea una nueva y pégala completa en el .env") from None
         raise
-    bloque = next(b for b in r.content if b.type == "tool_use")
-    return bloque.input, r, bloque
+    texto = "".join(b.text for b in r.content if b.type == "text")
+    try:
+        return json.loads(texto), r
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"El modelo no devolvió JSON válido (stop_reason="
+                           f"{getattr(r, 'stop_reason', '?')}): {texto[:200]}") from e
 
 
 def _crear(client, mensajes: list[dict], modelo: str):
@@ -90,8 +94,7 @@ def _crear(client, mensajes: list[dict], modelo: str):
         model=modelo,
         max_tokens=MAX_TOKENS,
         system=prompt.SISTEMA,
-        tools=[prompt.TOOL],
-        tool_choice={"type": "tool", "name": prompt.TOOL["name"]},
+        output_config={"format": {"type": "json_schema", "schema": prompt.ESQUEMA}},
         messages=mensajes,
     )
 
@@ -118,24 +121,20 @@ def redactar_juego(juego: dict, resumen: dict, client=None, modelo: str | None =
     modelo = modelo or MODELO
     datos = prompt.datos_juego(juego, resumen)
     mensajes = [{"role": "user", "content": prompt.mensaje_usuario(juego, resumen)}]
-    textos, resp, bloque = _pedir(client, mensajes, modelo)
+    textos, resp = _pedir(client, mensajes, modelo)
     val = validar(textos, datos)
     intentos = 1
 
     while val.cifras_sin_respaldo and intentos <= reintentos:
         mensajes += [
             {"role": "assistant", "content": resp.content},
-            {"role": "user", "content": [{
-                "type": "tool_result",
-                "tool_use_id": bloque.id,
-                "is_error": True,
-                "content": ("Estas cifras no aparecen en los datos del juego: "
-                            f"{', '.join(val.cifras_sin_respaldo)}. Quítalas o reemplázalas "
-                            "por cifras que sí estén en los datos (sin sumas ni cálculos "
-                            "propios) y entrega de nuevo las tres piezas completas."),
-            }]},
+            {"role": "user", "content": (
+                "Estas cifras no aparecen en los datos del juego: "
+                f"{', '.join(val.cifras_sin_respaldo)}. Quítalas o reemplázalas por cifras que "
+                "sí estén en los datos (sin sumas ni cálculos propios) y entrega de nuevo las "
+                "tres piezas completas.")},
         ]
-        textos, resp, bloque = _pedir(client, mensajes, modelo)
+        textos, resp = _pedir(client, mensajes, modelo)
         val = validar(textos, datos)
         intentos += 1
 

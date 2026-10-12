@@ -103,6 +103,9 @@ def validar(textos: dict, datos) -> Validacion:
             v.alertas.append(f"{nombre}: {len(texto)} caracteres (máx. {LIMITES['tuit']})")
 
     v.cifras_sin_respaldo = sin_respaldo
+    n_tuits = len(textos.get("hilo_x", []))
+    if not 3 <= n_tuits <= 5:
+        v.alertas.append(f"hilo_x: {n_tuits} tuits (deben ser entre 3 y 5)")
     if len(piezas["instagram"]) > LIMITES["instagram"]:
         v.alertas.append(f"instagram: {len(piezas['instagram'])} caracteres "
                          f"(máx. {LIMITES['instagram']})")

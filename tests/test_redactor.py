@@ -53,8 +53,8 @@ class ClienteFalso:
     def create(self, **kw):
         self.llamadas.append(kw)
         t = self.respuestas.pop(0)
-        bloque = SimpleNamespace(type="tool_use", id=f"tu_{len(self.llamadas)}", input=t)
-        return SimpleNamespace(content=[bloque])
+        bloque = SimpleNamespace(type="text", text=json.dumps(t, ensure_ascii=False))
+        return SimpleNamespace(content=[bloque], stop_reason="end_turn")
 
 
 # --- Validador ----------------------------------------------------------------
@@ -109,7 +109,9 @@ def test_redacta_y_pide_herramienta(juego_y_resumen):
     assert res["estado"] == "para revisar" and res["intentos"] == 1
     kw = cli.llamadas[0]
     assert kw["model"] == "modelo-x"
-    assert kw["tool_choice"] == {"type": "tool", "name": "entregar_textos"}
+    assert "tools" not in kw and "tool_choice" not in kw
+    fmt = kw["output_config"]["format"]
+    assert fmt["type"] == "json_schema" and fmt["schema"]["additionalProperties"] is False
     assert "Bateador LAD Uno" in kw["messages"][0]["content"]  # le llegan las figuras
     assert "game_pk" not in kw["messages"][0]["content"]       # sin campos técnicos
 
@@ -120,9 +122,9 @@ def test_corrige_cifra_inventada_en_segundo_intento(juego_y_resumen):
     cli = ClienteFalso(malo, textos())
     res = agente.redactar_juego(j, r, client=cli)
     assert res["intentos"] == 2 and res["validacion"]["ok"]
-    feedback = cli.llamadas[1]["messages"][-1]["content"][0]
-    assert feedback["type"] == "tool_result" and feedback["tool_use_id"] == "tu_1"
-    assert "15" in feedback["content"]
+    msgs = cli.llamadas[1]["messages"]
+    assert [m["role"] for m in msgs] == ["user", "assistant", "user"]
+    assert "15" in msgs[-1]["content"]
 
 
 def test_si_insiste_queda_con_alertas(juego_y_resumen):
@@ -197,3 +199,21 @@ def test_llave_rechazada_da_mensaje_claro(juego_y_resumen, monkeypatch):
         agente.redactar_juego(j, r, client=Rechaza())
     msg = str(e.value)
     assert "…ABCD" in msg and "Settings → API keys" in msg and "xxxx" not in msg
+
+
+def test_hilo_fuera_de_rango_alerta(juego_y_resumen):
+    j, r = juego_y_resumen
+    v = validar(textos(hilo=["Uno.", "Dos."]), prompt.datos_juego(j, r))
+    assert any("2 tuits" in a for a in v.alertas)
+
+
+def test_json_invalido_error_claro(juego_y_resumen):
+    j, r = juego_y_resumen
+
+    class Roto(ClienteFalso):
+        def create(self, **kw):
+            return SimpleNamespace(content=[SimpleNamespace(type="text", text="{incompleto")],
+                                   stop_reason="max_tokens")
+
+    with pytest.raises(RuntimeError, match="max_tokens"):
+        agente.redactar_juego(j, r, client=Roto())
