@@ -22,11 +22,25 @@ MODELO = os.environ.get("BPT_MODELO", "claude-sonnet-5-5")
 MAX_TOKENS = 2500
 
 
+def cargar_env(path: Path = Path(".env")) -> None:
+    """Carga KEY=VALOR de un archivo .env (no versionado) sin pisar variables ya definidas."""
+    if not path.exists():
+        return
+    for linea in path.read_text(encoding="utf-8-sig").splitlines():
+        linea = linea.strip()
+        if not linea or linea.startswith("#") or "=" not in linea:
+            continue
+        k, v = linea.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
 def _cliente():
     import anthropic
 
+    cargar_env()
     if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise RuntimeError("Falta ANTHROPIC_API_KEY en el entorno")
+        raise RuntimeError("Falta ANTHROPIC_API_KEY: ponla en un archivo .env en la raíz del "
+                           "proyecto (ANTHROPIC_API_KEY=sk-ant-...) o en el entorno")
     return anthropic.Anthropic()
 
 

@@ -8,6 +8,8 @@ from bpt import resultados
 from bpt.data import mlb_box
 
 FX = Path(__file__).parent / "fixtures"
+PERSONAS = {int(k): v for k, v in json.loads(
+    (FX / "mlb_people_sintetico.json").read_text(encoding="utf-8")).items() if k.isdigit()}
 
 
 @pytest.fixture
@@ -69,9 +71,11 @@ def test_textos_de_linea(box):
 
 def test_pipeline_con_figuras(sched, box, tmp_path):
     r = resultados.generar("2026-10-12", salida=tmp_path, schedule=sched,
-                           boxscores={900002: box})
+                           boxscores={900002: box},
+                           personas=PERSONAS)
     j = r["juegos"][0]
-    assert j["tarjetas"] == ["scln_j2_LAD-MIL_1_resultado.png", "scln_j2_LAD-MIL_2_figuras.png"]
+    assert j["tarjetas"] == ["scln_j2_LAD-MIL_1_resultado.png", "scln_j2_LAD-MIL_2_figuras.png",
+                             "scln_j2_LAD-MIL_3_latinos.png"]
     assert (tmp_path / "2026-10-12" / j["tarjetas"][1]).stat().st_size > 20_000
     fig = j["figuras"]
     assert fig["mejor_pitcheo"]["MIL"]["game_score"] == 68

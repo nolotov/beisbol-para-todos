@@ -69,6 +69,7 @@ class LineaBateo:
     hbp: int
     k: int
     br: int
+    ap: int = 0   # apariciones al plato
 
     @property
     def bases_totales(self) -> int:
@@ -167,6 +168,8 @@ def bateo(box: dict, lado: str) -> list[LineaBateo]:
             ca=b.get("runs", 0), bb=b.get("baseOnBalls", 0),  # incluye intencionales
             hbp=b.get("hitByPitch", 0), k=b.get("strikeOuts", 0),
             br=b.get("stolenBases", 0),
+            ap=b.get("plateAppearances", b.get("atBats", 0) + b.get("baseOnBalls", 0)
+                     + b.get("hitByPitch", 0) + b.get("sacFlies", 0) + b.get("sacBunts", 0)),
         ))
     return out
 
@@ -216,3 +219,87 @@ def figuras(box: dict) -> Figuras:
         if pits:
             mp[pits[0].equipo] = max(pits, key=lambda p: (p.game_score, p.outs))
     return Figuras(jonrones, mb, mp)
+
+
+# --- Latinos en el juego ------------------------------------------------------
+
+@dataclass
+class ActuacionLatina:
+    nombre: str
+    equipo: str
+    pais: str          # nombre en español
+    codigo: str        # VEN, DOM, PUR...
+    rol: str           # "bateo" | "pitcheo"
+    linea: str
+    valor: int         # bases ganadas (bateo) o Game Score (pitcheo)
+    destacada: bool
+    motivo: str | None  # por qué es destacada, en palabras
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+def _motivo_bateo(b: LineaBateo, es_figura: bool) -> str | None:
+    if b.hr:
+        return "jonrón" if b.hr == 1 else f"{b.hr} jonrones"
+    if es_figura:
+        return "mejor línea al bate de su equipo"
+    if b.h >= 2:
+        return f"{b.h} hits"
+    if b.ci >= 2:
+        return f"{b.ci} carreras impulsadas"
+    return None
+
+
+def _motivo_pitcheo(p: LineaPitcheo, es_figura: bool, decision: str | None) -> str | None:
+    if es_figura:
+        return "mejor salida en la loma de su equipo"
+    if p.game_score >= 60:
+        return f"Game Score de {p.game_score}"
+    if decision in ("ganador", "salvado"):
+        return "se llevó la victoria" if decision == "ganador" else "se apuntó el salvado"
+    return None
+
+
+def latinos(box: dict, personas: dict[int, dict], decisiones: dict[str, str | None] | None = None,
+            incluir_caribe_neerlandes: bool = True) -> list[ActuacionLatina]:
+    """Todos los latinos que participaron (bateo con al menos una aparición y pitcheo).
+
+    Orden: destacados primero; dentro de cada grupo, pitcheo por Game Score y bateo por
+    bases ganadas (los mismos criterios de las figuras).
+    `decisiones`: {"ganador": nombre, "perdedor": nombre, "salvado": nombre} del juego.
+    """
+    from bpt.data.mlb_people import pais_latino
+
+    decisiones = decisiones or {}
+    rol_decision = {v: k for k, v in decisiones.items() if v}
+    f = figuras(box)
+    figuras_ids = {b.id for b in f.mejor_bateo.values()} | {p.id for p in f.mejor_pitcheo.values()}
+    out: list[ActuacionLatina] = []
+    for lado in ("away", "home"):
+        for b in bateo(box, lado):
+            pais = pais_latino((personas.get(b.id) or {}).get("pais_api"), incluir_caribe_neerlandes)
+            if not pais or b.ap == 0:
+                continue
+            m = _motivo_bateo(b, b.id in figuras_ids)
+            out.append(ActuacionLatina(b.nombre, b.equipo, pais[1], pais[0], "bateo", b.texto(),
+                                       b.bases_ganadas, m is not None, m))
+        for p in pitcheo(box, lado):
+            pais = pais_latino((personas.get(p.id) or {}).get("pais_api"), incluir_caribe_neerlandes)
+            if not pais:
+                continue
+            m = _motivo_pitcheo(p, p.id in figuras_ids, rol_decision.get(p.nombre))
+            dec = rol_decision.get(p.nombre)
+            linea = p.texto() + (f"  ·  {dec}" if dec else "")
+            out.append(ActuacionLatina(p.nombre, p.equipo, pais[1], pais[0], "pitcheo", linea,
+                                       p.game_score, m is not None, m))
+    out.sort(key=lambda a: (not a.destacada, a.rol != "pitcheo", -a.valor))
+    return out
+
+
+def ids_del_juego(box: dict) -> list[int]:
+    ids: list[int] = []
+    for lado in ("away", "home"):
+        t = box["teams"][lado]
+        ids += list(t.get("batters", [])) + list(t.get("pitchers", []))
+    return list(dict.fromkeys(ids))

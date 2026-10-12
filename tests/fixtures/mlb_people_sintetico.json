@@ -1,0 +1,68 @@
+{
+ "_nota": "FIXTURE SINTÉTICO: países inventados para los jugadores del box score sintético 900002.",
+ "101": {
+  "nombre": null,
+  "pais_api": "Venezuela",
+  "ciudad": null
+ },
+ "102": {
+  "nombre": null,
+  "pais_api": "Dominican Republic",
+  "ciudad": null
+ },
+ "103": {
+  "nombre": null,
+  "pais_api": "USA",
+  "ciudad": null
+ },
+ "104": {
+  "nombre": null,
+  "pais_api": "USA",
+  "ciudad": null
+ },
+ "111": {
+  "nombre": null,
+  "pais_api": "USA",
+  "ciudad": null
+ },
+ "112": {
+  "nombre": null,
+  "pais_api": "Japan",
+  "ciudad": null
+ },
+ "113": {
+  "nombre": null,
+  "pais_api": "Venezuela",
+  "ciudad": null
+ },
+ "201": {
+  "nombre": null,
+  "pais_api": "USA",
+  "ciudad": null
+ },
+ "202": {
+  "nombre": null,
+  "pais_api": "Puerto Rico",
+  "ciudad": null
+ },
+ "203": {
+  "nombre": null,
+  "pais_api": "Cuba",
+  "ciudad": null
+ },
+ "211": {
+  "nombre": null,
+  "pais_api": "USA",
+  "ciudad": null
+ },
+ "212": {
+  "nombre": null,
+  "pais_api": "Curacao",
+  "ciudad": null
+ },
+ "213": {
+  "nombre": null,
+  "pais_api": "Mexico",
+  "ciudad": null
+ }
+}

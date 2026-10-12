@@ -10,6 +10,8 @@ from bpt.redactor import agente, prompt
 from bpt.redactor.validador import numeros_en, numeros_permitidos, validar
 
 FX = Path(__file__).parent / "fixtures"
+PERSONAS = {int(k): v for k, v in json.loads(
+    (FX / "mlb_people_sintetico.json").read_text(encoding="utf-8")).items() if k.isdigit()}
 
 GUION_OK = ("[LÁMINA 1] Juego 2 de la Serie de Campeonato. Los Dodgers le ganaron 3-2 a "
             "Milwaukee en 11 entradas y empataron la serie 1-1. " + "Partido apretado. " * 20 +
@@ -29,7 +31,8 @@ def textos(instagram="LAD le gana 3-2 a MIL en 11 entradas. ¿Y ahora?\n#Béisbo
 def dia(tmp_path):
     sched = json.loads((FX / "mlb_postemporada_sintetico.json").read_text(encoding="utf-8"))
     box = json.loads((FX / "mlb_boxscore_sintetico_900002.json").read_text(encoding="utf-8"))
-    resultados.generar("2026-10-12", salida=tmp_path, schedule=sched, boxscores={900002: box})
+    resultados.generar("2026-10-12", salida=tmp_path, schedule=sched, boxscores={900002: box},
+                           personas=PERSONAS)
     return tmp_path / "2026-10-12"
 
 
@@ -139,7 +142,29 @@ def test_redactar_dia_escribe_archivos(dia):
         "para revisar"
 
 
-def test_sin_llave_error_claro(monkeypatch):
+def test_sin_llave_error_claro(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)  # sin .env
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     with pytest.raises(RuntimeError, match="ANTHROPIC_API_KEY"):
         agente._cliente()
+
+
+def test_carga_llave_desde_env(monkeypatch, tmp_path):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")  # registra el valor original para restaurarlo
+    monkeypatch.delenv("ANTHROPIC_API_KEY")
+    (tmp_path / ".env").write_text('# comentario\nANTHROPIC_API_KEY="sk-ant-prueba"\n',
+                                   encoding="utf-8")
+    agente.cargar_env(tmp_path / ".env")
+    import os
+    assert os.environ["ANTHROPIC_API_KEY"] == "sk-ant-prueba"
+
+
+def test_prompt_recibe_latinos(juego_y_resumen):
+    j, r = juego_y_resumen
+    d = prompt.datos_juego(j, r)
+    assert d["laminas"] == 3
+    assert d["latinos_resumen"].startswith("7 peloteros")
+    assert "LATINOS" in prompt.SISTEMA and "venezolano" in prompt.SISTEMA
+    # el conteo de latinos es una cifra con respaldo
+    v = validar(textos(instagram="7 latinos vieron acción. LAD ganó 3-2."), d)
+    assert "7" not in v.cifras_sin_respaldo

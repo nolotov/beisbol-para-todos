@@ -75,6 +75,11 @@ Sale en `output/resultados/mlb/AAAA-MM-DD/`, dos láminas de carrusel por juego 
 2. `*_2_figuras.png`: por equipo, la mejor salida en la loma (**Game Score** v2 de Tango) y la
    mejor línea al bate (**bases ganadas** = bases totales + boletos + pelotazos + robos), más los
    jonrones del juego. El criterio va impreso en la tarjeta y en el JSON.
+3. `*_3_latinos.png` (si jugó algún latino): todos los latinos que vieron acción, en la loma y
+   al bate, con su país. Los destacados (jonrón, figura del equipo, Game Score 60+, 2+ hits o
+   2+ CI, victoria o salvado) van arriba con el motivo; los venezolanos en verde. El país sale
+   del endpoint `/people` de la API y se cachea en `data/raw/mlb/people.json`. Aruba y Curazao
+   cuentan como latinos (`mlb_people.CARIBE_NEERLANDES`, se puede desactivar).
 
 Y un `resumen.json` con las cifras del día, que es la entrada del agente redactor. Los juegos pospuestos o sin terminar quedan en
 `pendientes`. Fuente: MLB Stats API (`statsapi.mlb.com`), sin logos ni gráfica de MLB.
@@ -82,7 +87,8 @@ Y un `resumen.json` con las cifras del día, que es la entrada del agente redact
 #### Agente redactor
 
 ```powershell
-$env:ANTHROPIC_API_KEY = "sk-ant-..."         # o en un archivo .env que NO se versiona
+# Una sola vez: crea el archivo .env en la raíz (está en .gitignore, no se sube a GitHub)
+Copy-Item .env.example .env ; notepad .env    # pega tu llave: ANTHROPIC_API_KEY=sk-ant-...
 bpt mlb-resultados --fecha 2026-10-12 --redactar
 bpt redactar --fecha 2026-10-12                # solo textos, sobre un resumen.json existente
 ```
