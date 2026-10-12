@@ -1,5 +1,6 @@
-# Resultados de postemporada MLB: cada mañana genera las tarjetas de los juegos de ayer
-# y el resumen.json, y los deja como artefacto descargable del run.
+# Resultados de postemporada MLB: cada mañana genera las 3 láminas de cada juego de ayer,
+# el resumen.json y (si existe el secreto ANTHROPIC_API_KEY) los textos para redes.
+# Todo queda como artefacto descargable del run y los textos se ven en el resumen.
 #
 # El cron solo corre cuando este archivo está en la rama por defecto (main).
 # Mientras tanto se puede lanzar a mano desde la pestaña Actions ("Run workflow").
@@ -16,12 +17,20 @@ on:
         description: "Fecha oficial MLB (YYYY-MM-DD). Vacío = ayer en hora del Este"
         required: false
       fase:
-        description: "L=Campeonato, D=Divisional, F=Comodín, W=Mundial, todas"
+        description: "todas, L=Campeonato, D=Divisional, F=Comodín, W=Mundial"
         required: false
-        default: "L"
+        default: "todas"
 
 permissions:
   contents: read
+
+concurrency:
+  group: resultados-mlb
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash   # bash -eo pipefail: un error antes del "| tee" sí hace fallar el paso
 
 jobs:
   resultados:
@@ -47,7 +56,7 @@ jobs:
         id: gen
         env:
           FECHA: ${{ inputs.fecha }}
-          FASE: ${{ inputs.fase || 'L' }}
+          FASE: ${{ inputs.fase || 'todas' }}
         run: |
           ARGS="--fase $FASE"
           if [ -n "$FECHA" ]; then ARGS="$ARGS --fecha $FECHA"; fi
@@ -56,20 +65,23 @@ jobs:
 
       - name: Redactar textos (si hay ANTHROPIC_API_KEY)
         if: ${{ env.ANTHROPIC_API_KEY != '' }}
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python -m bpt redactar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
 
       - name: Resumen del run
+        if: always()
         run: |
           echo '### Resultados MLB' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          cat salida.txt >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           TEXTOS="${{ steps.gen.outputs.carpeta }}textos.md"
           if [ -f "$TEXTOS" ]; then cat "$TEXTOS" >> "$GITHUB_STEP_SUMMARY"; fi
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo '> Sin secreto ANTHROPIC_API_KEY: se generaron las tarjetas, pero no los textos.' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - uses: actions/upload-artifact@v4
+        if: always() && steps.gen.outputs.carpeta != ''
         with:
           name: resultados-mlb-${{ github.run_number }}
           path: ${{ steps.gen.outputs.carpeta }}

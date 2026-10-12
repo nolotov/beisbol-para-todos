@@ -142,3 +142,16 @@ def test_rechaza_fecha_futura(tmp_path, capsys):
     from bpt import cli
     rc = cli.main(["mlb-resultados", "--fecha", "2099-12-10", "--salida", str(tmp_path)])
     assert rc == 1 and "fecha futura" in capsys.readouterr().err
+
+
+def test_cli_todas_las_fases(sched, tmp_path, monkeypatch, capsys):
+    """El cron corre con --fase todas."""
+    from bpt import cli
+    from bpt.data import mlb_stats as ms
+    from bpt.data import mlb_box
+    monkeypatch.setattr(ms, "fetch_postseason", lambda *a, **k: sched)
+    monkeypatch.setattr(mlb_box, "fetch_boxscore", lambda *a, **k: (_ for _ in ()).throw(
+        ConnectionError("sin red en tests")))
+    rc = cli.main(["mlb-resultados", "--fecha", "2026-10-12", "--fase", "todas",
+                   "--salida", str(tmp_path)])
+    assert rc == 0 and "[ok] SCLN J2" in capsys.readouterr().out

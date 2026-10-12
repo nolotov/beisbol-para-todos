@@ -103,10 +103,14 @@ inventa una, se la devuelve para que corrija (1 reintento) y, si insiste, la pie
 **Nada se publica solo:** todo sale "para revisar". Modelo por defecto: `claude-sonnet-5-5`
 (`--modelo` o la variable `BPT_MODELO` para cambiarlo).
 
-**Automático:** `.github/workflows/resultados-mlb.yml` lo corre cada mañana de octubre y noviembre
-y deja la carpeta del día como artefacto del run. Si el repo tiene el secreto `ANTHROPIC_API_KEY`,
-también redacta, y los textos se ven directo en el resumen del run. El cron solo se activa cuando el workflow está
-en `main`; antes se puede lanzar a mano desde Actions.
+**Automático:** `.github/workflows/resultados-mlb.yml` corre cada mañana de octubre y noviembre
+(≈10:47 en Santiago) con `--fase todas`: genera las 3 láminas por juego, el `resumen.json` y, si
+el repo tiene el secreto `ANTHROPIC_API_KEY`, los textos. Todo queda como artefacto del run
+(Actions → el run → *Artifacts*) y los textos se leen directo en el resumen del run. También se
+puede lanzar a mano con **Run workflow**, eligiendo fecha y fase. El cron solo vive en `main`.
+
+Secreto: *Settings → Secrets and variables → Actions → New repository secret*,
+nombre `ANTHROPIC_API_KEY`, valor = la misma llave del `.env`.
 
 ### Etiquetas de métricas
 
