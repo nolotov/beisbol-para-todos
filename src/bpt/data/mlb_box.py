@@ -18,7 +18,9 @@ from pathlib import Path
 
 from bpt.data.mlb_stats import CACHE_DIR, _get
 
-CRITERIO_PITCHEO = "Game Score v2 (Tango): 40 + 2·outs + K − 2·BB − 2·H − 3·C − 6·HR"
+CRITERIO_PITCHEO = ("Game Score v2 (Tango): 40 + 2·outs + K − 2·BB − 2·H − 3·C − 6·HR; "
+                    "compiten los que lanzaron 3+ entradas (si nadie llegó, todos)")
+MIN_OUTS_SALIDA = 9
 CRITERIO_BATEO = ("Bases ganadas = bases totales + boletos + pelotazos + robos; "
                   "desempata impulsadas, luego anotadas, luego menos turnos")
 
@@ -148,8 +150,8 @@ def _players(team: dict) -> dict[int, dict]:
 
 
 def _abrev(team: dict) -> str:
-    t = team.get("team", {})
-    return t.get("abbreviation") or t.get("teamCode", "?").upper()
+    from bpt.data.mlb_stats import abrev_equipo
+    return abrev_equipo(team.get("team", {}))
 
 
 def bateo(box: dict, lado: str) -> list[LineaBateo]:
@@ -217,7 +219,10 @@ def figuras(box: dict) -> Figuras:
         if bats:
             mb[bats[0].equipo] = max(bats, key=lambda b: b.puntaje)
         if pits:
-            mp[pits[0].equipo] = max(pits, key=lambda p: (p.game_score, p.outs))
+            # El Game Score está pensado para salidas largas: si alguien lanzó 3+ entradas,
+            # solo compiten esos (un relevo de 1 entrada en blanco no es "la mejor salida").
+            largos = [p for p in pits if p.outs >= MIN_OUTS_SALIDA] or pits
+            mp[pits[0].equipo] = max(largos, key=lambda p: (p.game_score, p.outs))
     return Figuras(jonrones, mb, mp)
 
 

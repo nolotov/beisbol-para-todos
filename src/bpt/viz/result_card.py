@@ -39,7 +39,11 @@ def titular(j: Juego) -> str:
 
 
 def render_result_card(j: Juego, serie: EstadoSerie | None, out_path: Path,
-                       handle: str = theme.HANDLE, temporada: int | None = None) -> Path:
+                       handle: str = theme.HANDLE, temporada: int | None = None,
+                       encabezado: str | None = None, titulo: str | None = None,
+                       subtitulo: str | None = None, fuente: str = FUENTE) -> Path:
+    """`encabezado`/`titulo`/`subtitulo` permiten usarla fuera de la postemporada (LVBP).
+    Sin `serie`, si los equipos traen récord, el panel de abajo muestra el récord."""
     if not j.final:
         raise ValueError(f"El juego {j.game_pk} no ha terminado (estado: {j.estado})")
     fonts = theme.apply()
@@ -48,11 +52,11 @@ def render_result_card(j: Juego, serie: EstadoSerie | None, out_path: Path,
     temporada = temporada or int(j.fecha[:4])
 
     # --- Encabezado ---------------------------------------------------------
-    fig.text(0.06, 0.955, f"MBP  ·  MLB POSTEMPORADA {temporada}  ·  {j.serie_corto}",
+    fig.text(0.06, 0.955, encabezado or f"MBP  ·  MLB POSTEMPORADA {temporada}  ·  {j.serie_corto}",
              fontsize=14, color=theme.ACCENT, va="top", family=num)
-    fig.text(0.06, 0.915, f"JUEGO {j.juego_n}", fontsize=56, weight="bold",
+    fig.text(0.06, 0.915, titulo or f"JUEGO {j.juego_n}", fontsize=56, weight="bold",
              color=theme.TEXT, va="top")
-    fig.text(0.06, 0.838, j.serie_es, fontsize=17, color=theme.MUTED, va="top")
+    fig.text(0.06, 0.838, subtitulo or j.serie_es, fontsize=17, color=theme.MUTED, va="top")
 
     # --- Marcador -------------------------------------------------------------
     px, pw = 0.04, 0.92
@@ -152,10 +156,23 @@ def render_result_card(j: Juego, serie: EstadoSerie | None, out_path: Path,
         fig.text(px + pw - 0.03, by + bh - 0.025, f"GANA EL PRIMERO EN LLEGAR A {serie.para_ganar}",
                  fontsize=9, color=theme.MUTED, ha="right", va="top", family=num)
 
+    # --- Récord (temporada regular) ------------------------------------------
+    if not serie and j.visitante.record and j.local.record:
+        by, bh = 0.095, 0.115
+        _panel(fig, [px, by, pw, bh])
+        fig.text(px + 0.03, by + bh - 0.025, "RÉCORD EN LA TEMPORADA", fontsize=11,
+                 color=theme.MUTED, va="top", family=num)
+        for k, eq in enumerate([j.visitante, j.local]):
+            x = px + 0.03 + k * 0.45
+            fig.text(x, by + 0.04, eq.abrev, fontsize=22, weight="bold", color=theme.TEXT,
+                     va="center")
+            fig.text(x + 0.12, by + 0.04, eq.record, fontsize=24, weight="bold",
+                     color=theme.ACCENT if eq.ganador else theme.MUTED, va="center", family=num)
+
     # --- Pie ------------------------------------------------------------------
     fig.text(0.06, 0.06, f"{fecha_es(j.fecha)}  ·  {j.estadio}", fontsize=11,
              color=theme.MUTED, va="center", family=num)
-    fig.text(0.06, 0.035, FUENTE, fontsize=10, color=theme.MUTED, va="center", family=num)
+    fig.text(0.06, 0.035, fuente, fontsize=10, color=theme.MUTED, va="center", family=num)
     fig.text(0.94, 0.045, handle, fontsize=15, color=theme.TEXT, va="center", ha="right",
              weight="bold")
 

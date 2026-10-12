@@ -85,6 +85,7 @@ class Equipo:
     hits: int | None
     errores: int | None
     ganador: bool
+    record: str | None = None   # "5-3": récord en la temporada después del juego
 
 
 @dataclass
@@ -174,6 +175,23 @@ def fetch_postseason(season: int, refresh: bool = False,
     return data
 
 
+LVBP_LEAGUE_ID = 135
+WINTER_SPORT_ID = 17
+FUENTE_LVBP = "Datos: MLB Stats API (LVBP)"
+
+
+def fetch_lvbp_dia(fecha: str, refresh: bool = True, cache_dir: Path = CACHE_DIR) -> dict:
+    """Juegos de la LVBP de una fecha (temporada regular y playoffs) con pizarra y decisiones."""
+    cache = cache_dir / "lvbp" / f"calendario_{fecha}.json"
+    if cache.exists() and not refresh:
+        return json.loads(cache.read_text(encoding="utf-8"))
+    data = _get("schedule", {"sportId": WINTER_SPORT_ID, "leagueId": LVBP_LEAGUE_ID,
+                             "date": fecha, "hydrate": HYDRATE})
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    return data
+
+
 # --- Parseo -------------------------------------------------------------------
 
 _ESTADOS = {
@@ -194,16 +212,41 @@ def _estado(status: dict) -> str:
     return _ESTADOS.get(status.get("abstractGameState", ""), detalle or "Desconocido")
 
 
+# LVBP: la API usa sus propias siglas (para ella "CAR" es Caracas). Usamos las nuestras,
+# por id de equipo (los mismos ids que stats.lvbp.com).
+LVBP_IDS = {692: "AGU", 693: "CAR", 694: "ANZ", 695: "LEO",
+            696: "MAG", 697: "BRA", 698: "TIB", 699: "TIG"}
+
+
+# Nombres con tildes (la API los trae sin ellas)
+LVBP_NOMBRES = {692: "Águilas del Zulia", 693: "Cardenales de Lara",
+                694: "Caribes de Anzoátegui", 695: "Leones del Caracas",
+                696: "Navegantes del Magallanes", 697: "Bravos de Margarita",
+                698: "Tiburones de La Guaira", 699: "Tigres de Aragua"}
+
+
+def abrev_equipo(t: dict) -> str:
+    if t.get("id") in LVBP_IDS:
+        return LVBP_IDS[t["id"]]
+    return t.get("abbreviation") or (t.get("teamCode") or "?").upper()
+
+
+def _record(side: dict) -> str | None:
+    r = side.get("leagueRecord")
+    return f"{r['wins']}-{r['losses']}" if r and "wins" in r else None
+
+
 def _equipo(side: dict, line: dict) -> Equipo:
     t = side.get("team", {})
     return Equipo(
         id=t.get("id"),
-        nombre=t.get("name", "?"),
-        abrev=t.get("abbreviation") or t.get("teamCode", "?").upper(),
+        nombre=LVBP_NOMBRES.get(t.get("id"), t.get("name", "?")),
+        abrev=abrev_equipo(t),
         carreras=line.get("runs", side.get("score")),
         hits=line.get("hits"),
         errores=line.get("errors"),
         ganador=bool(side.get("isWinner", False)),
+        record=_record(side),
     )
 
 
