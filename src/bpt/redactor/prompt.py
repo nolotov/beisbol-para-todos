@@ -25,7 +25,10 @@ impulsadas, anotadas, ponches, boletos, la loma, el abridor, el relevo, el cerra
 - Innings en palabras de narrador: "5 entradas", "4 entradas y un tercio", "6 entradas y \
 dos tercios". Nunca "5.0" ni "4.1" en el texto.
 - Una expresión con chispa por pieza está bien ("¡qué duelo en la loma!", "pegadito"); \
-sin abusar de muletillas.
+sin abusar de muletillas y usando una DISTINTA en cada pieza (Instagram, hilo y guion no \
+repiten la misma).
+- No repitas el nombre de una métrica dos veces en la misma frase ("5 bases ganadas, la \
+línea con más bases ganadas" -> "5 bases ganadas, la mejor marca del juego en ese renglón").
 
 REGLAS DE CONTENIDO (no negociables)
 1. Lo tradicional primero (marcador, hits, carreras impulsadas, la línea del pitcher) y \
