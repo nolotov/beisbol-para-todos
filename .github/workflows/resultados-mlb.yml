@@ -8,9 +8,10 @@ name: Resultados MLB
 
 on:
   schedule:
-    # 13:47 UTC ≈ 10:47 en Santiago (los juegos terminan de madrugada en hora de Chile).
+    # 09:17 UTC = 06:17 en Santiago (UTC-3): todo listo antes de las 7 para publicar cuando
+    # Venezuela se despierta. El juego más tardío (costa oeste) termina ~01:30 de Santiago.
     # Solo octubre y noviembre: fuera de la postemporada no hace nada útil.
-    - cron: "47 13 * 10,11 *"
+    - cron: "17 9 * 10,11 *"
   workflow_dispatch:
     inputs:
       fecha:
