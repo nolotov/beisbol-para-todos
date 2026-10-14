@@ -1,7 +1,7 @@
 # Arquitectura del agente de resultados
 
 > Documento técnico de **Beisbol Para Todos** (`bpt`), el toolkit de datos de @mbp.deportes.
-> Versión del sistema: 0.5.0 · Actualizado: 12 de octubre de 2026.
+> Versión del sistema: 0.5.1 · Actualizado: 14 de octubre de 2026.
 
 ## Resumen
 
@@ -11,7 +11,7 @@ El sistema es una redacción automática. Cada madrugada descarga los resultados
 
 **Recorrido diario:**
 
-1. **06:17 (MLB) y 06:22 (LVBP), hora de Santiago.** GitHub Actions inicia el proceso mediante un cron.
+1. **06:10 (MLB) y 06:15 (LVBP), hora de Santiago.** cron-job.org dispara los workflows de GitHub Actions; el cron propio de GitHub (06:17 y 06:22) queda solo como respaldo.
 2. **Datos.** Se consultan en la MLB Stats API los juegos del día anterior, el box score de cada uno y, en MLB, el país de nacimiento de cada pelotero.
 3. **Cálculos.** Se obtienen las figuras (Game Score, bases ganadas), los latinos destacados en MLB y los destacados de la jornada en la LVBP.
 4. **Láminas.** Se generan las imágenes de 1080×1350 con la identidad visual de MBP.
@@ -29,7 +29,7 @@ Es un pipeline lineal con un único ciclo de retorno, el del validador. Se ejecu
 ```mermaid
 flowchart TD
     API["MLB Stats API<br/><small>calendario, pizarra, box score y país · MLB y LVBP</small>"]
-    subgraph GHA["GitHub Actions · 06:17 (MLB) y 06:22 (LVBP), hora de Santiago"]
+    subgraph GHA["GitHub Actions · 06:10 (MLB) y 06:15 (LVBP), hora de Santiago"]
         S1["1 · Extracción<br/><small>mlb_stats.py, mlb_box.py</small>"]
         S2["2 · Cálculos<br/><small>Game Score, bases ganadas, latinos, destacados</small>"]
         S3["3 · Láminas<br/><small>matplotlib · 1080×1350</small>"]
@@ -75,7 +75,7 @@ Cada decisión implicó un compromiso. La tabla resume las principales; a contin
 | Decisión | Elección | Alternativa | Motivo | Costo |
 | --- | --- | --- | --- | --- |
 | Fuente de datos | MLB Stats API (`statsapi.mlb.com`) | Scraping web, Baseball Savant | JSON oficial y estable; incluye MLB y la LVBP (liga 135) con box score | No está documentada para terceros: puede cambiar sin aviso |
-| Ejecución | GitHub Actions con cron | Cloud Run (GCP), servidor propio, equipo local | Gratuito a este volumen, el repositorio ya está ahí, máquina limpia en cada corrida | El cron puede retrasarse; no sirve para escuchar eventos (Fase 4) |
+| Ejecución | GitHub Actions disparado por cron-job.org (cron de GitHub como respaldo) | Cloud Run (GCP), servidor propio, equipo local | Gratuito a este volumen, el repositorio ya está ahí, máquina limpia en cada corrida | El cron de GitHub se atrasó hasta 8 horas, por eso el disparo externo; no sirve para escuchar eventos (Fase 4) |
 | Visualización | matplotlib (Python) | Canva, Figma, plantillas HTML | Generación automática y consistente, con los datos integrados | Diseñar en código es más lento que en una herramienta visual |
 | Redacción | Claude (Sonnet 5.5) por API | Gemini mediante Google AI Studio, plantillas fijas | Ver detalle abajo | Pago por uso, del orden de centavos por día (estimado) |
 | Control de calidad | Validador de cifras propio | Confiar en el modelo | Una cifra falsa publicada afecta la credibilidad de la marca | Falsos positivos ocasionales; no detecta números escritos en letras |
@@ -143,14 +143,14 @@ En un día normal no se requiere ninguna acción hasta recibir el mensaje de Tel
 
 | Hora (Santiago) | Evento | Período |
 | --- | --- | --- |
-| 06:17 | Workflow **Resultados MLB**: juegos del día anterior (hora del Este), todas las fases | Octubre y noviembre |
-| 06:22 | Workflow **Resultados LVBP**: jornada del día anterior (hora de Venezuela) | Octubre a enero |
+| 06:10 | Workflow **Resultados MLB**: juegos del día anterior (hora del Este), todas las fases | Octubre y noviembre |
+| 06:15 | Workflow **Resultados LVBP**: jornada del día anterior (hora de Venezuela) | Octubre a enero |
 | ~06:30 | Llegada de los paquetes a Telegram | — |
 | 07:30 a 08:30 | Revisión y publicación, cuando la audiencia en Venezuela se conecta | — |
 
 Ante una anomalía:
 
-- **No llegó nada a las 06:40.** GitHub puede retrasar los cron; si a las 07:30 no hay mensaje, revisar la ejecución en Actions.
+- **No llegó nada a las 06:40.** Revisar en cron-job.org el historial del job (debe responder `204`). Un `401` o `403` indica token vencido o sin permiso de Actions. Mientras tanto, lanzar el workflow a mano con *Run workflow*. El cron de GitHub corre de respaldo, pero puede llegar con horas de atraso.
 - **Llegó "con alertas".** La alerta indica la cifra o frase observada. Corregir el texto antes de publicar; las láminas no cambian.
 - **Llegó "sin textos".** Falló el redactor (crédito agotado, llave revocada o API no disponible). Las láminas siguen siendo válidas; ejecutar `bpt llave` para diagnosticar.
 - **Una cifra no coincide con el box score oficial.** No publicar y reportar el juego y la diferencia. Puede tratarse de una corrección del anotador oficial posterior a la ejecución.
