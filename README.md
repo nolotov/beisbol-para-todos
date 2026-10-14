@@ -115,6 +115,26 @@ el repo tiene el secreto `ANTHROPIC_API_KEY`, los textos. Todo queda como artefa
 (Actions → el run → *Artifacts*) y los textos se leen directo en el resumen del run. También se
 puede lanzar a mano con **Run workflow**, eligiendo fecha y fase. El cron solo vive en `main`.
 
+**Disparo puntual con cron-job.org.** El cron de GitHub se atrasa (hubo días en que corrió a las
+14:00). Por eso el arranque real lo da [cron-job.org](https://cron-job.org), que llama a la API
+de GitHub (`workflow_dispatch`) a las 06:10 (MLB) y 06:15 (LVBP), zona `America/Santiago`. El
+cron de GitHub queda de **respaldo**: si ese día ya hubo un run manual o de cron-job.org, el job
+`control` lo detiene y no se repite el paquete en Telegram.
+
+Llamada que hace cron-job.org (una por workflow):
+
+```
+POST https://api.github.com/repos/nolotov/beisbol-para-todos/actions/workflows/resultados-mlb.yml/dispatches
+Authorization: Bearer <token fine-grained, solo este repo, permiso Actions: Read and write>
+Accept: application/vnd.github+json
+X-GitHub-Api-Version: 2022-11-28
+Content-Type: application/json
+
+{"ref":"main"}
+```
+
+Respuesta esperada: `204 No Content`. El token vence: renovarlo antes de la fecha que elegiste.
+
 Secreto: *Settings → Secrets and variables → Actions → New repository secret*,
 nombre `ANTHROPIC_API_KEY`, valor = la misma llave del `.env`.
 
