@@ -1,0 +1,150 @@
+# Publica en Instagram una pieza ya aprobada desde Telegram (fase 4).
+#
+# Lo dispara el relé (infra/telegram-relay) cuando se toca "✅ Sí, publicar". También se puede
+# lanzar a mano desde Actions con el número del run de resultados y la pieza.
+#
+#   1. Descarga el paquete (artefacto) del run de resultados indicado.
+#   2. Convierte las láminas de la pieza a JPEG (Instagram no acepta PNG).
+#   3. Las sube a la rama `publicaciones` (repo público = URL pública que Instagram descarga).
+#      La rama se pisa en cada publicación: solo guarda lo último, no crece.
+#   4. Publica el carrusel y edita el mensaje de Telegram con el enlace (o con el error).
+name: Publicar en Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Número del run de 'Resultados MLB/LVBP' que trae el paquete"
+        required: true
+      pieza:
+        description: "1, 2... (juego MLB, en el orden de Telegram) o jornada (LVBP)"
+        required: true
+      message_id:
+        description: "Mensaje de Telegram a actualizar (lo llena el relé; vacío = no avisar)"
+        required: false
+
+permissions:
+  contents: write   # subir los JPEG a la rama publicaciones
+  actions: read     # descargar el artefacto del run de resultados
+
+concurrency:
+  group: publicar     # una publicación a la vez: la rama publicaciones se pisa en cada una
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  instagram:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      RUN_ID: ${{ inputs.run_id }}
+      PIEZA: ${{ inputs.pieza }}
+      MESSAGE_ID: ${{ inputs.message_id }}
+      URL_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Validar entrada
+        run: |
+          [[ "$RUN_ID" =~ ^[0-9]{1,20}$ ]] || { echo "::error::run_id inválido"; exit 1; }
+          [[ "$PIEZA" =~ ^([0-9]{1,2}|jornada)$ ]] || { echo "::error::pieza inválida"; exit 1; }
+          [[ -z "$MESSAGE_ID" || "$MESSAGE_ID" =~ ^[0-9]{1,15}$ ]] || { echo "::error::message_id inválido"; exit 1; }
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        id: instalar
+        run: pip install -e .
+
+      - name: ¿Hay token de Instagram?
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "falta el secreto IG_ACCESS_TOKEN en GitHub" > motivo.txt
+            echo "::error::Falta el secreto IG_ACCESS_TOKEN"; exit 1
+          fi
+
+      - name: Descargar el paquete del run ${{ inputs.run_id }}
+        id: paquete
+        run: |
+          NOMBRE=$(gh run view "$RUN_ID" -R "$REPO" --json workflowName --jq .workflowName 2>/dev/null || true)
+          if [[ "$NOMBRE" != Resultados* ]]; then
+            echo "el run $RUN_ID no es de un workflow de resultados" > motivo.txt
+            echo "::error::El run $RUN_ID no es de 'Resultados MLB/LVBP' ($NOMBRE)"; exit 1
+          fi
+          if ! gh run download "$RUN_ID" -R "$REPO" -D paquete; then
+            echo "no encontré el paquete del run $RUN_ID (¿venció o aún se está subiendo?)" > motivo.txt
+            exit 1
+          fi
+          RESUMEN=$(find paquete -name resumen.json | head -1)
+          echo "carpeta=$(dirname "$RESUMEN")" >> "$GITHUB_OUTPUT"
+
+      - name: Preparar la pieza ${{ inputs.pieza }}
+        id: preparar
+        env:
+          CARPETA: ${{ steps.paquete.outputs.carpeta }}
+        run: |
+          if ! python -m bpt publicar-preparar --carpeta "$CARPETA" \
+               --pieza "$PIEZA" --destino publico --prefijo "${RUN_ID}-${PIEZA}" --plan plan.json \
+               2> error.txt; then
+            sed 's/^\[error\] //' error.txt > motivo.txt; cat error.txt; exit 1
+          fi
+          echo "titular=$(jq -r .titular plan.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Subir los JPEG a la rama publicaciones
+        id: subir
+        run: |
+          cd publico
+          git init -q -b publicaciones
+          git -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" add -A
+          git -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" \
+            commit -qm "Pieza $PIEZA del run $RUN_ID"
+          SHA=$(git rev-parse HEAD)
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" publicaciones
+          BASE="https://raw.githubusercontent.com/${REPO}/${SHA}"
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          # Instagram descarga las imágenes enseguida: esperar a que la URL responda
+          PRIMERA=$(jq -r '.archivos[0]' ../plan.json)
+          for i in $(seq 1 12); do
+            if curl -sfI "$BASE/$PRIMERA" > /dev/null; then echo "URL pública lista"; exit 0; fi
+            sleep 5
+          done
+          echo "las imágenes no quedaron accesibles en raw.githubusercontent.com" > ../motivo.txt
+          exit 1
+
+      - name: Publicar en Instagram
+        env:
+          BASE: ${{ steps.subir.outputs.base }}
+        run: |
+          ARGS=(--plan plan.json --base-url "$BASE")
+          if [ -n "$MESSAGE_ID" ]; then ARGS+=(--message-id "$MESSAGE_ID"); fi
+          python -m bpt publicar-instagram "${ARGS[@]}"
+
+      - name: Avisar en Telegram si falló
+        if: ${{ failure() && steps.instalar.outcome == 'success' && env.MESSAGE_ID != '' }}
+        env:
+          TITULAR: ${{ steps.preparar.outputs.titular }}
+        run: |
+          ARGS=(--message-id "$MESSAGE_ID" --run-id "$RUN_ID" --pieza "$PIEZA" --url-run "$URL_RUN")
+          if [ -n "$TITULAR" ]; then ARGS+=(--titular "$TITULAR"); fi
+          python -m bpt publicar-fallo "${ARGS[@]}"
+
+      - name: Resumen
+        if: always()
+        run: |
+          {
+            echo "### Publicar en Instagram · run $RUN_ID · pieza $PIEZA"
+            if [ -f plan.json ]; then echo "**$(jq -r .titular plan.json)**"; fi
+            if [ -f motivo.txt ]; then echo "> ❌ $(cat motivo.txt)"; fi
+          } >> "$GITHUB_STEP_SUMMARY"

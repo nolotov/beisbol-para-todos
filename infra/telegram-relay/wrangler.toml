@@ -1,0 +1,9 @@
+# Despliegue opcional por consola (npx wrangler deploy). También se puede pegar worker.js
+# en el editor del panel de Cloudflare. Los secretos van con: npx wrangler secret put NOMBRE
+name = "mbp-telegram-relay"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+GITHUB_REPO = "nolotov/beisbol-para-todos"
+GITHUB_REF = "main"
