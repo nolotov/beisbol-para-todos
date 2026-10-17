@@ -6,6 +6,10 @@ su propio mensaje (para copiar en orden) y el guion.
 
 Necesita TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID (en el .env o como secretos de GitHub).
 El token nunca se imprime: los errores se limpian antes de mostrarlos.
+
+Fase 4: si BPT_PUBLICAR_INSTAGRAM está activo y el envío corre dentro de GitHub Actions
+(GITHUB_RUN_ID), cada pieza cierra con un botón "Publicar en Instagram". El botón lo atiende
+el relé (infra/telegram-relay), que pide confirmación y dispara el workflow publicar.yml.
 """
 from __future__ import annotations
 
@@ -80,6 +84,20 @@ class Telegram:
             self._llamar("sendMessage", {"chat_id": self.chat_id, "text": trozo,
                                          "disable_web_page_preview": "true"})
 
+    def botones(self, texto: str, filas: list[list[dict]]) -> dict:
+        """Mensaje con botones debajo (inline keyboard). Devuelve el mensaje enviado."""
+        return self._llamar("sendMessage", {
+            "chat_id": self.chat_id, "text": texto, "disable_web_page_preview": "true",
+            "reply_markup": json.dumps({"inline_keyboard": filas})})
+
+    def editar(self, message_id: int | str, texto: str,
+               filas: list[list[dict]] | None = None, chat_id: str | None = None) -> None:
+        """Reemplaza el texto (y los botones) de un mensaje ya enviado."""
+        data = {"chat_id": chat_id or self.chat_id, "message_id": str(message_id),
+                "text": texto, "disable_web_page_preview": "true",
+                "reply_markup": json.dumps({"inline_keyboard": filas or []})}
+        self._llamar("editMessageText", data)
+
     def album(self, imagenes: list[Path], como_archivo: bool = False,
               leyenda: str | None = None) -> None:
         """Hasta 10 imágenes en un solo mensaje (fotos o documentos)."""
@@ -117,6 +135,43 @@ def partir(texto: str, limite: int = LIMITE_TEXTO) -> list[str]:
     if actual.strip():
         trozos.append(actual.rstrip())
     return trozos
+
+
+# --- Botón de publicar (fase 4) ---------------------------------------------------
+
+def publicar_activo() -> bool:
+    """Botones solo si se pidió (variable del repo) y hay un run de Actions al que volver."""
+    flag = os.environ.get("BPT_PUBLICAR_INSTAGRAM", "").strip().lower()
+    return flag in ("1", "true", "si", "sí", "yes") and bool(os.environ.get("GITHUB_RUN_ID"))
+
+
+def callback_publicar(run_id: str, pieza: str) -> str:
+    data = f"pub:{run_id}:{pieza}"
+    if len(data.encode()) > 64:          # límite de Telegram para callback_data
+        raise TelegramError(f"callback demasiado largo: {data}")
+    return data
+
+
+def texto_publicar(titular: str, alertas: bool) -> str:
+    """El primer párrafo es la "base" que el relé conserva al editar el mensaje."""
+    aviso = " · ⚠️ con alertas" if alertas else ""
+    return f"📸 {titular}{aviso}\n\n¿La subo a Instagram? Te pido confirmación antes."
+
+
+def ofrecer_publicar(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
+    """Manda el botón de una pieza si está activo y la pieza es publicable."""
+    if not publicar_activo():
+        return False
+    from bpt.publicar import piezas
+    try:
+        p = piezas.buscar(carpeta, pieza_id)
+    except piezas.PiezaError:
+        return False
+    run_id = os.environ["GITHUB_RUN_ID"]
+    tg.botones(texto_publicar(p.titular, p.tiene_alertas),
+               [[{"text": "📸 Publicar en Instagram",
+                  "callback_data": callback_publicar(run_id, p.id)}]])
+    return True
 
 
 # --- Paquete del día ------------------------------------------------------------
@@ -175,6 +230,7 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
         for i, tuit in enumerate(hilo, 1):
             tg.texto(f"𝕏 {i}/{len(hilo)}\n\n{tuit}")
         tg.texto("🎙️ GUION (30-45 s)\n\n" + t["guion"])
+        ofrecer_publicar(tg, carpeta, str(n))
     return len(juegos)
 
 
@@ -214,6 +270,7 @@ def _enviar_jornada(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
                  leyenda="Extras para historias: resultado y figuras de cada juego")
     if r is not None:
         _textos(tg, r["textos"])
+        ofrecer_publicar(tg, carpeta, "jornada")
     return len(juegos)
 
 
@@ -229,6 +286,26 @@ def chats_recientes(token: str, http=requests) -> list[dict]:
                                   "nombre": chat.get("first_name") or chat.get("title") or "",
                                   "usuario": chat.get("username") or ""}
     return list(vistos.values())
+
+
+def poner_webhook(token: str, url: str, secreto: str, http=requests) -> None:
+    """Telegram avisará de cada toque de botón a `url` (el relé), firmando con `secreto`."""
+    if not url.startswith("https://"):
+        raise TelegramError("la URL del relé debe empezar con https://")
+    if not re.fullmatch(r"[A-Za-z0-9_-]{16,256}", secreto or ""):
+        raise TelegramError("el secreto debe tener 16 a 256 caracteres A-Z, a-z, 0-9, _ o -")
+    Telegram(token, "", pausa=0, http=http)._llamar("setWebhook", {
+        "url": url, "secret_token": secreto, "drop_pending_updates": "true",
+        "allowed_updates": json.dumps(["callback_query"])})
+
+
+def quitar_webhook(token: str, http=requests) -> None:
+    """Vuelve al modo sin relé (necesario para que funcione 'bpt telegram-chat')."""
+    Telegram(token, "", pausa=0, http=http)._llamar("deleteWebhook", {})
+
+
+def info_webhook(token: str, http=requests) -> dict:
+    return Telegram(token, "", pausa=0, http=http)._llamar("getWebhookInfo", {}) or {}
 
 
 def es_token_valido(token: str) -> bool:

@@ -1,0 +1,57 @@
+# Renueva el token de Instagram (dura 60 días) y lo guarda de vuelta en el secreto
+# IG_ACCESS_TOKEN. Corre cada lunes: aunque el cron de GitHub se atrase horas, sobra margen.
+#
+# Necesita el secreto GH_PAT_SECRETOS: token fine-grained de este repo con el permiso
+# "Secrets: Read and write" (el token automático de Actions no puede escribir secretos).
+name: Renovar token de Instagram
+
+on:
+  schedule:
+    - cron: "41 13 * * 1"   # lunes 13:41 UTC = 10:41 en Santiago
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  renovar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      GH_PAT_SECRETOS: ${{ secrets.GH_PAT_SECRETOS }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Renovar y guardar
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "Sin IG_ACCESS_TOKEN todavía: nada que renovar."; exit 0
+          fi
+          if [ -z "$GH_PAT_SECRETOS" ]; then
+            echo "::error::Falta el secreto GH_PAT_SECRETOS (token con permiso Secrets: write)"; exit 1
+          fi
+          RESP=$(curl -sS -G "https://graph.instagram.com/refresh_access_token" \
+                   --data-urlencode "grant_type=ig_refresh_token" \
+                   --data-urlencode "access_token=${IG_ACCESS_TOKEN}")
+          NUEVO=$(jq -r '.access_token // empty' <<< "$RESP")
+          if [ -z "$NUEVO" ]; then
+            echo "::error::Instagram no renovó el token: $(jq -c '.error // .' <<< "$RESP")"; exit 1
+          fi
+          echo "::add-mask::$NUEVO"
+          DIAS=$(( $(jq -r '.expires_in // 0' <<< "$RESP") / 86400 ))
+          GH_TOKEN="$GH_PAT_SECRETOS" gh secret set IG_ACCESS_TOKEN -R "$REPO" --body "$NUEVO"
+          echo "Token renovado y guardado: vence en $DIAS días." | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Avisar por Telegram si falló
+        if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode text="⚠️ MBP: no se pudo renovar el token de Instagram. Si vence, los botones de publicar fallan. Revisa: ${URL}"

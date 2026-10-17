@@ -16,6 +16,9 @@ Ejemplos:
     bpt telegram-chat                             # ver tu TELEGRAM_CHAT_ID
     bpt notificar --fecha 2026-10-11              # mandar el paquete del día a Telegram
     bpt lvbp-resultados --redactar                # jornada LVBP de ayer (hora de Venezuela)
+    bpt telegram-webhook --url https://mbp-telegram-relay.<cuenta>.workers.dev   # conectar el relé
+    bpt instagram-prueba                          # revisar el token de Instagram (no publica)
+    bpt publicar-piezas --carpeta output/resultados/lvbp/2026-10-15   # qué se puede publicar
 """
 from __future__ import annotations
 
@@ -292,6 +295,9 @@ def cmd_telegram_chat(args: argparse.Namespace) -> int:
         chats = telegram.chats_recientes(token)
     except telegram.TelegramError as e:
         print(f"[error] Telegram: {e}", file=sys.stderr)
+        if "webhook" in str(e).lower():
+            print("       El relé de botones está conectado: 'bpt telegram-webhook --quitar', "
+                  "busca el chat y vuelve a conectarlo", file=sys.stderr)
         return 1
     if not chats:
         print("[--] Nadie le ha escrito al bot todavía: ábrelo en Telegram, mándale /start "
@@ -312,6 +318,135 @@ def cmd_telegram_prueba(args: argparse.Namespace) -> int:
         print(f"[error] Telegram: {e}", file=sys.stderr)
         return 1
     print("[ok] Mensaje enviado")
+    return 0
+
+
+def cmd_telegram_webhook(args: argparse.Namespace) -> int:
+    import os
+    import secrets as _secrets
+    from bpt.notificar import telegram
+    from bpt.redactor.agente import cargar_env
+    cargar_env()
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    if not telegram.es_token_valido(token):
+        print("[error] TELEGRAM_BOT_TOKEN falta o no es válido", file=sys.stderr)
+        return 1
+    try:
+        if args.quitar:
+            telegram.quitar_webhook(token)
+            print("[ok] Relé desconectado: los botones dejan de responder y "
+                  "'bpt telegram-chat' vuelve a funcionar")
+            return 0
+        if not args.url:
+            info = telegram.info_webhook(token)
+            if info.get("url"):
+                print(f"[ok] Relé conectado: {info['url']}")
+                print(f"     Pendientes: {info.get('pending_update_count', 0)}"
+                      + (f" · Último error: {info['last_error_message']}"
+                         if info.get("last_error_message") else ""))
+            else:
+                print("[--] Sin relé: usa --url https://<tu-worker>.workers.dev")
+            return 0
+        secreto = args.secreto or _secrets.token_urlsafe(32)
+        telegram.poner_webhook(token, args.url, secreto)
+    except telegram.TelegramError as e:
+        print(f"[error] Telegram: {e}", file=sys.stderr)
+        return 1
+    print(f"[ok] Telegram ya le avisa al relé: {args.url}")
+    if not args.secreto:
+        print("Guarda este valor en el Worker como secreto TELEGRAM_WEBHOOK_SECRET:")
+        print(secreto)
+    return 0
+
+
+def cmd_instagram_prueba(args: argparse.Namespace) -> int:
+    from bpt.publicar import instagram
+    try:
+        ig = instagram.Instagram(*instagram.credenciales())
+        c = ig.cuenta()
+        lim = ig.limite()
+    except instagram.InstagramError as e:
+        print(f"[error] Instagram: {e}", file=sys.stderr)
+        return 1
+    uso = lim.get("quota_usage", "?")
+    tope = (lim.get("config") or {}).get("quota_total", "?")
+    print(f"[ok] Cuenta @{c.get('username')} ({c.get('account_type')}) · IG_USER_ID={c.get('user_id')}")
+    print(f"[ok] Publicaciones por API en las últimas 24 h: {uso} de {tope}")
+    return 0
+
+
+def cmd_publicar_piezas(args: argparse.Namespace) -> int:
+    from bpt.publicar import piezas
+    try:
+        lista = piezas.piezas(Path(args.carpeta))
+    except FileNotFoundError as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    if not lista:
+        print("[--] Nada publicable: hacen falta láminas y caption (textos.json)")
+        return 1
+    for p in lista:
+        marca = "⚠️" if p.tiene_alertas else "✅"
+        print(f"{marca} pieza {p.id}: {p.titular} · {len(p.imagenes)} lámina(s) · "
+              f"{len(p.caption)} caracteres")
+    return 0
+
+
+def cmd_publicar_preparar(args: argparse.Namespace) -> int:
+    from bpt.publicar import flujo, piezas
+    try:
+        plan = flujo.preparar(Path(args.carpeta), args.pieza, Path(args.destino), args.prefijo,
+                              Path(args.plan))
+    except (piezas.PiezaError, FileNotFoundError) as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    print(f"[ok] Pieza {plan['pieza']} · {plan['titular']} · {len(plan['archivos'])} JPEG")
+    for a in plan["alertas"]:
+        print(f"  ⚠️ {a}")
+    return 0
+
+
+def _tg_opcional():
+    from bpt.notificar import telegram
+    try:
+        return telegram.Telegram(*telegram.credenciales())
+    except telegram.TelegramError:
+        return None
+
+
+def cmd_publicar_instagram(args: argparse.Namespace) -> int:
+    import json
+    from bpt.notificar import telegram
+    from bpt.publicar import flujo, instagram
+    plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
+    tg = _tg_opcional() if args.message_id else None
+    try:
+        ig = instagram.Instagram(*instagram.credenciales())
+        hecho = flujo.publicar_instagram(plan, args.base_url, ig, tg, args.message_id)
+    except (instagram.InstagramError, telegram.TelegramError) as e:
+        print(f"[error] {e}", file=sys.stderr)
+        Path(args.motivo).write_text(str(e), encoding="utf-8")
+        return 1
+    tipo = "ya estaba publicado" if hecho.duplicado else "publicado"
+    print(f"[ok] Instagram: {tipo} · {hecho.permalink}")
+    return 0
+
+
+def cmd_publicar_fallo(args: argparse.Namespace) -> int:
+    from bpt.notificar import telegram
+    from bpt.publicar import flujo
+    tg = _tg_opcional()
+    if tg is None or not args.message_id:
+        return 0
+    motivo = args.texto or "falló el workflow de publicación"
+    if args.motivo and Path(args.motivo).exists():
+        motivo = Path(args.motivo).read_text(encoding="utf-8").strip() or motivo
+    try:
+        flujo.avisar_fallo(tg, args.message_id, args.run_id, args.pieza, motivo[:600],
+                           titular=args.titular, url_run=args.url_run)
+    except telegram.TelegramError as e:
+        print(f"[error] Telegram: {e}", file=sys.stderr)
+        return 1
     return 0
 
 
@@ -426,6 +561,47 @@ def main(argv: list[str] | None = None) -> int:
 
     ll = sub.add_parser("llave", help="Probar la llave de la API (no gasta créditos)")
     ll.set_defaults(func=cmd_llave)
+
+    tw = sub.add_parser("telegram-webhook",
+                        help="Conectar (o revisar) el relé que atiende los botones")
+    tw.add_argument("--url", default=None, help="URL del Worker (https://...workers.dev)")
+    tw.add_argument("--secreto", default=None,
+                    help="Secreto compartido con el Worker (si falta, se genera uno)")
+    tw.add_argument("--quitar", action="store_true", help="Desconectar el relé")
+    tw.set_defaults(func=cmd_telegram_webhook)
+
+    ip = sub.add_parser("instagram-prueba",
+                        help="Revisar el token de Instagram y la cuota (no publica nada)")
+    ip.set_defaults(func=cmd_instagram_prueba)
+
+    pp = sub.add_parser("publicar-piezas", help="Listar las piezas publicables de un paquete")
+    pp.add_argument("--carpeta", required=True)
+    pp.set_defaults(func=cmd_publicar_piezas)
+
+    pr = sub.add_parser("publicar-preparar", help="(workflow) JPEG y plan de una pieza")
+    pr.add_argument("--carpeta", required=True, help="Paquete del día (con resumen.json)")
+    pr.add_argument("--pieza", required=True, help="1, 2... (MLB) o jornada (LVBP)")
+    pr.add_argument("--destino", required=True, help="Carpeta que se hará pública")
+    pr.add_argument("--prefijo", required=True, help="Subcarpeta dentro de --destino")
+    pr.add_argument("--plan", required=True, help="Dónde escribir el plan.json")
+    pr.set_defaults(func=cmd_publicar_preparar)
+
+    pi = sub.add_parser("publicar-instagram", help="(workflow) Publicar un plan en Instagram")
+    pi.add_argument("--plan", required=True)
+    pi.add_argument("--base-url", required=True, help="URL pública donde quedaron los JPEG")
+    pi.add_argument("--message-id", default=None, help="Mensaje de Telegram a actualizar")
+    pi.add_argument("--motivo", default="motivo.txt", help="Si falla, el motivo queda aquí")
+    pi.set_defaults(func=cmd_publicar_instagram)
+
+    pf = sub.add_parser("publicar-fallo", help="(workflow) Avisar el fallo en Telegram")
+    pf.add_argument("--message-id", default=None)
+    pf.add_argument("--run-id", required=True)
+    pf.add_argument("--pieza", required=True)
+    pf.add_argument("--titular", default=None)
+    pf.add_argument("--motivo", default="motivo.txt")
+    pf.add_argument("--texto", default=None)
+    pf.add_argument("--url-run", default=None)
+    pf.set_defaults(func=cmd_publicar_fallo)
 
     pv = sub.add_parser("lvbp-previas", help="Tarjetas previas de temporada por equipo")
     pv.add_argument("--contenido", default="content/previas_2026-27.json",
