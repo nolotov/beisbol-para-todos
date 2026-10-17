@@ -43,7 +43,9 @@ flowchart TD
     API --> S1
     S3 --> ART["Artefacto del run<br/><small>zip con láminas · 30 días</small>"]
     S5 <--> CL["Claude API<br/><small>Sonnet 5.5</small>"]
-    S7 --> ED["Editor en Telegram<br/><small>revisa y publica manualmente</small>"]
+    S7 --> ED["Editor en Telegram<br/><small>revisa y aprueba</small>"]
+    ED -- "📸 Publicar (Fase 4)" --> PUB["publicar.yml<br/><small>ver Publicación en Instagram</small>"]
+    PUB --> IG["Instagram"]
     style S4 stroke-width:3px
 ```
 
@@ -127,6 +129,7 @@ El sistema usa tres secretos; ninguno está en el código. Cada uno se almacena 
 | `ANTHROPIC_API_KEY` | Llamadas del redactor a Claude | Consumo del crédito por terceros | Consola de Claude → Settings → API keys → eliminar y crear otra |
 | `TELEGRAM_BOT_TOKEN` | Envío de mensajes del bot | Suplantación del bot | @BotFather → `/revoke` |
 | `TELEGRAM_CHAT_ID` | Destinatario del bot | Bajo por sí solo; no se publica | Cambiar en `.env` y en GitHub |
+| `IG_ACCESS_TOKEN`, `GH_PAT_SECRETOS` y los del relé | Publicación en Instagram (Fase 4) | Ver [Publicación en Instagram](Publicacion-en-Instagram#seguridad) | Ídem |
 
 Prácticas aplicadas:
 
@@ -134,7 +137,7 @@ Prácticas aplicadas:
 - **`.env` tiene precedencia sobre el entorno.** Una variable antigua en la sesión se ignora y se advierte.
 - **Los errores nunca muestran un secreto completo.** De la llave de Claude solo se muestran los últimos 4 caracteres; el token de Telegram se elimina de cualquier mensaje de error, verificado por una prueba.
 - **Una llave por proyecto.** La de MBP es independiente de cualquier otra; revocarla no afecta otros sistemas.
-- **Permisos mínimos en GitHub Actions** (`contents: read`): el workflow puede leer el repositorio, no modificarlo.
+- **Permisos mínimos en GitHub Actions** (`contents: read`): los workflows de resultados pueden leer el repositorio, no modificarlo. La excepción es `publicar.yml`, que escribe solo en la rama `publicaciones`.
 - **Crédito prepago con recarga automática desactivada.** El peor escenario ante una filtración es perder ese saldo, no una factura abierta.
 
 ## Operación diaria
@@ -165,7 +168,7 @@ Comandos habituales, desde la carpeta del proyecto con el entorno virtual activo
 | `python -m bpt notificar --fecha 2026-10-12` | Enviar a Telegram un día de MLB (`--salida output/resultados/lvbp` para la LVBP) |
 | `python -m bpt llave` | Verificar la llave de Claude sin consumir crédito |
 | `python -m bpt telegram-prueba` | Confirmar que el bot puede enviar mensajes |
-| `python -m pytest -q` | Ejecutar las 112 pruebas antes de cualquier cambio |
+| `python -m pytest -q` | Ejecutar las 147 pruebas antes de cualquier cambio (más `node --test infra/telegram-relay/worker.test.mjs` para el relé) |
 
 Las fechas usan formato año-mes-día (`2026-10-12`). Las fechas futuras se rechazan para evitar confusiones como `2026-12-10` en lugar del 12 de octubre.
 
@@ -179,6 +182,7 @@ El único costo variable es Claude, estimado en pocos dólares mensuales. Es una
 | GitHub Actions | US$ 0 | Dos ejecuciones breves al día, dentro de los minutos gratuitos del plan |
 | MLB Stats API | US$ 0 | Uso público, sin llave |
 | Telegram | US$ 0 | API de bots gratuita |
+| Instagram y Cloudflare Workers | US$ 0 | API de publicación sin costo; plan gratuito de Workers (100.000 peticiones diarias) |
 
 **Prompt caching.** Lo único que se repite entre llamadas es el prompt de sistema (~1.400 tokens; el mínimo cacheable en Sonnet 5.5 es 512). Escribir el caché cuesta 1,25 veces la entrada normal, leerlo el 5 %, y dura 5 minutos. Por eso se activa solo cuando la corrida hará 2 o más llamadas: con 2 juegos el ahorro es de unos US$ 0,002 diarios, porque el costo lo domina la salida. Pasa a ser relevante con volumen alto (temporada regular de MLB, ~15 juegos diarios) o con conversaciones de edición en la Fase 4. Cada pieza registra sus tokens y su costo estimado en `textos.json` y el total diario en `uso.json`, para contrastar la estimación con el consumo real.
 
@@ -201,7 +205,7 @@ Hoja de ruta:
 2. **Fase 1, datos y láminas automáticas** — completada.
 3. **Fase 2, agente redactor con validador** — completada.
 4. **Fase 3, aprobación desde el teléfono** — completada con Telegram, en modalidad de revisión y publicación manual.
-5. **Fase 4, publicación** — pendiente. Botón "Aprobar" en Telegram que publique en Instagram (sin costo, con trámite en Meta) y luego en X (pago por uso). Requiere un servicio permanente, por ejemplo un Cloud Run.
+5. **Fase 4, publicación** — Instagram completado en la versión 0.6.0: botón en Telegram, relé en Cloudflare Workers y workflow `publicar.yml`. Detalle en [Publicación en Instagram](Publicacion-en-Instagram). Pendiente: X (pago por uso).
 6. **Fase 5, métricas** — pendiente. Resumen semanal de alcance y guardados para que el redactor aprenda de lo que funcionó.
 
 ## Glosario

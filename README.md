@@ -152,6 +152,24 @@ Configuración (una vez):
 4. `bpt telegram-prueba` para confirmar; `bpt notificar --fecha 2026-10-11` para ver un paquete.
 5. Crea los secretos `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en GitHub.
 
+#### Instagram: publicar con un botón (fase 4)
+
+Con la variable de repositorio `PUBLICAR_INSTAGRAM=1`, cada pieza del paquete (un carrusel por
+juego de MLB, o el de la jornada LVBP) cierra con **📸 Publicar en Instagram**. Pide
+confirmación y, al confirmar, el workflow `publicar.yml` la publica y el mensaje se actualiza
+con el enlace. Sin caption no hay botón; las piezas con alertas lo dicen en el mensaje.
+
+```powershell
+python -m bpt instagram-prueba          # token, cuenta y cuota de 24 h (no publica)
+python -m bpt publicar-piezas --carpeta output/resultados/lvbp/2026-10-15
+python -m bpt telegram-webhook          # estado del relé que atiende los botones
+```
+
+Requiere el relé `infra/telegram-relay/worker.js` (Cloudflare Worker, gratis), los secretos
+`IG_ACCESS_TOKEN`, `IG_USER_ID` (opcional) y `GH_PAT_SECRETOS`, y la renovación semanal del
+token (`instagram-token.yml`). Paso a paso, decisiones y fallas habituales en la wiki:
+[Publicación en Instagram](https://github.com/nolotov/beisbol-para-todos/wiki/Publicacion-en-Instagram).
+
 ### LVBP: resultados de la jornada
 
 ```powershell
@@ -197,12 +215,15 @@ src/bpt/
   lvbp_resultados.py     # pipeline de la jornada LVBP: carrusel + resumen.json
   resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
   redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
+  notificar/telegram.py  # paquete del día a Telegram + botón de publicar
+  publicar/              # fase 4: piezas publicables, JPEG y cliente de la API de Instagram
   glossary.py            # glosario de métricas: sigla, nombre en español, pista y explicación
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
   data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga
   viz/percentile_card.py # tarjeta de percentiles por jugador
   viz/team_card.py       # tarjeta de equipo (dot strip vs. los 8 equipos)
   cli.py                 # comando `bpt`
+infra/telegram-relay/    # relé de los botones (Cloudflare Worker) y sus pruebas (node --test)
 tests/                   # tests offline con CSV sintético
 scripts/setup.ps1        # bootstrap del entorno en Windows
 ```
@@ -220,6 +241,8 @@ scripts/setup.ps1        # bootstrap del entorno en Windows
 - [x] Ingesta LVBP (stats.lvbp.com) + tarjeta de percentiles vs. liga
 - [ ] Splits LVBP (vs. zurdos/derechos, por mes) y comparativa MLB vs. LVBP
 - [ ] Modelo de pronóstico (log5 + bullpen + park factor) con track record público
-- [ ] Job diario de extracción
+- [x] Job diario de extracción (resultados MLB y LVBP)
+- [x] Publicación en Instagram desde Telegram
+- [ ] Publicación en X
 
 Datos: Baseball Savant, FanGraphs, Baseball-Reference vía [pybaseball](https://github.com/jldbc/pybaseball).

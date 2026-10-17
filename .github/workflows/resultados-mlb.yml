@@ -103,9 +103,20 @@ jobs:
         if: ${{ env.ANTHROPIC_API_KEY != '' }}
         run: python -m bpt redactar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
 
+      # El paquete se sube ANTES de Telegram: el botón de publicar lo descarga desde aquí.
+      - uses: actions/upload-artifact@v7
+        if: always() && steps.gen.outputs.carpeta != ''
+        with:
+          name: resultados-mlb-${{ github.run_number }}
+          path: ${{ steps.gen.outputs.carpeta }}
+          retention-days: 30
+
       - name: Enviar a Telegram (si hay TELEGRAM_BOT_TOKEN)
         # Aunque falle el redactor: en ese caso llegan solo las láminas
         if: ${{ always() && steps.gen.outcome == 'success' && env.TELEGRAM_BOT_TOKEN != '' }}
+        env:
+          # Variable del repo (Settings > Variables): 1 = cada pieza trae el botón de publicar
+          BPT_PUBLICAR_INSTAGRAM: ${{ vars.PUBLICAR_INSTAGRAM }}
         run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
 
       - name: Avisar por Telegram si algo falló
@@ -128,10 +139,3 @@ jobs:
           if [ -z "$ANTHROPIC_API_KEY" ]; then
             echo '> Sin secreto ANTHROPIC_API_KEY: se generaron las tarjetas, pero no los textos.' >> "$GITHUB_STEP_SUMMARY"
           fi
-
-      - uses: actions/upload-artifact@v7
-        if: always() && steps.gen.outputs.carpeta != ''
-        with:
-          name: resultados-mlb-${{ github.run_number }}
-          path: ${{ steps.gen.outputs.carpeta }}
-          retention-days: 30
