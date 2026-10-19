@@ -342,3 +342,31 @@ def test_webhook_valida_url_y_secreto():
     (c,) = tele.llamadas
     assert c["metodo"] == "setWebhook" and c["data"]["secret_token"] == "s" * 32
     assert json.loads(c["data"]["allowed_updates"]) == ["callback_query"]
+
+
+# --- Historia del día ---------------------------------------------------------------
+
+def test_historia_un_contenedor_stories_sin_caption():
+    http = GraphFalso()
+    hecho = ig(http).publicar_historia("https://x/h.jpg")
+    (c,) = http.posts("1789/media")
+    assert c["datos"]["media_type"] == "STORIES" and c["datos"]["image_url"] == "https://x/h.jpg"
+    assert "caption" not in c["datos"]
+    assert http.posts("media_publish")[0]["datos"]["creation_id"] == "c1"
+    assert hecho.media_id == "pub2" and hecho.permalink
+
+
+def test_historia_sin_permalink_usa_el_perfil():
+    http = GraphFalso(error_en={"pub2": {"code": 100, "message": "no permalink"}})
+    hecho = ig(http).publicar_historia("https://x/h.jpg")
+    assert hecho.permalink == instagram.PERFIL_HISTORIAS
+
+
+def test_flujo_publica_historia_y_avisa(tmp_path):
+    plan = {"pieza": "1", "tipo": "historia", "titular": "Historia · Juegos de hoy · lunes",
+            "caption": "", "alertas": [], "archivos": ["9-1/01_historia.jpg"]}
+    http, t = GraphFalso(), TgFalso()
+    flujo.publicar_instagram(plan, "https://raw.example/abc", ig(http), tg(t), "55")
+    assert http.posts("1789/media")[0]["datos"]["media_type"] == "STORIES"
+    texto = t.llamadas[-1]["data"]["text"]
+    assert texto.startswith("📲 Historia") and "Historia publicada" in texto

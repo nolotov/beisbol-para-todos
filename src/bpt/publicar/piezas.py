@@ -3,6 +3,8 @@
 Una pieza es un carrusel con su caption:
   - MLB: una por juego, con id "1", "2"... (el orden del paquete de Telegram).
   - LVBP: una sola, la de la jornada, con id "jornada".
+  - Historia del día (juegos de hoy): una sola, id "1" y sin caption (las historias no
+    llevan). Usa "1" para que el relé de Telegram no necesite cambios.
 
 Instagram solo acepta JPEG, así que las láminas (PNG) se convierten antes de subirlas.
 """
@@ -16,6 +18,7 @@ from pathlib import Path
 from PIL import Image
 
 JORNADA = "jornada"
+HISTORIA = "historia"
 ID_VALIDO = re.compile(r"^(\d{1,2}|jornada)$")
 
 
@@ -30,6 +33,7 @@ class Pieza:
     imagenes: list[Path]
     caption: str
     alertas: list[str] = field(default_factory=list)
+    tipo: str = "post"            # "post" (imagen o carrusel) o "historia"
 
     @property
     def tiene_alertas(self) -> bool:
@@ -48,6 +52,12 @@ def piezas(carpeta: Path) -> list[Pieza]:
     """Todas las piezas publicables del paquete (las que tienen láminas y caption)."""
     carpeta = Path(carpeta)
     resumen = json.loads((carpeta / "resumen.json").read_text(encoding="utf-8"))
+    if resumen.get("formato") == HISTORIA:
+        imgs = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
+        if not imgs:
+            return []                       # día sin juegos: no hay historia
+        from bpt.historia import titular
+        return [Pieza("1", f"Historia · {titular(resumen)}", imgs[:1], "", tipo=HISTORIA)]
     tp = carpeta / "textos.json"
     redactados = json.loads(tp.read_text(encoding="utf-8")) if tp.exists() else []
     por_pk = {r["game_pk"]: r for r in redactados}
@@ -109,5 +119,5 @@ def preparar(pieza: Pieza, destino: Path, prefijo: str) -> dict:
         rel = f"{prefijo}/{i:02d}_{img.stem}.jpg"
         a_jpeg(img, destino / rel)
         archivos.append(rel)
-    return {"pieza": pieza.id, "titular": pieza.titular, "caption": pieza.caption,
-            "alertas": pieza.alertas, "archivos": archivos}
+    return {"pieza": pieza.id, "tipo": pieza.tipo, "titular": pieza.titular,
+            "caption": pieza.caption, "alertas": pieza.alertas, "archivos": archivos}

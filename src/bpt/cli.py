@@ -266,6 +266,33 @@ def cmd_lvbp_results(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_historia(args: argparse.Namespace) -> int:
+    from bpt import historia
+    fecha = args.fecha or historia.hoy_ven()
+    try:
+        date.fromisoformat(fecha)
+    except ValueError:
+        print(f"[error] Fecha inválida: {fecha}. Formato AAAA-MM-DD", file=sys.stderr)
+        return 1
+    r = historia.generar(fecha, salida=Path(args.salida), handle=args.handle)
+    carpeta = Path(args.salida) / fecha
+    if not r["total"]:
+        print(f"[--] {fecha}: no hay juegos de MLB ni de LVBP. No se genera historia.")
+    for liga, datos in r["ligas"].items():
+        fase = f" ({datos['fase']})" if datos["fase"] else ""
+        print(f"{liga}{fase}: {len(datos['juegos'])} juego(s)")
+        for j in datos["juegos"]:
+            extra = f" · {j['abridores']}" if j["abridores"] else ""
+            print(f"  {j['hora']:>12}  {j['visitante']} @ {j['local']}{extra}")
+    if r["tarjetas"]:
+        print(f"[ok] Historia: {carpeta / r['tarjetas'][0]}")
+    print(f"Resumen: {carpeta / 'resumen.json'}")
+    if args.github_output:
+        with open(args.github_output, "a", encoding="utf-8") as f:
+            f.write(f"carpeta={carpeta}\ntotal={r['total']}\n")
+    return 0
+
+
 def cmd_notificar(args: argparse.Namespace) -> int:
     from bpt.notificar import telegram
     carpeta = _carpeta_mlb(args)
@@ -542,6 +569,13 @@ def main(argv: list[str] | None = None) -> int:
     lr.add_argument("--redactar", action="store_true", help="Además, redactar los textos")
     lr.add_argument("--modelo", default=None)
     lr.set_defaults(func=cmd_lvbp_results)
+
+    hi = sub.add_parser("historia", help="Historia de Instagram con los juegos de hoy (MLB y LVBP)")
+    hi.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, hoy (hora de Venezuela)")
+    hi.add_argument("--salida", default="output/historia")
+    hi.add_argument("--handle", default=theme.HANDLE)
+    hi.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
+    hi.set_defaults(func=cmd_historia)
 
     nt = sub.add_parser("notificar", help="Enviar el paquete del día a Telegram")
     nt.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")

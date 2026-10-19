@@ -22,7 +22,8 @@ def preparar(carpeta: Path, pieza_id: str, destino: Path, prefijo: str, plan_pat
 
 
 def _base(plan: dict) -> str:
-    return f"📸 {plan.get('titular', 'Pieza')}"
+    icono = "📲" if plan.get("tipo") == piezas.HISTORIA else "📸"
+    return f"{icono} {plan.get('titular', 'Pieza')}"
 
 
 def publicar_instagram(plan: dict, base_url: str, ig: instagram.Instagram,
@@ -31,17 +32,23 @@ def publicar_instagram(plan: dict, base_url: str, ig: instagram.Instagram,
     if not base_url.startswith("https://"):
         raise instagram.InstagramError("la URL base de las imágenes debe ser https")
     urls = [base_url.rstrip("/") + "/" + rel for rel in plan["archivos"]]
-    hecho = ig.publicar(urls, plan["caption"])
+    historia = plan.get("tipo") == piezas.HISTORIA
+    hecho = ig.publicar_historia(urls[0]) if historia else ig.publicar(urls, plan["caption"])
     if tg and message_id:
-        estado = "✅ Ya estaba publicado en Instagram" if hecho.duplicado \
-            else "✅ Publicado en Instagram"
+        if historia:
+            estado = "✅ Historia publicada en Instagram (dura 24 h)"
+        elif hecho.duplicado:
+            estado = "✅ Ya estaba publicado en Instagram"
+        else:
+            estado = "✅ Publicado en Instagram"
         tg.editar(message_id, f"{_base(plan)}\n\n{estado}\n{hecho.permalink}".rstrip())
     return hecho
 
 
 def avisar_fallo(tg: telegram.Telegram, message_id: str, run_id: str, pieza_id: str,
                  motivo: str, titular: str | None = None, url_run: str | None = None) -> None:
-    base = f"📸 {titular}" if titular else "📸 Publicación"
+    icono = "📲" if titular and titular.startswith("Historia") else "📸"
+    base = f"{icono} {titular}" if titular else "📸 Publicación"
     texto = f"{base}\n\n❌ No se publicó: {motivo}"
     if url_run:
         texto += f"\nDetalle: {url_run}"
