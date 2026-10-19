@@ -36,16 +36,24 @@ jobs:
           if [ -z "$GH_PAT_SECRETOS" ]; then
             echo "::error::Falta el secreto GH_PAT_SECRETOS (token con permiso Secrets: write)"; exit 1
           fi
-          RESP=$(curl -sS -G "https://graph.instagram.com/refresh_access_token" \
+          if ! RESP=$(curl -sS -G "https://graph.instagram.com/refresh_access_token" \
                    --data-urlencode "grant_type=ig_refresh_token" \
-                   --data-urlencode "access_token=${IG_ACCESS_TOKEN}")
+                   --data-urlencode "access_token=${IG_ACCESS_TOKEN}" 2>&1); then
+            echo "::error::No se pudo contactar a Instagram: ${RESP}"; exit 1
+          fi
           NUEVO=$(jq -r '.access_token // empty' <<< "$RESP")
           if [ -z "$NUEVO" ]; then
             echo "::error::Instagram no renovó el token: $(jq -c '.error // .' <<< "$RESP")"; exit 1
           fi
           echo "::add-mask::$NUEVO"
           DIAS=$(( $(jq -r '.expires_in // 0' <<< "$RESP") / 86400 ))
-          GH_TOKEN="$GH_PAT_SECRETOS" gh secret set IG_ACCESS_TOKEN -R "$REPO" --body "$NUEVO"
+          # Si falla aquí, el token nuevo ya existe pero no quedó guardado: el anterior sigue
+          # vigente hasta su fecha, así que no hay apuro. Causa típica: GH_PAT_SECRETOS vencido
+          # o sin el permiso "Secrets: Read and write" sobre este repo.
+          if ! ERR=$(GH_TOKEN="$GH_PAT_SECRETOS" gh secret set IG_ACCESS_TOKEN -R "$REPO" --body "$NUEVO" 2>&1); then
+            echo "::error::Instagram renovó el token, pero no se pudo guardar en GitHub (revisa GH_PAT_SECRETOS: vigencia y permiso Secrets: Read and write): ${ERR}"
+            exit 1
+          fi
           echo "Token renovado y guardado: vence en $DIAS días." | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Avisar por Telegram si falló
