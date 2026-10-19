@@ -170,6 +170,22 @@ Requiere el relé `infra/telegram-relay/worker.js` (Cloudflare Worker, gratis), 
 token (`instagram-token.yml`). Paso a paso, decisiones y fallas habituales en la wiki:
 [Publicación en Instagram](https://github.com/nolotov/beisbol-para-todos/wiki/Publicacion-en-Instagram).
 
+#### Threads y X: el mismo botón, una red a la vez
+
+Con `PUBLICAR_THREADS=1` y/o `PUBLICAR_X=1` (variables del repo) el botón de cada pieza pasa a
+ser un menú: **📸 Instagram · 🧵 Threads · 𝕏 X · 🚀 Todas**, cada uno con confirmación. Threads
+recibe el carrusel con el hilo como respuestas; X, el hilo con hasta 4 láminas en el primer
+tuit (X cobra por post y rechazamos los tuits con enlace, que cuestan más).
+
+```powershell
+python -m bpt threads-prueba            # token, cuenta y cuota de Threads (no publica)
+python -m bpt x-prueba                  # credenciales de X (no publica)
+```
+
+Requiere desplegar el `worker.js` nuevo en Cloudflare y los secretos `THREADS_ACCESS_TOKEN`,
+`X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN` y `X_ACCESS_SECRET`. Paso a paso en la wiki:
+[Publicación en Threads y X](https://github.com/nolotov/beisbol-para-todos/wiki/Publicacion-en-Threads-y-X).
+
 #### Historia del día: los juegos de hoy
 
 Una historia vertical (1080×1920) con la cartelera de hoy de la MLB y la LVBP en hora de
@@ -233,7 +249,7 @@ src/bpt/
   historia.py            # historia del día: cartelera de juegos de hoy (MLB + LVBP)
   redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
   notificar/telegram.py  # paquete del día a Telegram + botón de publicar
-  publicar/              # fase 4: piezas publicables, JPEG y cliente de la API de Instagram
+  publicar/              # fase 4: piezas, JPEG, menú por red y clientes de Instagram, Threads y X
   glossary.py            # glosario de métricas: sigla, nombre en español, pista y explicación
   data/savant.py         # extracción de percentiles (pybaseball) + caché + búsqueda de jugador
   data/lvbp.py           # ingesta stats.lvbp.com: paginación, parseo, caché y percentiles vs. liga
@@ -261,6 +277,6 @@ scripts/setup.ps1        # bootstrap del entorno en Windows
 - [x] Job diario de extracción (resultados MLB y LVBP)
 - [x] Publicación en Instagram desde Telegram
 - [x] Historia diaria con los juegos de hoy
-- [ ] Publicación en X
+- [x] Publicación en Threads y X desde Telegram
 
 Datos: Baseball Savant, FanGraphs, Baseball-Reference vía [pybaseball](https://github.com/jldbc/pybaseball).

@@ -285,7 +285,7 @@ def test_aviso_de_fallo_ofrece_reintentar():
     flujo.avisar_fallo(tg(tele), "55", "123", "2", "token vencido", titular="Juego 2",
                        url_run="https://github.com/x/runs/1")
     (ed,) = tele.llamadas
-    assert ed["data"]["text"].startswith("📸 Juego 2\n\n❌ No se publicó: token vencido")
+    assert ed["data"]["text"].startswith("📸 Juego 2\n\n❌ No se publicó en Instagram: token vencido")
     teclado = json.loads(ed["data"]["reply_markup"])["inline_keyboard"]
     assert teclado[0][0]["callback_data"] == "pub:123:2"
 
