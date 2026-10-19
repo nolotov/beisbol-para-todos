@@ -20,6 +20,7 @@ VERSION = os.environ.get("IG_API_VERSION", "v25.0")
 MAX_CARRUSEL = 10
 MAX_CAPTION = 2200
 MAX_HASHTAGS = 30
+PERFIL_HISTORIAS = "https://www.instagram.com/stories/mbp.deportes/"
 
 # Códigos de error de Meta que conviene explicar en castellano
 EXPLICACIONES = {
@@ -174,6 +175,23 @@ class Instagram:
             if (m.get("caption") or "").strip() == clave:
                 return m
         return None
+
+    def publicar_historia(self, url: str) -> Publicado:
+        """Una imagen como historia (media_type=STORIES; las historias no llevan caption).
+
+        No hay chequeo de duplicado: las historias no tienen caption con qué compararlas.
+        El doble toque lo evita el relé, que quita los botones antes de disparar.
+        """
+        final = self._llamar("POST", f"{self.user_id}/media",
+                             {"image_url": url, "media_type": "STORIES"})["id"]
+        self.esperar(final)
+        media_id = self._llamar("POST", f"{self.user_id}/media_publish",
+                                {"creation_id": final})["id"]
+        try:
+            enlace = self.permalink(media_id)
+        except InstagramError:
+            enlace = ""
+        return Publicado(media_id, enlace or PERFIL_HISTORIAS)
 
     def publicar(self, urls: list[str], caption: str) -> Publicado:
         """Una imagen = post simple; de 2 a 10 = carrusel."""

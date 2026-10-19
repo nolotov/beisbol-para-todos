@@ -1,0 +1,122 @@
+# Historia del día: una lámina vertical (1080x1920) con los juegos de HOY de la MLB y la LVBP,
+# en hora de Venezuela. Llega a Telegram con su botón "📲 Publicar historia en Instagram",
+# igual que las publicaciones. Si ese día no hay juegos de ninguna liga, no manda nada.
+#
+# Cuándo corre (no hace falta otro disparo en cron-job.org):
+#   - Al terminar "Resultados MLB" o "Resultados LVBP" (el primero que termine; el segundo ve
+#     que la historia de hoy ya salió y no la repite).
+#   - Cron de respaldo a las 07:43 de Santiago, por si ese día no corrió ningún resultado
+#     (por ejemplo, en la temporada regular de MLB, cuando no hay workflow de resultados).
+#   - A mano desde Actions (siempre la genera, aunque ya haya salida hoy).
+#
+# workflow_run y el cron solo funcionan cuando este archivo está en la rama por defecto (main).
+name: Historia del día
+
+on:
+  workflow_run:
+    workflows: ["Resultados MLB", "Resultados LVBP"]
+    types: [completed]
+  schedule:
+    - cron: "43 10 * * *"     # 10:43 UTC = 07:43 en Santiago (UTC-3)
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: "Fecha (YYYY-MM-DD). Vacío = hoy en hora de Venezuela"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: historia      # en fila: así el segundo disparo ve al primero ya terminado
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  control:
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+    outputs:
+      correr: ${{ steps.revisar.outputs.correr }}
+    steps:
+      - name: ¿Ya salió la historia de hoy?
+        id: revisar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENTO: ${{ github.event_name }}
+          ESTE_RUN: ${{ github.run_id }}
+        run: |
+          if [ "$EVENTO" = "workflow_dispatch" ]; then echo "correr=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          HOY=$(date -u +%F)
+          PREVIOS=$(gh run list -R "${{ github.repository }}" --workflow "${{ github.workflow }}" \
+            --limit 30 --json databaseId,createdAt,conclusion \
+            --jq "[.[] | select(.createdAt[0:10] == \"$HOY\") | select(.databaseId != $ESTE_RUN)
+                       | select(.conclusion == \"success\")] | length")
+          if [ "${PREVIOS:-0}" -gt 0 ]; then
+            echo "La historia de hoy ($HOY) ya salió: no se repite."
+            echo "correr=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "correr=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  historia:
+    needs: control
+    if: ${{ needs.control.outputs.correr == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        run: pip install -e .
+
+      - name: Armar la historia
+        id: gen
+        env:
+          FECHA: ${{ inputs.fecha }}
+        run: |
+          ARGS=(--github-output "$GITHUB_OUTPUT")
+          if [ -n "$FECHA" ]; then ARGS+=(--fecha "$FECHA"); fi
+          python -m bpt historia "${ARGS[@]}" | tee salida.txt
+
+      # El paquete se sube ANTES de Telegram: el botón de publicar lo descarga desde aquí.
+      - uses: actions/upload-artifact@v7
+        if: steps.gen.outputs.total != '0'
+        with:
+          name: historia-${{ github.run_number }}
+          path: ${{ steps.gen.outputs.carpeta }}
+          retention-days: 7
+
+      - name: Enviar a Telegram
+        if: ${{ steps.gen.outputs.total != '0' && env.TELEGRAM_BOT_TOKEN != '' }}
+        env:
+          BPT_PUBLICAR_INSTAGRAM: ${{ vars.PUBLICAR_INSTAGRAM }}
+        run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Avisar por Telegram si algo falló
+        if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode text="⚠️ MBP: falló la historia del día. Revisa: ${URL}"
+
+      - name: Resumen del run
+        if: always()
+        run: |
+          echo '### Historia del día' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

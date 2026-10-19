@@ -152,10 +152,11 @@ def callback_publicar(run_id: str, pieza: str) -> str:
     return data
 
 
-def texto_publicar(titular: str, alertas: bool) -> str:
+def texto_publicar(titular: str, alertas: bool, historia: bool = False) -> str:
     """El primer párrafo es la "base" que el relé conserva al editar el mensaje."""
     aviso = " · ⚠️ con alertas" if alertas else ""
-    return f"📸 {titular}{aviso}\n\n¿La subo a Instagram? Te pido confirmación antes."
+    icono = "📲" if historia else "📸"
+    return f"{icono} {titular}{aviso}\n\n¿La subo a Instagram? Te pido confirmación antes."
 
 
 def ofrecer_publicar(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
@@ -168,8 +169,10 @@ def ofrecer_publicar(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
     except piezas.PiezaError:
         return False
     run_id = os.environ["GITHUB_RUN_ID"]
-    tg.botones(texto_publicar(p.titular, p.tiene_alertas),
-               [[{"text": "📸 Publicar en Instagram",
+    historia = p.tipo == piezas.HISTORIA
+    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia),
+               [[{"text": "📲 Publicar historia en Instagram" if historia
+                  else "📸 Publicar en Instagram",
                   "callback_data": callback_publicar(run_id, p.id)}]])
     return True
 
@@ -200,6 +203,8 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
 
     if resumen.get("formato") == "jornada":
         return _enviar_jornada(carpeta, resumen, por_pk.get("jornada"), tg, originales)
+    if resumen.get("formato") == "historia":
+        return _enviar_historia(carpeta, resumen, tg, originales)
 
     juegos = resumen.get("juegos", [])
     if not juegos:
@@ -272,6 +277,23 @@ def _enviar_jornada(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
         _textos(tg, r["textos"])
         ofrecer_publicar(tg, carpeta, "jornada")
     return len(juegos)
+
+
+def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: bool) -> int:
+    """Historia del día: vista previa, original y botón. Sin juegos no se manda nada."""
+    imagenes = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
+    if not resumen.get("total") or not imagenes:
+        return 0
+    lineas = []
+    for liga, datos in resumen.get("ligas", {}).items():
+        n = len(datos["juegos"])
+        lineas.append(f"{liga}: {n} juego{'s' if n != 1 else ''}")
+    leyenda = "📲 Historia de hoy · " + " · ".join(lineas)
+    tg.album(imagenes[:1], leyenda=leyenda)
+    if originales:
+        tg.album(imagenes[:1], como_archivo=True, leyenda="Original para la historia")
+    ofrecer_publicar(tg, carpeta, "1")
+    return resumen["total"]
 
 
 def chats_recientes(token: str, http=requests) -> list[dict]:

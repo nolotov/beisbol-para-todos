@@ -119,6 +119,17 @@ Fallas habituales y su significado (el mensaje de Telegram las indica y ofrece *
 
 Nota: con el relé conectado, Telegram deja de entregar mensajes por `getUpdates`, por lo que `bpt telegram-chat` deja de funcionar. Para usarlo: `bpt telegram-webhook --quitar`, ejecutar el comando y volver a conectar el relé.
 
+## Historia del día
+
+Además de los carruseles, cada día con juegos llega una **historia** (1080×1920) con la cartelera de hoy de la MLB y la LVBP, en hora de Venezuela. La genera `historia.yml` y se publica por el mismo camino: botón **📲 Publicar historia en Instagram** → confirmación → relé → `publicar.yml`.
+
+- **Cuándo llega:** al terminar el primer workflow de resultados del día (`workflow_run`), así que no requiere otro disparo en cron-job.org. Si ese día no corrió ningún resultado (temporada regular de MLB, por ejemplo), la manda el cron de respaldo de las 07:43 de Santiago. Un segundo disparo el mismo día no la repite; lanzarla a mano desde Actions sí la regenera.
+- **Sin juegos, nada:** si no hay juegos de ninguna de las dos ligas no se dibuja la lámina ni llega mensaje a Telegram (el resumen del run lo dice).
+- **Qué muestra:** hora (o estado, si el juego se pospuso), enfrentamiento, fase y estado de la serie en postemporada MLB o récords en la LVBP, y abridores probables. Con muchos juegos la lámina pasa a filas compactas. El contenido queda dentro de las zonas seguras de las historias.
+- **Pieza "1":** dentro de un paquete de historia la única pieza tiene id `1`. Así el relé de Cloudflare no necesita cambios: su expresión ya acepta ese valor, y `publicar.yml` distingue la historia por el `formato` del paquete.
+- **API:** contenedor con `media_type=STORIES` y sin caption. Las historias no tienen caption con qué comparar, así que no hay chequeo de duplicado; el doble toque lo evita el relé, que quita los botones antes de disparar. El mensaje de Telegram queda con "✅ Historia publicada" y el enlace a las historias del perfil.
+- **Artefacto:** se guarda 7 días (la historia solo tiene sentido el mismo día).
+
 ## Seguridad
 
 | Secreto | Dónde vive | Riesgo si se filtra | Revocación |
@@ -132,7 +143,7 @@ Controles aplicados:
 
 - **El relé rechaza todo lo que no venga de Telegram** (cabecera secreta) y todo toque de un usuario distinto al `TELEGRAM_CHAT_ID`.
 - **Entradas validadas en tres puntos:** el relé solo acepta `pub|ok|no:<número>:<1-2 dígitos o jornada>`; el workflow vuelve a validar con expresiones regulares antes de usar las entradas, que además se pasan por variables de entorno y nunca interpoladas en scripts; y Python valida el identificador de la pieza.
-- **El workflow solo acepta runs de los workflows de resultados**, comprobando el nombre antes de descargar.
+- **El workflow solo acepta runs de los workflows de resultados o de la historia del día**, comprobando el nombre antes de descargar.
 - **Permisos acotados:** `publicar.yml` tiene `contents: write` (para la rama `publicaciones`) y `actions: read`; los workflows de resultados siguen con `contents: read`.
 - **El token de Instagram nunca aparece en registros:** los errores lo reemplazan por `<token>` (verificado por pruebas) y el token renovado se enmascara con `::add-mask::` antes de guardarlo.
 
