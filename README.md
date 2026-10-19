@@ -170,6 +170,22 @@ Requiere el relé `infra/telegram-relay/worker.js` (Cloudflare Worker, gratis), 
 token (`instagram-token.yml`). Paso a paso, decisiones y fallas habituales en la wiki:
 [Publicación en Instagram](https://github.com/nolotov/beisbol-para-todos/wiki/Publicacion-en-Instagram).
 
+#### Historia del día: los juegos de hoy
+
+Una historia vertical (1080×1920) con la cartelera de hoy de la MLB y la LVBP en hora de
+Venezuela: hora, enfrentamiento, cómo va la serie (postemporada) o los récords (LVBP) y los
+abridores probables. Si no hay juegos de ninguna liga no se genera ni se manda nada. Llega a
+Telegram con **📲 Publicar historia en Instagram**, por el mismo camino que las publicaciones.
+
+```powershell
+python -m bpt historia                    # hoy (hora de Venezuela) -> output/historia/<fecha>/
+python -m bpt historia --fecha 2026-10-20
+python -m bpt notificar --carpeta output/historia/2026-10-20
+```
+
+El workflow `historia.yml` corre solo al terminar el primer workflow de resultados del día
+(cron de respaldo a las 07:43 de Santiago) y no repite la historia si ya salió.
+
 ### LVBP: resultados de la jornada
 
 ```powershell
@@ -214,6 +230,7 @@ src/bpt/
   theme.py               # paleta "Dashboard de dugout", estilo matplotlib y firma @mbp.deportes
   lvbp_resultados.py     # pipeline de la jornada LVBP: carrusel + resumen.json
   resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
+  historia.py            # historia del día: cartelera de juegos de hoy (MLB + LVBP)
   redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
   notificar/telegram.py  # paquete del día a Telegram + botón de publicar
   publicar/              # fase 4: piezas publicables, JPEG y cliente de la API de Instagram
@@ -243,6 +260,7 @@ scripts/setup.ps1        # bootstrap del entorno en Windows
 - [ ] Modelo de pronóstico (log5 + bullpen + park factor) con track record público
 - [x] Job diario de extracción (resultados MLB y LVBP)
 - [x] Publicación en Instagram desde Telegram
+- [x] Historia diaria con los juegos de hoy
 - [ ] Publicación en X
 
 Datos: Baseball Savant, FanGraphs, Baseball-Reference vía [pybaseball](https://github.com/jldbc/pybaseball).

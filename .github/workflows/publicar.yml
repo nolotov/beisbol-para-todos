@@ -1,4 +1,5 @@
-# Publica en Instagram una pieza ya aprobada desde Telegram (fase 4).
+# Publica en Instagram una pieza ya aprobada desde Telegram (fase 4): un carrusel de
+# resultados o la historia del día (juegos de hoy), según el paquete del run indicado.
 #
 # Lo dispara el relé (infra/telegram-relay) cuando se toca "✅ Sí, publicar". También se puede
 # lanzar a mano desde Actions con el número del run de resultados y la pieza.
@@ -14,10 +15,10 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: "Número del run de 'Resultados MLB/LVBP' que trae el paquete"
+        description: "Número del run de 'Resultados MLB/LVBP' o 'Historia del día' que trae el paquete"
         required: true
       pieza:
-        description: "1, 2... (juego MLB, en el orden de Telegram) o jornada (LVBP)"
+        description: "1, 2... (juego MLB, en el orden de Telegram), jornada (LVBP) o 1 (historia)"
         required: true
       message_id:
         description: "Mensaje de Telegram a actualizar (lo llena el relé; vacío = no avisar)"
@@ -79,9 +80,9 @@ jobs:
         id: paquete
         run: |
           NOMBRE=$(gh run view "$RUN_ID" -R "$REPO" --json workflowName --jq .workflowName 2>/dev/null || true)
-          if [[ "$NOMBRE" != Resultados* ]]; then
-            echo "el run $RUN_ID no es de un workflow de resultados" > motivo.txt
-            echo "::error::El run $RUN_ID no es de 'Resultados MLB/LVBP' ($NOMBRE)"; exit 1
+          if [[ "$NOMBRE" != Resultados* && "$NOMBRE" != "Historia del día" ]]; then
+            echo "el run $RUN_ID no es de resultados ni de la historia del día" > motivo.txt
+            echo "::error::El run $RUN_ID no es de 'Resultados MLB/LVBP' ni de 'Historia del día' ($NOMBRE)"; exit 1
           fi
           if ! gh run download "$RUN_ID" -R "$REPO" -D paquete; then
             echo "no encontré el paquete del run $RUN_ID (¿venció o aún se está subiendo?)" > motivo.txt
