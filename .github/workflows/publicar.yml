@@ -1,15 +1,16 @@
-# Publica en Instagram una pieza ya aprobada desde Telegram (fase 4): un carrusel de
-# resultados o la historia del día (juegos de hoy), según el paquete del run indicado.
+# Publica una pieza ya aprobada desde Telegram (fase 4) en Instagram, Threads y/o X: un
+# carrusel de resultados o la historia del día (solo Instagram), según el paquete del run.
 #
 # Lo dispara el relé (infra/telegram-relay) cuando se toca "✅ Sí, publicar". También se puede
 # lanzar a mano desde Actions con el número del run de resultados y la pieza.
 #
 #   1. Descarga el paquete (artefacto) del run de resultados indicado.
 #   2. Convierte las láminas de la pieza a JPEG (Instagram no acepta PNG).
-#   3. Las sube a la rama `publicaciones` (repo público = URL pública que Instagram descarga).
-#      La rama se pisa en cada publicación: solo guarda lo último, no crece.
-#   4. Publica el carrusel y edita el mensaje de Telegram con el enlace (o con el error).
-name: Publicar en Instagram
+#   3. Si va a Instagram o Threads, las sube a la rama `publicaciones` (repo público = URL
+#      pública que Meta descarga). La rama se pisa en cada publicación: no crece.
+#      A X se le suben los archivos directamente.
+#   4. Publica en cada red y lo cuenta en Telegram (enlaces, errores y "🔁 Reintentar").
+name: Publicar en redes
 
 on:
   workflow_dispatch:
@@ -22,6 +23,12 @@ on:
         required: true
       message_id:
         description: "Mensaje de Telegram a actualizar (lo llena el relé; vacío = no avisar)"
+        required: false
+      destino:
+        description: "Redes: i=Instagram, t=Threads, x=X (ej. itx). Vacío = Instagram"
+        required: false
+      quedan:
+        description: "(relé) Redes que tenía el menú del mensaje. Vacío = las de destino"
         required: false
 
 permissions:
@@ -43,6 +50,12 @@ jobs:
     env:
       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+      THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+      X_API_KEY: ${{ secrets.X_API_KEY }}
+      X_API_SECRET: ${{ secrets.X_API_SECRET }}
+      X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+      X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       GH_TOKEN: ${{ github.token }}
@@ -50,6 +63,8 @@ jobs:
       RUN_ID: ${{ inputs.run_id }}
       PIEZA: ${{ inputs.pieza }}
       MESSAGE_ID: ${{ inputs.message_id }}
+      DESTINO: ${{ inputs.destino || 'i' }}
+      QUEDAN: ${{ inputs.quedan || inputs.destino || 'i' }}
       URL_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Validar entrada
@@ -57,6 +72,8 @@ jobs:
           [[ "$RUN_ID" =~ ^[0-9]{1,20}$ ]] || { echo "::error::run_id inválido"; exit 1; }
           [[ "$PIEZA" =~ ^([0-9]{1,2}|jornada)$ ]] || { echo "::error::pieza inválida"; exit 1; }
           [[ -z "$MESSAGE_ID" || "$MESSAGE_ID" =~ ^[0-9]{1,15}$ ]] || { echo "::error::message_id inválido"; exit 1; }
+          [[ "$DESTINO" =~ ^[itx]{1,3}$ ]] || { echo "::error::destino inválido"; exit 1; }
+          [[ "$QUEDAN" =~ ^[itx]{1,3}$ ]] || { echo "::error::quedan inválido"; exit 1; }
 
       - uses: actions/checkout@v6
 
@@ -69,11 +86,15 @@ jobs:
         id: instalar
         run: pip install -e .
 
-      - name: ¿Hay token de Instagram?
+      - name: ¿Hay credenciales de las redes pedidas?
         run: |
-          if [ -z "$IG_ACCESS_TOKEN" ]; then
-            echo "falta el secreto IG_ACCESS_TOKEN en GitHub" > motivo.txt
-            echo "::error::Falta el secreto IG_ACCESS_TOKEN"; exit 1
+          falta=()
+          [[ "$DESTINO" == *i* && -z "$IG_ACCESS_TOKEN" ]] && falta+=(IG_ACCESS_TOKEN)
+          [[ "$DESTINO" == *t* && -z "$THREADS_ACCESS_TOKEN" ]] && falta+=(THREADS_ACCESS_TOKEN)
+          [[ "$DESTINO" == *x* && ( -z "$X_API_KEY" || -z "$X_ACCESS_TOKEN" ) ]] && falta+=(X_API_KEY/X_ACCESS_TOKEN)
+          if [ ${#falta[@]} -gt 0 ]; then
+            echo "faltan secretos en GitHub: ${falta[*]}" > motivo.txt
+            echo "::error::Faltan secretos: ${falta[*]}"; exit 1
           fi
 
       - name: Descargar el paquete del run ${{ inputs.run_id }}
@@ -105,6 +126,7 @@ jobs:
 
       - name: Subir los JPEG a la rama publicaciones
         id: subir
+        if: ${{ contains(env.DESTINO, 'i') || contains(env.DESTINO, 't') }}
         run: |
           cd publico
           git init -q -b publicaciones
@@ -124,20 +146,24 @@ jobs:
           echo "las imágenes no quedaron accesibles en raw.githubusercontent.com" > ../motivo.txt
           exit 1
 
-      - name: Publicar en Instagram
+      - name: Publicar en las redes
         env:
           BASE: ${{ steps.subir.outputs.base }}
         run: |
-          ARGS=(--plan plan.json --base-url "$BASE")
+          ARGS=(--plan plan.json --destino "$DESTINO" --quedan "$QUEDAN" --carpeta publico
+                --run-id "$RUN_ID")
+          if [ -n "$BASE" ]; then ARGS+=(--base-url "$BASE"); fi
           if [ -n "$MESSAGE_ID" ]; then ARGS+=(--message-id "$MESSAGE_ID"); fi
-          python -m bpt publicar-instagram "${ARGS[@]}"
+          python -m bpt publicar-redes "${ARGS[@]}"
 
+      # Solo si el fallo fue ANTES de publicar: si publicar-redes ya avisó, no se repite.
       - name: Avisar en Telegram si falló
-        if: ${{ failure() && steps.instalar.outcome == 'success' && env.MESSAGE_ID != '' }}
+        if: ${{ failure() && steps.instalar.outcome == 'success' && env.MESSAGE_ID != '' && hashFiles('avisado.txt') == '' }}
         env:
           TITULAR: ${{ steps.preparar.outputs.titular }}
         run: |
-          ARGS=(--message-id "$MESSAGE_ID" --run-id "$RUN_ID" --pieza "$PIEZA" --url-run "$URL_RUN")
+          ARGS=(--message-id "$MESSAGE_ID" --run-id "$RUN_ID" --pieza "$PIEZA" --url-run "$URL_RUN"
+                --destino "$DESTINO" --quedan "$QUEDAN")
           if [ -n "$TITULAR" ]; then ARGS+=(--titular "$TITULAR"); fi
           python -m bpt publicar-fallo "${ARGS[@]}"
 
@@ -145,7 +171,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "### Publicar en Instagram · run $RUN_ID · pieza $PIEZA"
+            echo "### Publicar · run $RUN_ID · pieza $PIEZA · redes $DESTINO"
             if [ -f plan.json ]; then echo "**$(jq -r .titular plan.json)**"; fi
             if [ -f motivo.txt ]; then echo "> ❌ $(cat motivo.txt)"; fi
           } >> "$GITHUB_STEP_SUMMARY"

@@ -2,6 +2,8 @@
 
 Desde la versión 0.6.0 cada pieza del paquete diario llega a Telegram con un botón **📸 Publicar en Instagram**. Al tocarlo, el bot pide confirmación; al confirmar, la pieza se publica en la cuenta y el mismo mensaje se actualiza con el enlace al post. Nada se publica sin dos toques explícitos del editor.
 
+> Desde la versión 0.8.0 el mismo botón puede publicar también en Threads y X: ver [Publicación en Threads y X](Publicacion-en-Threads-y-X).
+
 Una pieza es un carrusel con su caption:
 
 - **MLB:** una por juego (láminas de resultado, figuras y latinos), con identificador `1`, `2`… según el orden del paquete.
@@ -104,7 +106,7 @@ Para desactivar la publicación basta con borrar la variable o ponerla en `0`.
 - **Publicar:** tocar **📸 Publicar en Instagram**, revisar que sea la pieza correcta y tocar **✅ Sí, publicar**. En uno o dos minutos el mensaje muestra el enlace al post.
 - **Corregir antes de publicar:** si el caption necesita cambios, no usar el botón: publicar a mano con las láminas originales del paquete, como antes. La edición del caption desde Telegram queda como mejora futura.
 - **Piezas con alertas:** el mensaje del botón lo indica con "⚠️ con alertas". El botón funciona igual; la decisión es del editor.
-- **Publicar a mano desde GitHub:** Actions → **Publicar en Instagram** → *Run workflow*, con el número del run de resultados (aparece en su URL) y la pieza. Sin `message_id` no se actualiza ningún mensaje.
+- **Publicar a mano desde GitHub:** Actions → **Publicar en redes** → *Run workflow*, con el número del run de resultados (aparece en su URL) y la pieza. Sin `message_id` no se actualiza ningún mensaje.
 
 Fallas habituales y su significado (el mensaje de Telegram las indica y ofrece **🔁 Reintentar**):
 
@@ -153,7 +155,7 @@ Controles aplicados:
 - **Solo JPEG, hasta 10 imágenes por carrusel**, todas recortadas según la proporción de la primera. Las láminas son 1080×1350 (4:5), dentro del rango aceptado.
 - **Caption de hasta 2.200 caracteres y 30 hashtags.** El validador del redactor alerta cuando el caption pasa de 1.200; el cliente comprueba el límite real antes de llamar a la API.
 - **Sin edición del caption desde Telegram.** Para corregir hay que publicar a mano.
-- **X todavía no.** La publicación en X (pago por uso) es el siguiente paso de esta fase; la estructura de `src/bpt/publicar/` está pensada para añadir otro destino.
+- **Threads y X:** desde la 0.8.0, en su propia página: [Publicación en Threads y X](Publicacion-en-Threads-y-X).
 
 ## Fuentes
 

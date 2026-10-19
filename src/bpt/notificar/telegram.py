@@ -7,9 +7,10 @@ su propio mensaje (para copiar en orden) y el guion.
 Necesita TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID (en el .env o como secretos de GitHub).
 El token nunca se imprime: los errores se limpian antes de mostrarlos.
 
-Fase 4: si BPT_PUBLICAR_INSTAGRAM está activo y el envío corre dentro de GitHub Actions
-(GITHUB_RUN_ID), cada pieza cierra con un botón "Publicar en Instagram". El botón lo atiende
-el relé (infra/telegram-relay), que pide confirmación y dispara el workflow publicar.yml.
+Fase 4: si alguna red está encendida (BPT_PUBLICAR_INSTAGRAM, BPT_PUBLICAR_THREADS,
+BPT_PUBLICAR_X) y el envío corre dentro de GitHub Actions (GITHUB_RUN_ID), cada pieza cierra
+con un botón por red. Los atiende el relé (infra/telegram-relay), que pide confirmación y
+dispara el workflow publicar.yml.
 """
 from __future__ import annotations
 
@@ -84,11 +85,16 @@ class Telegram:
             self._llamar("sendMessage", {"chat_id": self.chat_id, "text": trozo,
                                          "disable_web_page_preview": "true"})
 
-    def botones(self, texto: str, filas: list[list[dict]]) -> dict:
-        """Mensaje con botones debajo (inline keyboard). Devuelve el mensaje enviado."""
-        return self._llamar("sendMessage", {
-            "chat_id": self.chat_id, "text": texto, "disable_web_page_preview": "true",
-            "reply_markup": json.dumps({"inline_keyboard": filas})})
+    def botones(self, texto: str, filas: list[list[dict]],
+                responder_a: int | str | None = None) -> dict:
+        """Mensaje con botones debajo (inline keyboard). Devuelve el mensaje enviado.
+        Con `responder_a`, sale como respuesta a ese mensaje."""
+        data = {"chat_id": self.chat_id, "text": texto, "disable_web_page_preview": "true",
+                "reply_markup": json.dumps({"inline_keyboard": filas})}
+        if responder_a:
+            data["reply_parameters"] = json.dumps({"message_id": int(responder_a),
+                                                   "allow_sending_without_reply": True})
+        return self._llamar("sendMessage", data)
 
     def editar(self, message_id: int | str, texto: str,
                filas: list[list[dict]] | None = None, chat_id: str | None = None) -> None:
@@ -140,40 +146,45 @@ def partir(texto: str, limite: int = LIMITE_TEXTO) -> list[str]:
 # --- Botón de publicar (fase 4) ---------------------------------------------------
 
 def publicar_activo() -> bool:
-    """Botones solo si se pidió (variable del repo) y hay un run de Actions al que volver."""
-    flag = os.environ.get("BPT_PUBLICAR_INSTAGRAM", "").strip().lower()
-    return flag in ("1", "true", "si", "sí", "yes") and bool(os.environ.get("GITHUB_RUN_ID"))
+    """Botones solo si hay alguna red encendida (variables del repo) y un run de Actions al
+    que volver."""
+    from bpt.publicar import redes
+    return bool(redes.activas()) and bool(os.environ.get("GITHUB_RUN_ID"))
 
 
-def callback_publicar(run_id: str, pieza: str) -> str:
-    data = f"pub:{run_id}:{pieza}"
-    if len(data.encode()) > 64:          # límite de Telegram para callback_data
-        raise TelegramError(f"callback demasiado largo: {data}")
-    return data
+def callback_publicar(run_id: str, pieza: str, destino: str = "i", quedan: str = "i") -> str:
+    from bpt.publicar import redes
+    try:
+        return redes.callback("pub", run_id, pieza, destino, quedan)
+    except ValueError as e:
+        raise TelegramError(str(e)) from None
 
 
-def texto_publicar(titular: str, alertas: bool, historia: bool = False) -> str:
+def texto_publicar(titular: str, alertas: bool, historia: bool = False,
+                   quedan: str = "i") -> str:
     """El primer párrafo es la "base" que el relé conserva al editar el mensaje."""
+    from bpt.publicar import redes
     aviso = " · ⚠️ con alertas" if alertas else ""
     icono = "📲" if historia else "📸"
-    return f"{icono} {titular}{aviso}\n\n¿La subo a Instagram? Te pido confirmación antes."
+    return f"{icono} {titular}{aviso}\n\n{redes.pregunta(quedan)}"
 
 
 def ofrecer_publicar(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
-    """Manda el botón de una pieza si está activo y la pieza es publicable."""
+    """Manda el menú de redes de una pieza si hay redes activas y la pieza sirve para alguna."""
     if not publicar_activo():
         return False
-    from bpt.publicar import piezas
+    from bpt.publicar import piezas, redes
     try:
         p = piezas.buscar(carpeta, pieza_id)
     except piezas.PiezaError:
         return False
+    quedan = p.redes(redes.activas())
+    if not quedan:
+        return False
     run_id = os.environ["GITHUB_RUN_ID"]
     historia = p.tipo == piezas.HISTORIA
-    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia),
-               [[{"text": "📲 Publicar historia en Instagram" if historia
-                  else "📸 Publicar en Instagram",
-                  "callback_data": callback_publicar(run_id, p.id)}]])
+    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia, quedan),
+               redes.menu(run_id, p.id, quedan, historia))
     return True
 
 

@@ -470,10 +470,82 @@ def cmd_publicar_fallo(args: argparse.Namespace) -> int:
         motivo = Path(args.motivo).read_text(encoding="utf-8").strip() or motivo
     try:
         flujo.avisar_fallo(tg, args.message_id, args.run_id, args.pieza, motivo[:600],
-                           titular=args.titular, url_run=args.url_run)
+                           titular=args.titular, url_run=args.url_run,
+                           destino=args.destino, quedan=args.quedan or args.destino)
     except telegram.TelegramError as e:
         print(f"[error] Telegram: {e}", file=sys.stderr)
         return 1
+    return 0
+
+
+def _clientes() -> dict:
+    """Fábricas de clientes por red: se crean recién al publicar (sin secretos = error de
+    esa red, no de todas)."""
+    from bpt.publicar import instagram, threads, x
+    return {
+        "i": lambda: instagram.Instagram(*instagram.credenciales()),
+        "t": lambda: threads.Threads(*threads.credenciales()),
+        "x": lambda: x.X(x.autenticacion(*x.credenciales()), secretos=x.credenciales()),
+    }
+
+
+def cmd_publicar_redes(args: argparse.Namespace) -> int:
+    import json
+    from bpt.notificar import telegram
+    from bpt.publicar import flujo, redes
+    destino = redes.normalizar(args.destino)
+    quedan = redes.normalizar(args.quedan or destino)
+    if not destino:
+        print("[error] destino inválido (letras i, t, x)", file=sys.stderr)
+        return 1
+    plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
+    resultados = flujo.publicar_redes(plan, destino, args.base_url, Path(args.carpeta),
+                                      _clientes())
+    for r in resultados:
+        print(("[ok] " if r.ok else "[error] ") + r.linea(plan.get("tipo") == "historia")
+              .replace("\n", " · "))
+    tg = _tg_opcional() if args.message_id else None
+    if tg:
+        try:
+            flujo.avisar_resultados(tg, plan, resultados, args.run_id, args.message_id,
+                                    destino, quedan)
+            Path(args.avisado).write_text("ok", encoding="utf-8")
+        except telegram.TelegramError as e:
+            print(f"[error] Telegram: {e}", file=sys.stderr)
+    malos = [r for r in resultados if not r.ok]
+    if malos:
+        Path(args.motivo).write_text("; ".join(f"{redes.NOMBRES[r.red]}: {r.motivo}"
+                                               for r in malos), encoding="utf-8")
+        return 1
+    return 0
+
+
+def cmd_threads_prueba(args: argparse.Namespace) -> int:
+    from bpt.publicar import threads
+    try:
+        t = threads.Threads(*threads.credenciales())
+        c = t.cuenta()
+        lim = t.limite()
+    except threads.ThreadsError as e:
+        print(f"[error] Threads: {e}", file=sys.stderr)
+        return 1
+    uso = lim.get("quota_usage", "?")
+    tope = (lim.get("config") or {}).get("quota_total", "?")
+    print(f"[ok] Cuenta @{c.get('username')} · THREADS_USER_ID={c.get('id')}")
+    print(f"[ok] Posts por API en las últimas 24 h: {uso} de {tope}")
+    return 0
+
+
+def cmd_x_prueba(args: argparse.Namespace) -> int:
+    from bpt.publicar import x
+    try:
+        cred = x.credenciales()
+        c = x.X(x.autenticacion(*cred), secretos=cred).cuenta()
+    except x.XError as e:
+        print(f"[error] X: {e}", file=sys.stderr)
+        return 1
+    print(f"[ok] Cuenta @{c.get('username')} ({c.get('name')}) · id {c.get('id')}")
+    print("     Ojo: en X cada llamada se cobra (esta lectura también, aunque poco).")
     return 0
 
 
@@ -635,7 +707,28 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("--motivo", default="motivo.txt")
     pf.add_argument("--texto", default=None)
     pf.add_argument("--url-run", default=None)
+    pf.add_argument("--destino", default="i")
+    pf.add_argument("--quedan", default=None)
     pf.set_defaults(func=cmd_publicar_fallo)
+
+    pz = sub.add_parser("publicar-redes", help="(workflow) Publicar un plan en Instagram, Threads y/o X")
+    pz.add_argument("--plan", required=True)
+    pz.add_argument("--destino", default="i", help="Letras de red: i=Instagram, t=Threads, x=X")
+    pz.add_argument("--quedan", default=None, help="Redes que tenía el menú (por defecto, destino)")
+    pz.add_argument("--base-url", default=None, help="URL pública de los JPEG (Instagram y Threads)")
+    pz.add_argument("--carpeta", default="publico", help="Carpeta local de los JPEG (X)")
+    pz.add_argument("--run-id", default="0", help="Run del paquete (para el botón de reintentar)")
+    pz.add_argument("--message-id", default=None, help="Mensaje de Telegram del botón")
+    pz.add_argument("--motivo", default="motivo.txt")
+    pz.add_argument("--avisado", default="avisado.txt",
+                    help="Se crea si el resultado ya se avisó en Telegram")
+    pz.set_defaults(func=cmd_publicar_redes)
+
+    tp2 = sub.add_parser("threads-prueba", help="Probar el token de Threads (no publica)")
+    tp2.set_defaults(func=cmd_threads_prueba)
+
+    xp = sub.add_parser("x-prueba", help="Probar las credenciales de X (no publica; cobra una lectura)")
+    xp.set_defaults(func=cmd_x_prueba)
 
     pv = sub.add_parser("lvbp-previas", help="Tarjetas previas de temporada por equipo")
     pv.add_argument("--contenido", default="content/previas_2026-27.json",

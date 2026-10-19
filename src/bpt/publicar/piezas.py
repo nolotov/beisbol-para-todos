@@ -34,10 +34,21 @@ class Pieza:
     caption: str
     alertas: list[str] = field(default_factory=list)
     tipo: str = "post"            # "post" (imagen o carrusel) o "historia"
+    hilo: list[str] = field(default_factory=list)   # hilo_x del redactor (X y Threads)
 
     @property
     def tiene_alertas(self) -> bool:
         return bool(self.alertas)
+
+    def redes(self, activas: str) -> str:
+        """De las redes activas, a cuáles puede ir esta pieza (letras i, t, x).
+
+        La historia solo existe en Instagram. Instagram necesita caption; Threads y X, el hilo.
+        """
+        if self.tipo == HISTORIA:
+            return "i" if "i" in activas else ""
+        sirve = {"i": bool(self.caption.strip()), "t": bool(self.hilo), "x": bool(self.hilo)}
+        return "".join(c for c in "itx" if c in activas and sirve[c])
 
 
 def _alertas(r: dict) -> list[str]:
@@ -69,7 +80,8 @@ def piezas(carpeta: Path) -> list[Pieza]:
         if r and imgs:
             liga = resumen.get("liga", "LVBP")
             salida.append(Pieza(JORNADA, f"{liga} · Jornada del {resumen['fecha']}", imgs,
-                                r["textos"]["instagram"], _alertas(r)))
+                                r["textos"]["instagram"], _alertas(r),
+                                hilo=list(r["textos"].get("hilo_x") or [])))
         return salida
 
     for n, j in enumerate(resumen.get("juegos", []), 1):
@@ -77,7 +89,7 @@ def piezas(carpeta: Path) -> list[Pieza]:
         imgs = [carpeta / t for t in j.get("tarjetas", []) if (carpeta / t).exists()]
         if r and imgs:
             salida.append(Pieza(str(n), j["titular"], imgs, r["textos"]["instagram"],
-                                _alertas(r)))
+                                _alertas(r), hilo=list(r["textos"].get("hilo_x") or [])))
     return salida
 
 
@@ -120,4 +132,5 @@ def preparar(pieza: Pieza, destino: Path, prefijo: str) -> dict:
         a_jpeg(img, destino / rel)
         archivos.append(rel)
     return {"pieza": pieza.id, "tipo": pieza.tipo, "titular": pieza.titular,
-            "caption": pieza.caption, "alertas": pieza.alertas, "archivos": archivos}
+            "caption": pieza.caption, "hilo": pieza.hilo, "alertas": pieza.alertas,
+            "archivos": archivos}
