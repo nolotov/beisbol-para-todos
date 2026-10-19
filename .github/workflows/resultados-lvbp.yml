@@ -110,8 +110,10 @@ jobs:
         # Aunque falle el redactor: en ese caso llegan solo las láminas
         if: ${{ always() && steps.gen.outcome == 'success' && env.TELEGRAM_BOT_TOKEN != '' }}
         env:
-          # Variable del repo (Settings > Variables): 1 = cada pieza trae el botón de publicar
+          # Variables del repo (Settings > Variables): 1 = cada pieza trae el botón de esa red
           BPT_PUBLICAR_INSTAGRAM: ${{ vars.PUBLICAR_INSTAGRAM }}
+          BPT_PUBLICAR_THREADS: ${{ vars.PUBLICAR_THREADS }}
+          BPT_PUBLICAR_X: ${{ vars.PUBLICAR_X }}
         run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
 
       - name: Avisar por Telegram si algo falló

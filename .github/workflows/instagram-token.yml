@@ -1,9 +1,10 @@
-# Renueva el token de Instagram (dura 60 días) y lo guarda de vuelta en el secreto
-# IG_ACCESS_TOKEN. Corre cada lunes: aunque el cron de GitHub se atrase horas, sobra margen.
+# Renueva los tokens de Instagram y de Threads (duran 60 días) y los guarda de vuelta en los
+# secretos IG_ACCESS_TOKEN y THREADS_ACCESS_TOKEN. Corre cada lunes: aunque el cron de GitHub
+# se atrase horas, sobra margen. Si un secreto no existe todavía, ese paso no hace nada.
 #
 # Necesita el secreto GH_PAT_SECRETOS: token fine-grained de este repo con el permiso
 # "Secrets: Read and write" (el token automático de Actions no puede escribir secretos).
-name: Renovar token de Instagram
+name: Renovar tokens de Instagram y Threads
 
 on:
   schedule:
@@ -23,12 +24,13 @@ jobs:
     timeout-minutes: 5
     env:
       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
       GH_PAT_SECRETOS: ${{ secrets.GH_PAT_SECRETOS }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       REPO: ${{ github.repository }}
     steps:
-      - name: Renovar y guardar
+      - name: Renovar y guardar el de Instagram
         run: |
           if [ -z "$IG_ACCESS_TOKEN" ]; then
             echo "Sin IG_ACCESS_TOKEN todavía: nada que renovar."; exit 0
@@ -56,10 +58,36 @@ jobs:
           fi
           echo "Token renovado y guardado: vence en $DIAS días." | tee -a "$GITHUB_STEP_SUMMARY"
 
+      - name: Renovar y guardar el de Threads
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -z "$THREADS_ACCESS_TOKEN" ]; then
+            echo "Sin THREADS_ACCESS_TOKEN todavía: nada que renovar."; exit 0
+          fi
+          if [ -z "$GH_PAT_SECRETOS" ]; then
+            echo "::error::Falta el secreto GH_PAT_SECRETOS (token con permiso Secrets: write)"; exit 1
+          fi
+          if ! RESP=$(curl -sS -G "https://graph.threads.net/refresh_access_token" \
+                   --data-urlencode "grant_type=th_refresh_token" \
+                   --data-urlencode "access_token=${THREADS_ACCESS_TOKEN}" 2>&1); then
+            echo "::error::No se pudo contactar a Threads: ${RESP}"; exit 1
+          fi
+          NUEVO=$(jq -r '.access_token // empty' <<< "$RESP")
+          if [ -z "$NUEVO" ]; then
+            echo "::error::Threads no renovó el token: $(jq -c '.error // .' <<< "$RESP")"; exit 1
+          fi
+          echo "::add-mask::$NUEVO"
+          DIAS=$(( $(jq -r '.expires_in // 0' <<< "$RESP") / 86400 ))
+          if ! ERR=$(GH_TOKEN="$GH_PAT_SECRETOS" gh secret set THREADS_ACCESS_TOKEN -R "$REPO" --body "$NUEVO" 2>&1); then
+            echo "::error::Threads renovó el token, pero no se pudo guardar en GitHub (revisa GH_PAT_SECRETOS): ${ERR}"
+            exit 1
+          fi
+          echo "Token de Threads renovado y guardado: vence en $DIAS días." | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Avisar por Telegram si falló
         if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
         run: |
           URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
-            --data-urlencode text="⚠️ MBP: no se pudo renovar el token de Instagram. Si vence, los botones de publicar fallan. Revisa: ${URL}"
+            --data-urlencode text="⚠️ MBP: no se pudo renovar un token (Instagram o Threads). Si vence, los botones de publicar fallan. Revisa: ${URL}"
