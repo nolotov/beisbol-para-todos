@@ -3,6 +3,7 @@
 Una pieza es un carrusel con su caption:
   - MLB: una por juego, con id "1", "2"... (el orden del paquete de Telegram).
   - LVBP: una sola, la de la jornada, con id "jornada".
+  - Especial (content/especiales/*.json): una sola, id "1", con caption e hilo.
   - Historia del día (juegos de hoy): una sola, id "1" y sin caption (las historias no
     llevan). Usa "1" para que el relé de Telegram no necesite cambios.
 
@@ -19,6 +20,7 @@ from PIL import Image
 
 JORNADA = "jornada"
 HISTORIA = "historia"
+ESPECIAL = "especial"
 ID_VALIDO = re.compile(r"^(\d{1,2}|jornada)$")
 
 
@@ -63,6 +65,13 @@ def piezas(carpeta: Path) -> list[Pieza]:
     """Todas las piezas publicables del paquete (las que tienen láminas y caption)."""
     carpeta = Path(carpeta)
     resumen = json.loads((carpeta / "resumen.json").read_text(encoding="utf-8"))
+    if resumen.get("formato") == ESPECIAL:
+        r = por_pk_especial(carpeta)
+        imgs = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
+        if not (r and imgs):
+            return []
+        return [Pieza("1", resumen["titular"], imgs, r["textos"]["instagram"], _alertas(r),
+                      hilo=list(r["textos"].get("hilo_x") or []))]
     if resumen.get("formato") == HISTORIA:
         imgs = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
         if not imgs:
@@ -91,6 +100,14 @@ def piezas(carpeta: Path) -> list[Pieza]:
             salida.append(Pieza(str(n), j["titular"], imgs, r["textos"]["instagram"],
                                 _alertas(r), hilo=list(r["textos"].get("hilo_x") or [])))
     return salida
+
+
+def por_pk_especial(carpeta: Path) -> dict | None:
+    tp = Path(carpeta) / "textos.json"
+    if not tp.exists():
+        return None
+    return next((r for r in json.loads(tp.read_text(encoding="utf-8"))
+                 if r.get("game_pk") == ESPECIAL), None)
 
 
 def buscar(carpeta: Path, pieza_id: str) -> Pieza:

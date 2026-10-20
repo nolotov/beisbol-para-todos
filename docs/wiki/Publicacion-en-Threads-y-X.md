@@ -68,6 +68,10 @@ X cobra por uso: no hay plan gratis para cuentas nuevas. Referencia de octubre d
 
 Estos tokens (OAuth 1.0a) no vencen: no hay renovación. Si se filtran, se regeneran en la misma pantalla.
 
+## Especiales
+
+Además del paquete diario, el workflow **Especial MBP** (a mano) arma una publicación desde un JSON de `content/especiales/` (portada, rosters y textos) y la manda a Telegram con el mismo menú de redes. `publicar.yml` acepta sus runs igual que los de resultados. El primero fue `latinos-serie-mundial.json`: el mejor latino por posición entre los que jugaron una Serie Mundial, un roster por liga.
+
 ## Fallas habituales
 
 | Mensaje | Causa | Acción |
