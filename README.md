@@ -197,6 +197,12 @@ python -m bpt especial --archivo content/especiales/latinos-serie-mundial.json
 
 En GitHub: Actions → **Especial MBP** → *Run workflow* con la ruta del archivo.
 
+**Historia especial.** Con `"tipo": "historia"` el JSON no lleva rosters ni textos sino un
+bloque `historia` (antetítulo, titular en 1-3 líneas, marcador, figuras, dato y lo que viene) y
+sale una sola lámina 1080x1920 para historias de Instagram. Llega a Telegram con el botón
+"📲 Publicar historia en Instagram", igual que la historia del día. Ejemplo:
+`content/especiales/rays-banderin-2026.json`.
+
 #### Historia del día: los juegos de hoy
 
 Una historia vertical (1080×1920) con la cartelera de hoy de la MLB y la LVBP en hora de

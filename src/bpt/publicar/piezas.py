@@ -76,8 +76,12 @@ def piezas(carpeta: Path) -> list[Pieza]:
         imgs = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
         if not imgs:
             return []                       # día sin juegos: no hay historia
-        from bpt.historia import titular
-        return [Pieza("1", f"Historia · {titular(resumen)}", imgs[:1], "", tipo=HISTORIA)]
+        if resumen.get("titular"):           # historia especial (content/especiales)
+            nombre = resumen["titular"]
+        else:
+            from bpt.historia import titular
+            nombre = titular(resumen)
+        return [Pieza("1", f"Historia · {nombre}", imgs[:1], "", tipo=HISTORIA)]
     tp = carpeta / "textos.json"
     redactados = json.loads(tp.read_text(encoding="utf-8")) if tp.exists() else []
     por_pk = {r["game_pk"]: r for r in redactados}

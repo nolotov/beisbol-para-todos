@@ -297,11 +297,14 @@ def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: boo
     imagenes = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
     if not resumen.get("total") or not imagenes:
         return 0
-    lineas = []
-    for liga, datos in resumen.get("ligas", {}).items():
-        n = len(datos["juegos"])
-        lineas.append(f"{liga}: {n} juego{'s' if n != 1 else ''}")
-    leyenda = "📲 Historia de hoy · " + " · ".join(lineas)
+    if resumen.get("especial"):
+        leyenda = f"📲 Historia especial · {resumen['titular']}"
+    else:
+        lineas = []
+        for liga, datos in resumen.get("ligas", {}).items():
+            n = len(datos["juegos"])
+            lineas.append(f"{liga}: {n} juego{'s' if n != 1 else ''}")
+        leyenda = "📲 Historia de hoy · " + " · ".join(lineas)
     tg.album(imagenes[:1], leyenda=leyenda)
     if originales:
         tg.album(imagenes[:1], como_archivo=True, leyenda="Original para la historia")
