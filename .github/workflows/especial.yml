@@ -1,0 +1,68 @@
+# Especial MBP: publicaciones armadas a mano (content/especiales/*.json), fuera del ciclo
+# diario. Dibuja las láminas, sube el paquete como artefacto y lo manda a Telegram con el menú
+# de redes, igual que una pieza del día. Se lanza a mano desde Actions.
+name: Especial MBP
+
+on:
+  workflow_dispatch:
+    inputs:
+      archivo:
+        description: "Archivo del especial (ej. content/especiales/latinos-serie-mundial.json)"
+        required: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  especial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      ARCHIVO: ${{ inputs.archivo }}
+    steps:
+      - name: Validar entrada
+        run: |
+          [[ "$ARCHIVO" =~ ^content/especiales/[A-Za-z0-9_-]{1,80}\.json$ ]] || { echo "::error::archivo inválido"; exit 1; }
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        run: pip install -e .
+
+      - name: Armar el especial
+        id: gen
+        run: python -m bpt especial --archivo "$ARCHIVO" --github-output "$GITHUB_OUTPUT" | tee salida.txt
+
+      # El paquete se sube ANTES de Telegram: el botón de publicar lo descarga desde aquí.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: especial-${{ github.run_number }}
+          path: ${{ steps.gen.outputs.carpeta }}
+          retention-days: 30
+
+      - name: Enviar a Telegram
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' }}
+        env:
+          BPT_PUBLICAR_INSTAGRAM: ${{ vars.PUBLICAR_INSTAGRAM }}
+          BPT_PUBLICAR_THREADS: ${{ vars.PUBLICAR_THREADS }}
+          BPT_PUBLICAR_X: ${{ vars.PUBLICAR_X }}
+        run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Resumen del run
+        if: always()
+        run: |
+          echo '### Especial MBP' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

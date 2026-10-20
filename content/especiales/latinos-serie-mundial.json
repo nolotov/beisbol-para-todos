@@ -1,0 +1,61 @@
+{
+  "slug": "latinos-serie-mundial",
+  "fecha": "2026-10-20",
+  "titular": "Los mejores latinos de la Serie Mundial · Nacional y Americana",
+  "fuente": "Datos: Baseball-Reference / SABR",
+  "portada": {
+    "titulo": "LOS LATINOS\nDE OCTUBRE",
+    "subtitulo": "El mejor latino en cada posición entre los que\njugaron una Serie Mundial: un roster por liga.",
+    "pie": "Latino = nacido en Latinoamérica o el Caribe (incluye Puerto Rico y Curazao)."
+  },
+  "rosters": [
+    {
+      "archivo": "02_nacional.png",
+      "titulo": "LIGA NACIONAL",
+      "subtitulo": "Sin bateador designado, como jugó casi toda su historia",
+      "nota_pie": "Posición: la que jugó en su Serie Mundial o la principal de su carrera.",
+      "jugadores": [
+        {"pos": "C",  "nombre": "Yadier Molina",    "pais": "Puerto Rico",     "equipo": "Cardenales", "nota": "Campeón 2006 y 2011"},
+        {"pos": "1B", "nombre": "Albert Pujols",    "pais": "Rep. Dominicana", "equipo": "Cardenales", "nota": "Campeón 2006 y 2011"},
+        {"pos": "2B", "nombre": "Ketel Marte",      "pais": "Rep. Dominicana", "equipo": "D-backs",    "nota": "Serie Mundial 2023"},
+        {"pos": "3B", "nombre": "Tony Pérez",       "pais": "Cuba",            "equipo": "Rojos",      "nota": "Campeón 1975 y 1976"},
+        {"pos": "SS", "nombre": "Dave Concepción",  "pais": "Venezuela",       "equipo": "Rojos",      "nota": "Campeón 1975 y 1976"},
+        {"pos": "LF", "nombre": "Juan Soto",        "pais": "Rep. Dominicana", "equipo": "Nacionales", "nota": "Campeón 2019"},
+        {"pos": "CF", "nombre": "Andruw Jones",     "pais": "Curazao",         "equipo": "Bravos",     "nota": "2 HR en el J1 de 1996"},
+        {"pos": "RF", "nombre": "Roberto Clemente", "pais": "Puerto Rico",     "equipo": "Piratas",    "nota": "Campeón 1960 y 1971"},
+        {"pos": "SP", "nombre": "Juan Marichal",    "pais": "Rep. Dominicana", "equipo": "Gigantes",   "nota": "Serie Mundial 1962"},
+        {"pos": "RP", "nombre": "Kenley Jansen",    "pais": "Curazao",         "equipo": "Dodgers",    "nota": "Campeón 2020"}
+      ]
+    },
+    {
+      "archivo": "03_americana.png",
+      "titulo": "LIGA AMERICANA",
+      "subtitulo": "Con bateador designado: aquí batea el Big Papi",
+      "nota_pie": "Posición: la que jugó en su Serie Mundial o la principal de su carrera.",
+      "jugadores": [
+        {"pos": "C",  "nombre": "Iván Rodríguez",    "pais": "Puerto Rico",     "equipo": "Tigres",       "nota": "Serie Mundial 2006"},
+        {"pos": "1B", "nombre": "Miguel Cabrera",    "pais": "Venezuela",       "equipo": "Tigres",       "nota": "Serie Mundial 2012"},
+        {"pos": "2B", "nombre": "José Altuve",       "pais": "Venezuela",       "equipo": "Astros",       "nota": "Campeón 2017 y 2022"},
+        {"pos": "3B", "nombre": "Adrián Beltré",     "pais": "Rep. Dominicana", "equipo": "Rangers",      "nota": "Serie Mundial 2011"},
+        {"pos": "SS", "nombre": "Luis Aparicio",     "pais": "Venezuela",       "equipo": "Orioles",      "nota": "Campeón 1966"},
+        {"pos": "LF", "nombre": "Manny Ramírez",     "pais": "Rep. Dominicana", "equipo": "Medias Rojas", "nota": "MVP de la Serie 2004"},
+        {"pos": "CF", "nombre": "Bernie Williams",   "pais": "Puerto Rico",     "equipo": "Yankees",      "nota": "4 anillos"},
+        {"pos": "RF", "nombre": "Vladimir Guerrero", "pais": "Rep. Dominicana", "equipo": "Rangers",      "nota": "Serie Mundial 2010"},
+        {"pos": "SP", "nombre": "Pedro Martínez",    "pais": "Rep. Dominicana", "equipo": "Medias Rojas", "nota": "Campeón 2004"},
+        {"pos": "RP", "nombre": "Mariano Rivera",    "pais": "Panamá",          "equipo": "Yankees",      "nota": "5 anillos"},
+        {"pos": "DH", "nombre": "David Ortiz",       "pais": "Rep. Dominicana", "equipo": "Medias Rojas", "nota": "MVP de la Serie 2013"}
+      ]
+    }
+  ],
+  "textos": {
+    "angulo": "Equipo ideal latino de la Serie Mundial, uno por liga; Venezuela pone cuatro.",
+    "instagram": "⚾ Los mejores latinos que han jugado una Serie Mundial, posición por posición: un roster por la Liga Nacional y otro por la Americana.\n\nEn la Nacional manda la vieja escuela: Clemente, Tony Pérez, Marichal y Dave Concepción, con Yadier y Pujols de los Cardenales. En la Americana está el núcleo de las Medias Rojas de 2004 (Pedro, Manny y el Big Papi) y Mariano con sus cinco anillos.\n\n🇻🇪 Venezuela pone cuatro: Concepción en la Nacional; Aparicio, Altuve y Miguel Cabrera en la Americana.\n\n📌 Criterio: latinos (incluye Puerto Rico y Curazao) que jugaron al menos una Serie Mundial con un equipo de esa liga. La Nacional va sin bateador designado, como jugó casi toda su historia.\n\n¿A quién dejamos fuera? Rentería, Sandoval, Posada, Vizquel y Correa esperan en la banca. Te leemos 👇\n\n#SerieMundial #MLB #BeisbolLatino #Venezuela #MBP",
+    "hilo_x": [
+      "⚾ Los mejores latinos que han jugado una Serie Mundial, posición por posición. Un roster por la Liga Nacional y otro por la Americana. 🧵",
+      "Nacional: C Yadier Molina, 1B Pujols, 2B Ketel Marte, 3B Tony Pérez, SS Concepción 🇻🇪, LF Juan Soto, CF Andruw Jones, RF Clemente. Abridor Marichal y cerrador Kenley Jansen.",
+      "Americana: C Pudge Rodríguez, 1B Miguel Cabrera 🇻🇪, 2B Altuve 🇻🇪, 3B Beltré, SS Aparicio 🇻🇪, LF Manny, CF Bernie Williams, RF Vlad Guerrero y BD David Ortiz. Abridor Pedro y cerrador Mariano.",
+      "Criterio: latinos (incluye Puerto Rico y Curazao) que jugaron al menos una Serie Mundial con un equipo de esa liga. Venezuela pone cuatro. ¿A quién dejamos fuera? Rentería, Sandoval, Posada y Vizquel esperan en la banca 👇"
+    ],
+    "guion": "Si armamos un equipo solo con latinos que jugaron una Serie Mundial, ¿quién entra? En la Nacional: Yadier detrás del plato, Pujols en primera, Concepción en el campo corto y Clemente en el derecho, con Marichal abriendo y Kenley Jansen cerrando. En la Americana: Altuve en segunda, Aparicio en el campo corto, Miguel Cabrera en primera, Manny y Bernie en los jardines, el Big Papi de designado, Pedro abriendo y Mariano cerrando. Venezuela pone cuatro. ¿A quién dejamos fuera?"
+  }
+}

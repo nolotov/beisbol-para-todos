@@ -186,6 +186,17 @@ Requiere desplegar el `worker.js` nuevo en Cloudflare y los secretos `THREADS_AC
 `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN` y `X_ACCESS_SECRET`. Paso a paso en la wiki:
 [Publicación en Threads y X](https://github.com/nolotov/beisbol-para-todos/wiki/Publicacion-en-Threads-y-X).
 
+#### Especiales: publicaciones armadas a mano
+
+Un JSON en `content/especiales/` (portada, rosters y textos) se convierte en un paquete igual
+al del día: láminas 1080×1350, caption e hilo, y llega a Telegram con el menú de redes.
+
+```powershell
+python -m bpt especial --archivo content/especiales/latinos-serie-mundial.json
+```
+
+En GitHub: Actions → **Especial MBP** → *Run workflow* con la ruta del archivo.
+
 #### Historia del día: los juegos de hoy
 
 Una historia vertical (1080×1920) con la cartelera de hoy de la MLB y la LVBP en hora de
@@ -247,6 +258,7 @@ src/bpt/
   lvbp_resultados.py     # pipeline de la jornada LVBP: carrusel + resumen.json
   resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
   historia.py            # historia del día: cartelera de juegos de hoy (MLB + LVBP)
+  especial.py            # especiales armados a mano (content/especiales/*.json)
   redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
   notificar/telegram.py  # paquete del día a Telegram + botón de publicar
   publicar/              # fase 4: piezas, JPEG, menú por red y clientes de Instagram, Threads y X
