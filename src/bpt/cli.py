@@ -293,6 +293,24 @@ def cmd_historia(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_especial(args: argparse.Namespace) -> int:
+    from bpt import especial
+    try:
+        r = especial.generar(Path(args.archivo), salida=Path(args.salida), handle=args.handle)
+    except (especial.EspecialError, FileNotFoundError, KeyError) as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    print(f"[ok] {r['titular']}")
+    print(f"     Láminas: {', '.join(r['tarjetas'])}")
+    for a in r["alertas"]:
+        print(f"  ⚠️ {a}")
+    print(f"Carpeta: {r['carpeta']}")
+    if args.github_output:
+        with open(args.github_output, "a", encoding="utf-8") as f:
+            f.write(f"carpeta={r['carpeta']}\n")
+    return 0
+
+
 def cmd_notificar(args: argparse.Namespace) -> int:
     from bpt.notificar import telegram
     carpeta = _carpeta_mlb(args)
@@ -648,6 +666,13 @@ def main(argv: list[str] | None = None) -> int:
     hi.add_argument("--handle", default=theme.HANDLE)
     hi.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
     hi.set_defaults(func=cmd_historia)
+
+    es = sub.add_parser("especial", help="Láminas y textos de un especial (content/especiales/*.json)")
+    es.add_argument("--archivo", required=True)
+    es.add_argument("--salida", default="output/especiales")
+    es.add_argument("--handle", default=theme.HANDLE)
+    es.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
+    es.set_defaults(func=cmd_especial)
 
     nt = sub.add_parser("notificar", help="Enviar el paquete del día a Telegram")
     nt.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")

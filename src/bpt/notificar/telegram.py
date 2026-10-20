@@ -216,6 +216,8 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
         return _enviar_jornada(carpeta, resumen, por_pk.get("jornada"), tg, originales)
     if resumen.get("formato") == "historia":
         return _enviar_historia(carpeta, resumen, tg, originales)
+    if resumen.get("formato") == "especial":
+        return _enviar_especial(carpeta, resumen, por_pk.get("especial"), tg, originales)
 
     juegos = resumen.get("juegos", [])
     if not juegos:
@@ -305,6 +307,26 @@ def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: boo
         tg.album(imagenes[:1], como_archivo=True, leyenda="Original para la historia")
     ofrecer_publicar(tg, carpeta, "1")
     return resumen["total"]
+
+
+def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
+                     originales: bool) -> int:
+    """Especial: láminas, textos y menú de redes (igual que una pieza del día)."""
+    imagenes = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
+    if not imagenes:
+        return 0
+    if r is None:
+        enc = "Sin textos: solo láminas."
+    else:
+        enc = encabezado(r, 1, 1).split("\n", 1)[1]
+    tg.texto(f"⭐ Especial · {resumen['titular']}\n{enc}\n\nNada se publica sin tu ok. 👇")
+    tg.album(imagenes)
+    if originales:
+        tg.album(imagenes, como_archivo=True, leyenda="Originales para subir")
+    if r is not None:
+        _textos(tg, r["textos"])
+        ofrecer_publicar(tg, carpeta, "1")
+    return 1
 
 
 def chats_recientes(token: str, http=requests) -> list[dict]:
