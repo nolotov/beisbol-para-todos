@@ -150,3 +150,41 @@ def test_telegram_manda_la_historia_especial_con_su_boton(historia, monkeypatch)
     assert ultimo["text"].startswith("📲 Historia · Rays a la Serie Mundial")
     filas = json.loads(ultimo["reply_markup"])["inline_keyboard"]
     assert any("pub:4343:1" in b["callback_data"] for f in filas for b in f)
+
+
+# --- Carrusel por bloques (content/especiales con "laminas") ---------------------------------
+
+PREVIA = Path(__file__).parents[1] / "content" / "especiales" / "previa-serie-mundial-2026.json"
+
+
+@pytest.fixture(scope="module")
+def previa(tmp_path_factory):
+    r = especial.generar(PREVIA, tmp_path_factory.mktemp("previa"))
+    return Path(r["carpeta"]), r
+
+
+def test_previa_pasa_las_revisiones_y_dibuja_cada_lamina(previa):
+    carpeta, r = previa
+    assert r["alertas"] == []
+    datos = json.loads(PREVIA.read_text(encoding="utf-8"))
+    assert len(r["tarjetas"]) == len(datos["laminas"])
+    assert r["tarjetas"][0] == "01_portada.png"
+    for t in r["tarjetas"]:
+        assert Image.open(carpeta / t).size == (1080, 1350)
+
+
+def test_previa_es_un_carrusel_publicable_en_las_tres_redes(previa):
+    carpeta, r = previa
+    [p] = piezas.piezas(carpeta)
+    assert p.id == "1" and p.tipo != piezas.HISTORIA
+    assert len(p.imagenes) == len(r["tarjetas"])
+    assert p.redes("itx") == "itx"
+
+
+def test_lamina_de_tipo_desconocido_se_rechaza(tmp_path):
+    datos = json.loads(PREVIA.read_text(encoding="utf-8"))
+    datos["laminas"] = [{"tipo": "inventada", "titulo": "x"}]
+    malo = tmp_path / "malo.json"
+    malo.write_text(json.dumps(datos), encoding="utf-8")
+    with pytest.raises(especial.EspecialError):
+        especial.generar(malo, tmp_path)

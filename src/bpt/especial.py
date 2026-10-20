@@ -1,7 +1,9 @@
 """Especiales: publicaciones armadas a mano (no salen de un resultado del día).
 
 Un especial es un JSON en `content/especiales/` con la portada, uno o más rosters y los textos
-(caption de Instagram, hilo para X/Threads y guion). Con `"tipo": "historia"` es, en cambio,
+(caption de Instagram, hilo para X/Threads y guion). En vez de rosters puede traer
+"laminas" (carrusel por bloques: portada, cifras, barras, cara_a_cara, camino, figuras; ver
+`bpt.viz.carrusel_card`) con los dos "equipos" del duelo. Con `"tipo": "historia"` es, en cambio,
 una historia de Instagram de una sola lámina 1080x1920 (bloque "historia": titular, marcador,
 figuras, dato y lo que viene), sin caption ni hilo. `generar` dibuja las láminas y deja la
 carpeta igual que un paquete diario: resumen.json (formato "especial") y textos.json. Desde
@@ -38,9 +40,18 @@ def cargar(archivo: Path) -> dict:
             if campo not in h:
                 raise EspecialError(f"a la historia especial le falta 'historia.{campo}'")
         return datos
-    for campo in ("slug", "titular", "rosters", "textos"):
+    for campo in ("slug", "titular", "textos"):
         if campo not in datos:
             raise EspecialError(f"al especial le falta '{campo}'")
+    if not datos.get("rosters") and not datos.get("laminas"):
+        raise EspecialError("al especial le faltan 'rosters' o 'laminas'")
+    if datos.get("laminas"):
+        from bpt.viz.carrusel_card import tipos_validos
+        if set(datos.get("equipos", {})) != {"A", "B"}:
+            raise EspecialError("un especial con 'laminas' necesita 'equipos' con A y B")
+        for i, l in enumerate(datos["laminas"], 1):
+            if l.get("tipo") not in tipos_validos():
+                raise EspecialError(f"lámina {i}: tipo desconocido '{l.get('tipo')}'")
     t = datos["textos"]
     if not t.get("instagram") or not t.get("hilo_x"):
         raise EspecialError("el especial necesita caption de Instagram e hilo")
@@ -89,12 +100,21 @@ def generar(archivo: Path, salida: Path = SALIDA, handle: str = theme.HANDLE) ->
 
     if datos.get("portada"):
         p = datos["portada"]
-        cuenta = paises(datos["rosters"])
+        cuenta = paises(datos.get("rosters", []))
         render_portada(p["titulo"], p.get("subtitulo", ""), cuenta,
                        sum(n for _, n in cuenta), carpeta / "01_portada.png",
                        pie=p.get("pie"), fuente=fuente, handle=handle)
         tarjetas.append("01_portada.png")
-    for r in datos["rosters"]:
+    laminas = datos.get("laminas", [])
+    if laminas:
+        from bpt.viz.carrusel_card import render_lamina
+        total = len(laminas)
+        for i, l in enumerate(laminas, 1):
+            nombre = f"{i:02d}_{l['tipo']}.png"
+            render_lamina(l, datos["equipos"], carpeta / nombre, pagina=f"{i}/{total}",
+                          fuente=fuente, handle=handle)
+            tarjetas.append(nombre)
+    for r in datos.get("rosters", []):
         render_roster(r["titulo"], r.get("subtitulo", ""), r["jugadores"],
                       carpeta / r["archivo"], nota_pie=r.get("nota_pie"), fuente=fuente,
                       handle=handle)

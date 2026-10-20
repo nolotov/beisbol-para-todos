@@ -1,0 +1,480 @@
+{
+ "slug": "previa-serie-mundial-2026",
+ "fecha": "2026-10-20",
+ "titular": "Previa de la Serie Mundial 2026 · Rays vs. Cerveceros",
+ "fuente": "Datos: MLB Stats API · Forbes · AP",
+ "equipos": {
+  "A": {
+   "nombre": "Rays",
+   "liga": "Campeón de la Liga Americana",
+   "color": "#7FB2E5"
+  },
+  "B": {
+   "nombre": "Cerveceros",
+   "liga": "Campeón de la Liga Nacional",
+   "color": "#F5B700"
+  }
+ },
+ "laminas": [
+  {
+   "tipo": "portada",
+   "etiqueta": "MBP  ·  PREVIA  ·  SERIE MUNDIAL 2026",
+   "titulo": "UN CAMPEÓN\nNUEVO",
+   "subtitulo": "Juego 1: viernes 23 de octubre en Milwaukee\n8:03 p. m. hora de Venezuela",
+   "datos": {
+    "A": [
+     {
+      "cifra": "98-64",
+      "texto": "mejor récord de la Americana"
+     },
+     {
+      "cifra": "$110 M",
+      "texto": "nómina: puesto 28 de 30"
+     },
+     {
+      "cifra": "0",
+      "texto": "títulos · 3.ª Serie Mundial"
+     }
+    ],
+    "B": [
+     {
+      "cifra": "103-59",
+      "texto": "mejor récord de MLB"
+     },
+     {
+      "cifra": "$154 M",
+      "texto": "nómina: puesto 19 de 30"
+     },
+     {
+      "cifra": "0",
+      "texto": "títulos · 2.ª Serie Mundial"
+     }
+    ]
+   },
+   "remate": {
+    "cifra": "1980",
+    "texto": "La última vez que dos equipos sin título se vieron en una\nSerie Mundial (Filis vs. Reales). Han pasado 46 años."
+   }
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "NADIE TIENE\nANILLO",
+   "subtitulo": "Gane quien gane, el trofeo estrena dueño",
+   "ancho_cifra": 0.27,
+   "items": [
+    {
+     "cifra": "0 - 0",
+     "texto": "Series Mundiales ganadas entre los dos.\nLos Rays nacieron en 1998; los Cerveceros, en 1969."
+    },
+    {
+     "cifra": "1980",
+     "texto": "Último duelo entre dos equipos sin título:\nlos Filis le ganaron 4-2 a los Reales."
+    },
+    {
+     "cifra": "1982",
+     "equipo": "B",
+     "texto": "La única Serie de Milwaukee: perdió 4-3 con los\nCardenales, cuando jugaba en la Liga Americana."
+    },
+    {
+     "cifra": "2008\n2020",
+     "equipo": "A",
+     "tamano": 24,
+     "texto": "Rays: cayeron 4-1 con los Filis en 2008\ny 4-2 con los Dodgers en 2020."
+    },
+    {
+     "cifra": "5 → 4",
+     "texto": "Equipos de MLB sin título: Cerveceros, Rays, Rockies,\nPadres y Marineros. Esta Serie borra a uno."
+    }
+   ],
+   "nota": "Milwaukee es el 2.º equipo con banderín en las dos ligas (el otro: Houston)."
+  },
+  {
+   "tipo": "barras",
+   "titulo": "LA SERIE DE\nLOS PRESUPUESTOS",
+   "subtitulo": "Nómina 2026 para el impuesto de lujo",
+   "barras": [
+    {
+     "etiqueta": "Dodgers",
+     "detalle": "1.º · barridos por Milwaukee",
+     "valor": 422,
+     "texto": "$422 M"
+    },
+    {
+     "etiqueta": "Cerveceros",
+     "detalle": "19.º de 30",
+     "equipo": "B",
+     "valor": 154,
+     "texto": "$154 M"
+    },
+    {
+     "etiqueta": "Rays",
+     "detalle": "28.º de 30",
+     "equipo": "A",
+     "valor": 110,
+     "texto": "$110 M"
+    }
+   ],
+   "conclusion": {
+    "cifra": "63 %",
+    "texto": "Rays y Cerveceros juntos ($264 M) gastan\nmenos de dos tercios de lo que gastan\nsolo los Dodgers."
+   },
+   "nota": "El campeón tendrá la nómina más baja desde los Reales de 2015.",
+   "fuente": "Nóminas: Forbes / FanGraphs · AP"
+  },
+  {
+   "tipo": "camino",
+   "titulo": "CÓMO LLEGAN",
+   "subtitulo": "Los dos fueron 1.º sembrado y se saltaron el comodín",
+   "equipos": {
+    "A": {
+     "record": "7-2",
+     "record_nota": "en postemporada\n98-64 en la temporada",
+     "series": [
+      {
+       "ronda": "Divisional",
+       "rival": "Yankees",
+       "resultado": "3-0",
+       "juegos": [
+        "1-0",
+        "5-2",
+        "4-3"
+       ]
+      },
+      {
+       "ronda": "Campeonato",
+       "rival": "Guardianes",
+       "resultado": "4-2",
+       "juegos": [
+        "3-7",
+        "3-1",
+        "2-3",
+        "7-3",
+        "3-1",
+        "7-3"
+       ]
+      }
+     ],
+     "cierre": "Iban abajo 2-1 ante Cleveland\ny cerraron con 3 triunfos seguidos."
+    },
+    "B": {
+     "record": "7-1",
+     "record_nota": "en postemporada\n103-59 en la temporada",
+     "series": [
+      {
+       "ronda": "Divisional",
+       "rival": "Padres",
+       "resultado": "3-1",
+       "juegos": [
+        "3-2",
+        "4-3",
+        "3-4",
+        "3-1"
+       ]
+      },
+      {
+       "ronda": "Campeonato",
+       "rival": "Dodgers",
+       "resultado": "4-0",
+       "juegos": [
+        "2-1",
+        "7-4",
+        "6-2",
+        "6-4"
+       ]
+      }
+     ],
+     "cierre": "Barrieron a los bicampeones.\n6 de sus 7 triunfos fueron remontando."
+    }
+   },
+   "nota": "Marcadores desde el lado de cada equipo."
+  },
+  {
+   "tipo": "cara_a_cara",
+   "titulo": "CARA A CARA",
+   "subtitulo": "Temporada regular 2026 · entre paréntesis, su puesto en MLB",
+   "filas": [
+    {
+     "stat": "Diferencial",
+     "ayuda": "carreras anotadas menos permitidas",
+     "A": "+86",
+     "rank_A": "6.º",
+     "B": "+214",
+     "rank_B": "1.º",
+     "mejor": "B"
+    },
+    {
+     "stat": "Carreras anotadas",
+     "A": "736",
+     "rank_A": "12.º",
+     "B": "832",
+     "rank_B": "2.º",
+     "mejor": "B"
+    },
+    {
+     "stat": "Jonrones",
+     "A": "169",
+     "rank_A": "22.º",
+     "B": "154",
+     "rank_B": "28.º (emp.)",
+     "mejor": "A"
+    },
+    {
+     "stat": "Promedio",
+     "A": ".258",
+     "rank_A": "1.º (emp.)",
+     "B": ".258",
+     "rank_B": "1.º (emp.)",
+     "mejor": "ambos"
+    },
+    {
+     "stat": "Embasado (OBP)",
+     "A": ".326",
+     "rank_A": "5.º (emp.)",
+     "B": ".341",
+     "rank_B": "1.º",
+     "mejor": "B"
+    },
+    {
+     "stat": "Bases robadas",
+     "A": "164",
+     "rank_A": "2.º (emp.)",
+     "B": "162",
+     "rank_B": "5.º",
+     "mejor": "A"
+    },
+    {
+     "stat": "Ponches recibidos",
+     "ayuda": "menos es mejor",
+     "A": "1.145",
+     "rank_A": "1.º",
+     "B": "1.383",
+     "rank_B": "20.º",
+     "mejor": "A"
+    },
+    {
+     "stat": "EFE",
+     "A": "3.70",
+     "rank_A": "7.º",
+     "B": "3.51",
+     "rank_B": "2.º",
+     "mejor": "B"
+    },
+    {
+     "stat": "WHIP",
+     "ayuda": "boletos + hits por entrada",
+     "A": "1.14",
+     "rank_A": "1.º (emp.)",
+     "B": "1.18",
+     "rank_B": "4.º",
+     "mejor": "A"
+    },
+    {
+     "stat": "Salvados",
+     "A": "58",
+     "rank_A": "1.º",
+     "B": "55",
+     "rank_B": "2.º",
+     "mejor": "A"
+    }
+   ],
+   "nota": "En color, el mejor de los dos en cada renglón."
+  },
+  {
+   "tipo": "figuras",
+   "titulo": "A QUIÉN SEGUIR",
+   "subtitulo": "Temporada 2026 y, debajo, lo que llevan en octubre",
+   "jugadores": {
+    "A": [
+     {
+      "rol": "3B",
+      "nombre": "Junior Caminero",
+      "pais": "Rep. Dominicana",
+      "linea": ".276 · 42 HR · 101 CI",
+      "nota": "Post: .273, 1 HR, 4 CI"
+     },
+     {
+      "rol": "BD",
+      "nombre": "Yandy Díaz",
+      "pais": "Cuba",
+      "linea": ".293 · 22 HR · 85 CI",
+      "nota": "Post: .308, 2 HR"
+     },
+     {
+      "rol": "Abridor",
+      "nombre": "Drew Rasmussen",
+      "pais": "EE. UU.",
+      "linea": "16-5 · 2.67 EFE · 174 K",
+      "nota": "Post: 2-0, 1.29 EFE en 21 IP"
+     },
+     {
+      "rol": "Abridor",
+      "nombre": "Freddy Peralta",
+      "pais": "Rep. Dominicana",
+      "linea": "5-2 · 3.25 EFE con TB",
+      "nota": "Post: 2-0, 1.08 EFE · MVP de la SCLA"
+     },
+     {
+      "rol": "Cerrador",
+      "nombre": "Bryan Baker",
+      "pais": "EE. UU.",
+      "linea": "41 SV · 1.44 EFE",
+      "nota": "Post: 5 SV, 0.00 EFE en 7 IP"
+     }
+    ],
+    "B": [
+     {
+      "rol": "Abridor",
+      "nombre": "Jacob Misiorowski",
+      "pais": "EE. UU.",
+      "linea": "16-5 · 1.80 EFE · 252 K",
+      "nota": "WHIP 0.80 · Post: 3.24 EFE"
+     },
+     {
+      "rol": "Receptor",
+      "nombre": "William Contreras",
+      "pais": "Venezuela",
+      "linea": ".270 · 18 HR · 94 CI",
+      "nota": "Post: .367, 3 HR, 1.157 OPS"
+     },
+     {
+      "rol": "Jardinero",
+      "nombre": "Jackson Chourio",
+      "pais": "Venezuela",
+      "linea": ".291 · 25 HR · 23 BR",
+      "nota": "Post: 2 HR, 7 CI"
+     },
+     {
+      "rol": "1B",
+      "nombre": "Jake Bauers",
+      "pais": "EE. UU.",
+      "linea": ".266 · 26 HR · .873 OPS",
+      "nota": "MVP de la SCLN"
+     },
+     {
+      "rol": "Cerrador",
+      "nombre": "Trevor Megill",
+      "pais": "EE. UU.",
+      "linea": "30 SV · 2.63 EFE",
+      "nota": "Post: 4 SV, 0.00 EFE en 5.2 IP"
+     }
+    ]
+   }
+  },
+  {
+   "tipo": "cifras",
+   "etiqueta": "MBP  ·  SELLO VENEZOLANO",
+   "titulo": "VENEZUELA\nJUEGA CON MILWAUKEE",
+   "subtitulo": "Los cuatro venezolanos del roster de los Cerveceros",
+   "ancho_cifra": 0.24,
+   "items": [
+    {
+     "cifra": "4",
+     "venezolano": true,
+     "texto": "Jackson Chourio, William Contreras,\nLuis Lara y Antonio Senzatela."
+    },
+    {
+     "cifra": "3",
+     "venezolano": true,
+     "texto": "Chourio, Contreras y Senzatela ganaron el Clásico\nen marzo: pueden ser campeones del mundo\ndos veces en 2026."
+    },
+    {
+     "cifra": ".367",
+     "venezolano": true,
+     "tamano": 36,
+     "texto": "Contreras en octubre: 11 hits en 30 turnos,\n3 jonrones y 1.157 de OPS."
+    },
+    {
+     "cifra": "J2",
+     "venezolano": true,
+     "texto": "Chourio dejó en el terreno a los Padres en la Divisional\ncon un jonrón de 2 carreras ante Mason Miller."
+    }
+   ],
+   "nota": "Chourio en la temporada: .291, 25 HR, 75 CI y 23 bases robadas."
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "SE CONOCEN\nDE MEMORIA",
+   "subtitulo": "El enfrentamiento de 2026 y los que cambiaron de bando",
+   "ancho_cifra": 0.24,
+   "items": [
+    {
+     "cifra": "2-1",
+     "equipo": "B",
+     "texto": "Milwaukee ganó la única serie del año (30 mar-1 abr,\nen casa): 2-3, 6-2 y 8-2. Le anotó 16 a 7 carreras."
+    },
+    {
+     "cifra": "7 K",
+     "equipo": "B",
+     "texto": "Misiorowski ya los enfrentó: 6 IP, 2 carreras, 7 K\nel 1 de abril. Se espera ante Rasmussen en el Juego 1."
+    },
+    {
+     "cifra": "2",
+     "equipo": "A",
+     "texto": "Abridores de los Rays que salieron de Milwaukee: Peralta\n(Cerveceros 2017-25) y Rasmussen (cambiado en 2021)."
+    },
+    {
+     "cifra": "MVP",
+     "equipo": "B",
+     "tamano": 36,
+     "texto": "Jake Bauers, MVP de la serie ante los Dodgers,\ndebutó en Grandes Ligas con los Rays en 2018."
+    },
+    {
+     "cifra": "9",
+     "equipo": "B",
+     "texto": "Años de Matt Arnold en los Rays antes de llegar a\nMilwaukee. Hoy dirige las operaciones de los Cerveceros."
+    }
+   ]
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "LO QUE NO\nSE VE A SIMPLE VISTA",
+   "subtitulo": "Datos de la temporada regular",
+   "ancho_cifra": 0.25,
+   "items": [
+    {
+     "cifra": ".258",
+     "texto": "Rays y Cerveceros terminaron empatados\ncon el mejor promedio de bateo de MLB."
+    },
+    {
+     "cifra": "1.145",
+     "equipo": "A",
+     "tamano": 36,
+     "texto": "Ponches de los Rays: nadie se ponchó menos.\nMeten la pelota en juego y corren (164 robos)."
+    },
+    {
+     "cifra": "2.º",
+     "equipo": "B",
+     "texto": "Milwaukee fue 2.º en carreras y 28.º en jonrones.\nNadie terminaba top 3 en una y bottom 3 en la\notra desde los Medias Blancas de 1960."
+    },
+    {
+     "cifra": "58",
+     "equipo": "A",
+     "texto": "Salvados de los Rays, más que nadie. Bryan Baker\npuso 41 con 1.44 de EFE."
+    },
+    {
+     "cifra": "252",
+     "equipo": "B",
+     "texto": "Ponches de Misiorowski, con 0.80 de WHIP en\n174.2 IP y más de 1.000 pitcheos de 100+ mph."
+    },
+    {
+     "cifra": "31/10",
+     "tamano": 34,
+     "texto": "Un Juego 7 sería en Milwaukee en Halloween:\nprobablemente la primera Serie Mundial toda bajo techo."
+    }
+   ],
+   "fuente": "Datos: MLB Stats API · MLB.com · AP"
+  }
+ ],
+ "textos": {
+  "angulo": "Previa: dos equipos sin título y de nómina baja; datos de temporada, octubre, rosters, enfrentamientos y sello venezolano.",
+  "instagram": "⚾ Serie Mundial 2026: Rays vs. Cerveceros. Gane quien gane, habrá campeón nuevo.\n\n🏆 Ninguno de los dos tiene anillo. Es la primera Serie Mundial entre dos equipos sin título desde 1980 (Filis vs. Reales).\n\n💰 Juntos tienen $264 M de nómina, el 63 % de lo que gastan solo los Dodgers. Milwaukee barrió a los bicampeones.\n\n📊 Lo que no se ve: terminaron empatados con el mejor promedio de MLB (.258). Los Rays fueron el equipo que menos se ponchó, y Milwaukee fue 2.º en carreras pero 28.º en jonrones.\n\n🔁 Se conocen: los Rays abren con dos ex-Cerveceros (Peralta y Rasmussen), y el MVP de Milwaukee, Jake Bauers, debutó con Tampa Bay.\n\n🇻🇪 Chourio, Contreras, Lara y Senzatela juegan con Milwaukee. Tres de ellos ya ganaron el Clásico este año.\n\n🗓️ Juego 1: viernes 23 de octubre en Milwaukee, 8:03 p. m. hora de Venezuela.\n\n¿Quién se lleva su primer anillo? Te leemos 👇\n\n#SerieMundial #WorldSeries #Rays #Brewers #MLB #Venezuela #MBP",
+  "hilo_x": [
+   "⚾ Previa de la Serie Mundial 2026: Rays vs. Cerveceros. Ninguno tiene título: es el primer duelo así desde 1980 (Filis vs. Reales). Juego 1 el viernes 23 en Milwaukee. 🧵",
+   "💰 La Serie de los presupuestos: Cerveceros $154 M (19.º) y Rays $110 M (28.º). Juntos suman el 63 % de la nómina de los Dodgers, a los que Milwaukee barrió en la Serie de Campeonato.",
+   "📊 Cara a cara: empatados con el mejor promedio de MLB (.258). Milwaukee: mejor diferencial (+214) y OBP (.341). Rays: los que menos se poncharon, mejor WHIP y más salvados (58).",
+   "🔁 Se conocen de memoria: Peralta y Rasmussen salieron de Milwaukee y hoy abren por los Rays. Jake Bauers, MVP ante los Dodgers, debutó con Tampa Bay. En abril, Milwaukee ganó la serie 2-1.",
+   "🇻🇪 Chourio, Contreras, Lara y Senzatela juegan con Milwaukee. Contreras batea .367 con 3 HR en octubre, y tres de ellos ya ganaron el Clásico en marzo. ¿Quién se lleva su primer anillo? 👇"
+  ],
+  "guion": "Rays contra Cerveceros: una Serie Mundial que va a coronar a un campeón nuevo. No pasaba desde 1980 que dos equipos sin título se vieran en la Serie. Los dos juntos gastan el 63 % de lo que gastan solo los Dodgers, y Milwaukee los barrió. Terminaron empatados con el mejor promedio de las mayores; los Rays casi no se ponchan y Milwaukee anota sin jonrones. Y se conocen: Peralta y Rasmussen salieron de Milwaukee, y Bauers debutó con Tampa. Cuatro venezolanos juegan con Milwaukee. ¿Quién gana su primer anillo?"
+ }
+}

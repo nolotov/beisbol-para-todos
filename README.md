@@ -203,6 +203,11 @@ sale una sola lámina 1080x1920 para historias de Instagram. Llega a Telegram co
 "📲 Publicar historia en Instagram", igual que la historia del día. Ejemplo:
 `content/especiales/rays-banderin-2026.json`.
 
+**Carrusel por bloques.** En vez de `rosters`, un especial puede traer `equipos` (A y B, con
+nombre y color) y `laminas`: una lista de láminas 1080x1350 de tipo `portada`, `cifras`,
+`barras`, `cara_a_cara`, `camino` o `figuras` (ver `src/bpt/viz/carrusel_card.py`). Sirve para
+previas y duelos. Ejemplo: `content/especiales/previa-serie-mundial-2026.json` (9 láminas).
+
 #### Historia del día: los juegos de hoy
 
 Una historia vertical (1080×1920) con la cartelera de hoy de la MLB y la LVBP en hora de
