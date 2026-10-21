@@ -208,6 +208,56 @@ nombre y color) y `laminas`: una lista de láminas 1080x1350 de tipo `portada`, 
 `barras`, `cara_a_cara`, `camino` o `figuras` (ver `src/bpt/viz/carrusel_card.py`). Sirve para
 previas y duelos. Ejemplo: `content/especiales/previa-serie-mundial-2026.json` (9 láminas).
 
+**Verificador.** Cada especial pasa por `bpt.verificador` antes de llegar a Telegram: los
+números de los textos tienen que estar en las láminas, las láminas en la evidencia (si el JSON
+trae `evidencia` o `evidencia_archivo`) y los hechos del bloque `verificar` se comprueban otra
+vez contra MLB Stats API (récord, marcador, línea, estadística de temporada). Sin bloquear:
+lo que no cuadra deja la pieza "con alertas".
+
+```powershell
+python -m bpt verificar --archivo content/especiales/previa-serie-mundial-2026.json
+```
+
+#### Agente editor: propuestas de especiales
+
+El editor busca la historia del día (o arma el tema que le pidas), consulta MLB Stats API y
+Statcast con herramientas, calcula las cifras derivadas con una calculadora, arma el especial
+(carrusel o historia) y lo entrega al verificador: si alguna cifra no salió de una consulta,
+se lo devuelve para que corrija. Llega a Telegram como "🧠 Propuesta del editor", con el
+porqué, otras ideas y el menú de redes. En el paquete quedan `<slug>.json` y
+`<slug>.evidencia.json`: copiados a `content/especiales/`, el especial queda en el repo.
+
+```powershell
+python -m bpt editor                                   # tema libre, hoy
+python -m bpt editor --tema "el mejor venezolano de la semana en la LVBP"
+```
+
+En GitHub: Actions → **Editor MBP** → *Run workflow*. Diario a las 11:43 de Santiago con la
+variable de repo `EDITOR_DIARIO = 1`. Modelo: `MODELO_EDITOR` (por defecto Sonnet 5.5).
+
+#### Métricas: qué funcionó
+
+Cada publicación queda anotada en la rama `metricas`. Los lunes, **Métricas MBP** pide los
+números de los últimos 28 días a Instagram, Threads y X, manda el informe por Telegram y
+escribe `aprendizajes.md`, que el editor lee antes de elegir. Requiere los permisos
+`instagram_business_manage_insights` y `threads_manage_insights` en la app de Meta.
+
+```powershell
+python -m bpt metricas --registro ruta/publicaciones.jsonl --salida ruta --enviar
+```
+
+#### Reels: las láminas con voz
+
+`bpt reel` arma un video vertical por pieza con sus láminas, la voz del guion (edge-tts, voz
+venezolana `es-VE-SebastianNeural`; cámbiala con `BPT_VOZ`) y subtítulos. Sin voz sale mudo,
+para ponerle música en la app. Con la variable `REELS = 1` se arman solos y llegan a Telegram
+con "🎬 Publicar Reel en Instagram".
+
+```powershell
+pip install -e ".[video]"
+python -m bpt reel --carpeta output/especiales/previa-serie-mundial-2026
+```
+
 #### Historia del día: los juegos de hoy
 
 Una historia vertical (1080×1920) con la cartelera de hoy de la MLB y la LVBP en hora de
@@ -270,6 +320,10 @@ src/bpt/
   resultados.py          # pipeline de resultados MLB: tarjetas + resumen.json
   historia.py            # historia del día: cartelera de juegos de hoy (MLB + LVBP)
   especial.py            # especiales armados a mano (content/especiales/*.json)
+  verificador.py         # verificador de especiales: cifras, evidencia, hechos y reglas
+  editor/                # agente editor: herramientas de datos, bucle con Claude y entrega
+  metricas/              # fase 5: insights de cada red, informe y aprendizajes
+  video/reel.py          # Reels: láminas + voz del guion + subtítulos (ffmpeg)
   redactor/              # agente redactor: prompt de marca, llamada a Claude y validador de cifras
   notificar/telegram.py  # paquete del día a Telegram + botón de publicar
   publicar/              # fase 4: piezas, JPEG, menú por red y clientes de Instagram, Threads y X
@@ -301,5 +355,8 @@ scripts/setup.ps1        # bootstrap del entorno en Windows
 - [x] Publicación en Instagram desde Telegram
 - [x] Historia diaria con los juegos de hoy
 - [x] Publicación en Threads y X desde Telegram
+- [x] Verificador de especiales y agente editor
+- [x] Métricas semanales con aprendizajes para el editor
+- [x] Reels con voz venezolana
 
 Datos: Baseball Savant, FanGraphs, Baseball-Reference vía [pybaseball](https://github.com/jldbc/pybaseball).

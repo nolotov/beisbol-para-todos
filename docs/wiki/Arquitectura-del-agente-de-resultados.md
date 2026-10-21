@@ -206,7 +206,7 @@ Hoja de ruta:
 3. **Fase 2, agente redactor con validador** — completada.
 4. **Fase 3, aprobación desde el teléfono** — completada con Telegram, en modalidad de revisión y publicación manual.
 5. **Fase 4, publicación** — Instagram completado en la versión 0.6.0: botón en Telegram, relé en Cloudflare Workers y workflow `publicar.yml`. Detalle en [Publicación en Instagram](Publicacion-en-Instagram). Threads y X se sumaron en la 0.8.0 con un menú por red: [Publicación en Threads y X](Publicacion-en-Threads-y-X).
-6. **Fase 5, métricas** — pendiente. Resumen semanal de alcance y guardados para que el redactor aprenda de lo que funcionó.
+6. **Fase 5, métricas** — completada en la 0.14.0, junto con el verificador de especiales (0.12.0), el agente editor (0.13.0) y los Reels (0.15.0): [Editor, métricas y Reels](Editor-metricas-y-Reels).
 
 ## Glosario
 
