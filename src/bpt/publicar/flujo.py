@@ -79,6 +79,7 @@ class Resultado:
     motivo: str = ""
     parcial: bool = False       # hilo a medias: no se ofrece reintentar (saldría repetido)
     duplicado: bool = False
+    media_id: str = ""          # id de la publicación en la red (para las métricas)
 
     def linea(self, historia: bool = False) -> str:
         nombre = redes.NOMBRES[self.red]
@@ -117,12 +118,27 @@ def publicar_redes(plan: dict, destino: str, base_url: str | None, carpeta_jpeg:
             else:
                 hecho = cliente.publicar_hilo([Path(carpeta_jpeg) / a for a in archivos],
                                               plan.get("hilo") or [])
-            salida.append(Resultado(red, True, hecho.permalink, duplicado=hecho.duplicado))
+            salida.append(Resultado(red, True, hecho.permalink, duplicado=hecho.duplicado,
+                                    media_id=str(hecho.media_id or "")))
         except (th.PublicacionParcial, xx.PublicacionParcial) as e:
             salida.append(Resultado(red, False, e.permalink, str(e), parcial=True))
         except ERRORES as e:
             salida.append(Resultado(red, False, motivo=str(e)))
     return salida
+
+
+def registro(plan: dict, resultados: list[Resultado], run_id: str,
+             ahora: str | None = None) -> list[dict]:
+    """Una fila por red publicada, para la rama `metricas` (publicaciones.jsonl). Los
+    duplicados no se registran (ya se registraron la primera vez)."""
+    from datetime import datetime, timezone
+    ahora = ahora or datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return [{"fecha_utc": ahora, "run_id": str(run_id), "pieza": plan.get("pieza"),
+             "titular": plan.get("titular"), "tipo": plan.get("tipo", "post"),
+             "formato": plan.get("formato", "resultado"), "red": r.red,
+             "media_id": r.media_id, "permalink": r.permalink,
+             "laminas": len(plan.get("archivos", []))}
+            for r in resultados if r.ok and not r.duplicado and r.media_id]
 
 
 def avisar_resultados(tg: telegram.Telegram, plan: dict, resultados: list[Resultado],

@@ -37,6 +37,9 @@ class Pieza:
     alertas: list[str] = field(default_factory=list)
     tipo: str = "post"            # "post" (imagen o carrusel) o "historia"
     hilo: list[str] = field(default_factory=list)   # hilo_x del redactor (X y Threads)
+    # Para las métricas: resultado (MLB), jornada (LVBP), especial, editor, historia_dia,
+    # historia_especial
+    formato: str = "resultado"
 
     @property
     def tiene_alertas(self) -> bool:
@@ -71,7 +74,8 @@ def piezas(carpeta: Path) -> list[Pieza]:
         if not (r and imgs):
             return []
         return [Pieza("1", resumen["titular"], imgs, r["textos"]["instagram"], _alertas(r),
-                      hilo=list(r["textos"].get("hilo_x") or []))]
+                      hilo=list(r["textos"].get("hilo_x") or []),
+                      formato="editor" if resumen.get("editor") else "especial")]
     if resumen.get("formato") == HISTORIA:
         imgs = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
         if not imgs:
@@ -81,7 +85,9 @@ def piezas(carpeta: Path) -> list[Pieza]:
         else:
             from bpt.historia import titular
             nombre = titular(resumen)
-        return [Pieza("1", f"Historia · {nombre}", imgs[:1], "", tipo=HISTORIA)]
+        formato = "historia_especial" if resumen.get("titular") else "historia_dia"
+        return [Pieza("1", f"Historia · {nombre}", imgs[:1], "", tipo=HISTORIA,
+                      formato=formato)]
     tp = carpeta / "textos.json"
     redactados = json.loads(tp.read_text(encoding="utf-8")) if tp.exists() else []
     por_pk = {r["game_pk"]: r for r in redactados}
@@ -94,7 +100,7 @@ def piezas(carpeta: Path) -> list[Pieza]:
             liga = resumen.get("liga", "LVBP")
             salida.append(Pieza(JORNADA, f"{liga} · Jornada del {resumen['fecha']}", imgs,
                                 r["textos"]["instagram"], _alertas(r),
-                                hilo=list(r["textos"].get("hilo_x") or [])))
+                                hilo=list(r["textos"].get("hilo_x") or []), formato=JORNADA))
         return salida
 
     for n, j in enumerate(resumen.get("juegos", []), 1):
@@ -154,4 +160,4 @@ def preparar(pieza: Pieza, destino: Path, prefijo: str) -> dict:
         archivos.append(rel)
     return {"pieza": pieza.id, "tipo": pieza.tipo, "titular": pieza.titular,
             "caption": pieza.caption, "hilo": pieza.hilo, "alertas": pieza.alertas,
-            "archivos": archivos}
+            "formato": pieza.formato, "archivos": archivos}

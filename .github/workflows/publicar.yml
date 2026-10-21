@@ -151,10 +151,31 @@ jobs:
           BASE: ${{ steps.subir.outputs.base }}
         run: |
           ARGS=(--plan plan.json --destino "$DESTINO" --quedan "$QUEDAN" --carpeta publico
-                --run-id "$RUN_ID")
+                --run-id "$RUN_ID" --registro registro.jsonl)
           if [ -n "$BASE" ]; then ARGS+=(--base-url "$BASE"); fi
           if [ -n "$MESSAGE_ID" ]; then ARGS+=(--message-id "$MESSAGE_ID"); fi
           python -m bpt publicar-redes "${ARGS[@]}"
+
+      # Fase 5: lo publicado se anota en la rama `metricas` (publicaciones.jsonl) para que el
+      # workflow "Métricas MBP" pida sus números. Si esto falla, la publicación ya salió.
+      - name: Anotar en la rama metricas
+        if: ${{ always() && hashFiles('registro.jsonl') != '' }}
+        continue-on-error: true
+        run: |
+          URL="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          for intento in 1 2 3; do
+            rm -rf rama-metricas
+            if ! git clone -q --depth 1 --branch metricas "$URL" rama-metricas 2>/dev/null; then
+              mkdir rama-metricas && git -C rama-metricas init -q -b metricas
+            fi
+            cat registro.jsonl >> rama-metricas/publicaciones.jsonl
+            git -C rama-metricas add publicaciones.jsonl
+            git -C rama-metricas -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" \
+              commit -qm "Publicación: run $RUN_ID, pieza $PIEZA ($DESTINO)"
+            if git -C rama-metricas push -q "$URL" HEAD:metricas; then echo "Anotado"; exit 0; fi
+            sleep $((intento * 5))
+          done
+          echo "::warning::No se pudo anotar la publicación en la rama metricas"
 
       # Solo si el fallo fue ANTES de publicar: si publicar-redes ya avisó, no se repite.
       - name: Avisar en Telegram si falló

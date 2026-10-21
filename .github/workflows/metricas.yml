@@ -1,0 +1,97 @@
+# Métricas MBP (fase 5): cada lunes pide a Instagram, Threads y X los números de lo publicado
+# en los últimos 28 días (anotado por "Publicar en redes" en la rama metricas), manda el
+# informe por Telegram y deja aprendizajes.md en la rama para que el editor lo lea.
+#
+# Permisos: Instagram necesita instagram_business_manage_insights y Threads,
+# threads_manage_insights (app de Meta). Sin ellos, el informe dice qué falta y sigue con
+# las demás redes. Leer métricas de X cuesta (pago por uso): se apaga con METRICAS_X = 0.
+name: Métricas MBP
+
+on:
+  schedule:
+    # Lunes 12:17 UTC = 09:17 en Santiago (UTC-3)
+    - cron: "17 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # escribir la foto y los aprendizajes en la rama metricas
+
+concurrency:
+  group: metricas
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  metricas:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+      THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+      X_API_KEY: ${{ vars.METRICAS_X != '0' && secrets.X_API_KEY || '' }}
+      X_API_SECRET: ${{ secrets.X_API_SECRET }}
+      X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+      X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        run: pip install -e .
+
+      - name: Traer la rama metricas
+        run: |
+          URL="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if ! git clone -q --depth 1 --branch metricas "$URL" rama-metricas 2>/dev/null; then
+            mkdir rama-metricas && git -C rama-metricas init -q -b metricas
+            echo "Todavía no hay rama metricas: se crea con esta corrida"
+          fi
+
+      - name: Métricas e informe
+        run: |
+          python -m bpt metricas --registro rama-metricas/publicaciones.jsonl \
+            --salida rama-metricas --imagen output/metricas/informe.png --enviar | tee salida.txt
+
+      - name: Guardar en la rama metricas
+        run: |
+          URL="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          cd rama-metricas
+          git add -A
+          if git diff --cached --quiet; then echo "Nada nuevo"; exit 0; fi
+          git -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" \
+            commit -qm "Métricas $(date -u +%F)"
+          for intento in 1 2 3; do
+            if git push -q "$URL" HEAD:metricas; then exit 0; fi
+            git pull -q --rebase "$URL" metricas || true
+            sleep $((intento * 5))
+          done
+          exit 1
+
+      - name: Avisar por Telegram si algo falló
+        if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode text="⚠️ MBP: fallaron las métricas semanales. Revisa: ${URL}"
+
+      - name: Resumen del run
+        if: always()
+        run: |
+          echo '### Métricas MBP' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

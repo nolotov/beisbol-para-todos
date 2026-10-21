@@ -351,6 +351,30 @@ def cmd_editor(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_metricas(args: argparse.Namespace) -> int:
+    """Métricas de lo publicado: foto, informe para Telegram y aprendizajes para el editor."""
+    from bpt import metricas
+    from bpt.notificar import telegram
+    foto, texto, apr, img = metricas.ejecutar(Path(args.registro), Path(args.salida),
+                                             _clientes(), imagen=Path(args.imagen))
+    print(texto)
+    if apr:
+        print("\n--- aprendizajes.md ---\n" + apr)
+    if args.enviar:
+        tg = _tg_opcional()
+        if tg is None:
+            print("[aviso] Sin credenciales de Telegram: no se envía el informe", file=sys.stderr)
+        else:
+            try:
+                if img:
+                    tg.album([img], leyenda="📈 Alcance por formato")
+                tg.texto(texto)
+            except telegram.TelegramError as e:
+                print(f"[error] Telegram: {e}", file=sys.stderr)
+                return 1
+    return 0
+
+
 def cmd_verificar(args: argparse.Namespace) -> int:
     """Verifica un especial sin dibujarlo: cifras, evidencia, hechos y reglas de marca."""
     import json
@@ -585,6 +609,12 @@ def cmd_publicar_redes(args: argparse.Namespace) -> int:
     for r in resultados:
         print(("[ok] " if r.ok else "[error] ") + r.linea(plan.get("tipo") == "historia")
               .replace("\n", " · "))
+    if args.registro:
+        filas = flujo.registro(plan, resultados, args.run_id)
+        if filas:
+            with open(args.registro, "a", encoding="utf-8") as f:
+                for fila in filas:
+                    f.write(json.dumps(fila, ensure_ascii=False) + "\n")
     tg = _tg_opcional() if args.message_id else None
     if tg:
         try:
@@ -746,6 +776,13 @@ def main(argv: list[str] | None = None) -> int:
     ed.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
     ed.set_defaults(func=cmd_editor)
 
+    me = sub.add_parser("metricas", help="Métricas de lo publicado e informe semanal")
+    me.add_argument("--registro", default="metricas/publicaciones.jsonl")
+    me.add_argument("--salida", default="metricas", help="Carpeta de la rama metricas")
+    me.add_argument("--imagen", default="output/metricas/informe.png")
+    me.add_argument("--enviar", action="store_true", help="Mandar el informe por Telegram")
+    me.set_defaults(func=cmd_metricas)
+
     ve = sub.add_parser("verificar", help="Verificar las cifras de un especial (sin dibujarlo)")
     ve.add_argument("--archivo", required=True)
     ve.add_argument("--evidencia", default=None, help="JSON con la evidencia (reemplaza la del especial)")
@@ -822,6 +859,8 @@ def main(argv: list[str] | None = None) -> int:
     pz.add_argument("--carpeta", default="publico", help="Carpeta local de los JPEG (X)")
     pz.add_argument("--run-id", default="0", help="Run del paquete (para el botón de reintentar)")
     pz.add_argument("--message-id", default=None, help="Mensaje de Telegram del botón")
+    pz.add_argument("--registro", default=None,
+                    help="Archivo .jsonl donde anotar lo publicado (para las métricas)")
     pz.add_argument("--motivo", default="motivo.txt")
     pz.add_argument("--avisado", default="avisado.txt",
                     help="Se crea si el resultado ya se avisó en Telegram")
