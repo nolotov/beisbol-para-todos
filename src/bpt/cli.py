@@ -302,6 +302,8 @@ def cmd_especial(args: argparse.Namespace) -> int:
         return 1
     print(f"[ok] {r['titular']}")
     print(f"     Láminas: {', '.join(r['tarjetas'])}")
+    if r.get("verificacion"):
+        print(f"     {r['verificacion']['resumen']}")
     for a in r["alertas"]:
         print(f"  ⚠️ {a}")
     print(f"Carpeta: {r['carpeta']}")
@@ -309,6 +311,29 @@ def cmd_especial(args: argparse.Namespace) -> int:
         with open(args.github_output, "a", encoding="utf-8") as f:
             f.write(f"carpeta={r['carpeta']}\n")
     return 0
+
+
+def cmd_verificar(args: argparse.Namespace) -> int:
+    """Verifica un especial sin dibujarlo: cifras, evidencia, hechos y reglas de marca."""
+    import json
+
+    from bpt import especial, verificador
+    try:
+        datos = especial.cargar(Path(args.archivo))
+    except (especial.EspecialError, FileNotFoundError, KeyError, ValueError) as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    evidencia = (json.loads(Path(args.evidencia).read_text(encoding="utf-8"))
+                 if args.evidencia else None)
+    v = verificador.verificar(datos, evidencia=evidencia, hechos=not args.sin_hechos)
+    print(v.resumen())
+    if v.cifras_sin_respaldo:
+        print("  ❌ Cifras sin respaldo: " + ", ".join(v.cifras_sin_respaldo))
+    for a in v.alertas:
+        print(f"  ⚠️ {a}")
+    if v.ok:
+        print("  ✅ Todo en orden")
+    return 0 if v.ok else 2
 
 
 def cmd_notificar(args: argparse.Namespace) -> int:
@@ -673,6 +698,12 @@ def main(argv: list[str] | None = None) -> int:
     es.add_argument("--handle", default=theme.HANDLE)
     es.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
     es.set_defaults(func=cmd_especial)
+
+    ve = sub.add_parser("verificar", help="Verificar las cifras de un especial (sin dibujarlo)")
+    ve.add_argument("--archivo", required=True)
+    ve.add_argument("--evidencia", default=None, help="JSON con la evidencia (reemplaza la del especial)")
+    ve.add_argument("--sin-hechos", action="store_true", help="No consultar MLB Stats API")
+    ve.set_defaults(func=cmd_verificar)
 
     nt = sub.add_parser("notificar", help="Enviar el paquete del día a Telegram")
     nt.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")

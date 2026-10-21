@@ -299,6 +299,11 @@ def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: boo
         return 0
     if resumen.get("especial"):
         leyenda = f"📲 Historia especial · {resumen['titular']}"
+        ver = resumen.get("verificacion") or {}
+        if ver.get("resumen"):
+            leyenda += "\n" + ver["resumen"]
+            if not ver.get("ok"):
+                leyenda += "\n⚠️ " + "\n⚠️ ".join(_alertas_verificacion(ver))
     else:
         lineas = []
         for liga, datos in resumen.get("ligas", {}).items():
@@ -312,6 +317,13 @@ def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: boo
     return resumen["total"]
 
 
+def _alertas_verificacion(ver: dict) -> list[str]:
+    salida = list(ver.get("alertas") or [])
+    if ver.get("cifras_sin_respaldo"):
+        salida.append("cifras sin respaldo: " + ", ".join(ver["cifras_sin_respaldo"]))
+    return salida
+
+
 def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
                      originales: bool) -> int:
     """Especial: láminas, textos y menú de redes (igual que una pieza del día)."""
@@ -322,7 +334,18 @@ def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
         enc = "Sin textos: solo láminas."
     else:
         enc = encabezado(r, 1, 1).split("\n", 1)[1]
-    tg.texto(f"⭐ Especial · {resumen['titular']}\n{enc}\n\nNada se publica sin tu ok. 👇")
+    ver = (resumen.get("verificacion") or {}).get("resumen")
+    if ver:
+        enc += "\n" + ver
+    editor = resumen.get("editor") or {}
+    cabeza = "🧠 Propuesta del editor" if editor else "⭐ Especial"
+    extra = ""
+    if editor.get("por_que"):
+        extra += f"\n\nPor qué ahora: {editor['por_que']}"
+    if editor.get("otras_ideas"):
+        extra += "\n\nOtras ideas (pídelas con el workflow «Editor MBP» y el tema):\n" + \
+            "\n".join(f"• {i}" for i in editor["otras_ideas"][:5])
+    tg.texto(f"{cabeza} · {resumen['titular']}\n{enc}{extra}\n\nNada se publica sin tu ok. 👇")
     tg.album(imagenes)
     if originales:
         tg.album(imagenes, como_archivo=True, leyenda="Originales para subir")
