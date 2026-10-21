@@ -65,7 +65,9 @@ def menu(run_id: str, pieza: str, quedan: str, historia: bool = False) -> list[l
     if not quedan:
         return []
     if len(quedan) == 1:
-        if quedan == "i":
+        if quedan == "i" and pieza.startswith("r"):
+            texto = "🎬 Publicar Reel en Instagram"
+        elif quedan == "i":
             texto = "📲 Publicar historia en Instagram" if historia else "📸 Publicar en Instagram"
         else:
             texto = f"{BOTON[quedan]}: publicar"

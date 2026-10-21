@@ -102,6 +102,7 @@ def publicar_redes(plan: dict, destino: str, base_url: str | None, carpeta_jpeg:
     archivos = plan.get("archivos", [])
     urls = [base_url.rstrip("/") + "/" + rel for rel in archivos] if base_url else []
     historia = plan.get("tipo") == piezas.HISTORIA
+    reel = plan.get("tipo") == piezas.REEL
     salida: list[Resultado] = []
     for red in redes.normalizar(destino):
         try:
@@ -110,9 +111,12 @@ def publicar_redes(plan: dict, destino: str, base_url: str | None, carpeta_jpeg:
             cliente = clientes[red]()
             if red == "i":
                 hecho = (cliente.publicar_historia(urls[0]) if historia
+                         else cliente.publicar_reel(urls[0], plan["caption"]) if reel
                          else cliente.publicar(urls, plan["caption"]))
             elif historia:
                 raise th.ThreadsError("las historias solo existen en Instagram")
+            elif reel:
+                raise th.ThreadsError("los Reels por ahora solo van a Instagram")
             elif red == "t":
                 hecho = cliente.publicar_hilo(urls, plan.get("hilo") or [])
             else:

@@ -104,6 +104,13 @@ class Telegram:
                 "reply_markup": json.dumps({"inline_keyboard": filas or []})}
         self._llamar("editMessageText", data)
 
+    def video(self, archivo: Path, leyenda: str | None = None) -> None:
+        """Un video (hasta 50 MB por la API de bots), reproducible en el chat."""
+        with open(archivo, "rb") as f:
+            self._llamar("sendVideo", {"chat_id": self.chat_id, "caption": leyenda or "",
+                                       "supports_streaming": "true", "width": "1080",
+                                       "height": "1920"}, {"video": f})
+
     def album(self, imagenes: list[Path], como_archivo: bool = False,
               leyenda: str | None = None) -> None:
         """Hasta 10 imágenes en un solo mensaje (fotos o documentos)."""
@@ -161,11 +168,11 @@ def callback_publicar(run_id: str, pieza: str, destino: str = "i", quedan: str =
 
 
 def texto_publicar(titular: str, alertas: bool, historia: bool = False,
-                   quedan: str = "i") -> str:
+                   quedan: str = "i", reel: bool = False) -> str:
     """El primer párrafo es la "base" que el relé conserva al editar el mensaje."""
     from bpt.publicar import redes
     aviso = " · ⚠️ con alertas" if alertas else ""
-    icono = "📲" if historia else "📸"
+    icono = "🎬" if reel else "📲" if historia else "📸"
     return f"{icono} {titular}{aviso}\n\n{redes.pregunta(quedan)}"
 
 
@@ -183,8 +190,28 @@ def ofrecer_publicar(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
         return False
     run_id = os.environ["GITHUB_RUN_ID"]
     historia = p.tipo == piezas.HISTORIA
-    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia, quedan),
+    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia, quedan,
+                              reel=p.tipo == piezas.REEL),
                redes.menu(run_id, p.id, quedan, historia))
+    return True
+
+
+def ofrecer_reel(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
+    """Si la pieza tiene Reel (reel_<id>.mp4), lo manda y ofrece publicarlo en Instagram."""
+    carpeta = Path(carpeta)
+    video = carpeta / f"reel_{pieza_id}.mp4"
+    if not video.exists():
+        return False
+    info = {}
+    try:
+        resumen = json.loads((carpeta / "resumen.json").read_text(encoding="utf-8"))
+        info = (resumen.get("reels") or {}).get(pieza_id) or {}
+    except (OSError, ValueError):
+        pass
+    detalle = f" · {info['duracion']:.0f} s" if info.get("duracion") else ""
+    voz = "" if not info else (" · con voz" if info.get("voz") else " · sin voz: ponle música")
+    tg.video(video, leyenda=f"🎬 Reel{detalle}{voz}")
+    ofrecer_publicar(tg, carpeta, f"r{pieza_id}")
     return True
 
 
@@ -249,6 +276,7 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
             tg.texto(f"𝕏 {i}/{len(hilo)}\n\n{tuit}")
         tg.texto("🎙️ GUION (30-45 s)\n\n" + t["guion"])
         ofrecer_publicar(tg, carpeta, str(n))
+        ofrecer_reel(tg, carpeta, str(n))
     return len(juegos)
 
 
@@ -289,6 +317,7 @@ def _enviar_jornada(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
     if r is not None:
         _textos(tg, r["textos"])
         ofrecer_publicar(tg, carpeta, "jornada")
+        ofrecer_reel(tg, carpeta, "jornada")
     return len(juegos)
 
 
@@ -356,6 +385,7 @@ def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
     if r is not None:
         _textos(tg, r["textos"])
         ofrecer_publicar(tg, carpeta, "1")
+        ofrecer_reel(tg, carpeta, "1")
     return 1
 
 

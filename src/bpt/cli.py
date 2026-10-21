@@ -375,6 +375,26 @@ def cmd_metricas(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_reel(args: argparse.Namespace) -> int:
+    """Reels de un paquete: láminas + voz venezolana del guion (reel_<id>.mp4)."""
+    from bpt.video import reel
+    carpeta = Path(args.carpeta)
+    if not (carpeta / "resumen.json").exists():
+        print(f"[error] No existe {carpeta / 'resumen.json'}", file=sys.stderr)
+        return 1
+    try:
+        hechos = reel.armar_paquete(carpeta, voz=not args.sin_voz, handle=args.handle)
+    except reel.ReelError as e:
+        print(f"[error] Reel: {e}", file=sys.stderr)
+        return 1
+    if not hechos:
+        print("[aviso] Ninguna pieza con guion: no hay Reels")
+    for h in hechos:
+        voz = "con voz" if h["voz"] else f"SIN voz · {h['aviso']}"
+        print(f"[ok] Pieza {h['pieza']}: {h['archivo']} · {h['duracion']} s · {voz}")
+    return 0
+
+
 def cmd_verificar(args: argparse.Namespace) -> int:
     """Verifica un especial sin dibujarlo: cifras, evidencia, hechos y reglas de marca."""
     import json
@@ -782,6 +802,12 @@ def main(argv: list[str] | None = None) -> int:
     me.add_argument("--imagen", default="output/metricas/informe.png")
     me.add_argument("--enviar", action="store_true", help="Mandar el informe por Telegram")
     me.set_defaults(func=cmd_metricas)
+
+    rl = sub.add_parser("reel", help="Reels de un paquete (láminas + voz del guion)")
+    rl.add_argument("--carpeta", required=True, help="Carpeta del paquete (con resumen.json)")
+    rl.add_argument("--sin-voz", action="store_true", help="Mudo (para ponerle música en la app)")
+    rl.add_argument("--handle", default=theme.HANDLE)
+    rl.set_defaults(func=cmd_reel)
 
     ve = sub.add_parser("verificar", help="Verificar las cifras de un especial (sin dibujarlo)")
     ve.add_argument("--archivo", required=True)

@@ -20,7 +20,8 @@
 const WORKFLOW = "publicar.yml";
 // accion:run:pieza  (formato corto: solo Instagram)  o  accion:run:pieza:destino:quedan
 // destino y quedan son letras de red: i = Instagram, t = Threads, x = X.
-const DATA = /^(pub|ok|no):(\d{1,20}):(\d{1,2}|jornada)(?::([itx]{1,3}):([itx]{1,3}))?$/;
+// La pieza "r1", "rjornada"... es el Reel de esa pieza (solo Instagram).
+const DATA = /^(pub|ok|no):(\d{1,20}):(r?(?:\d{1,2}|jornada))(?::([itx]{1,3}):([itx]{1,3}))?$/;
 
 // Mismo menú que src/bpt/publicar/redes.py: si cambias un texto allá, cámbialo aquí.
 const ORDEN = "itx";
@@ -47,7 +48,9 @@ export function menu(runId, pieza, quedan, historia = false) {
   if (quedan.length === 1) {
     const texto =
       quedan === "i"
-        ? historia ? "📲 Publicar historia en Instagram" : "📸 Publicar en Instagram"
+        ? String(pieza).startsWith("r")
+          ? "🎬 Publicar Reel en Instagram"
+          : historia ? "📲 Publicar historia en Instagram" : "📸 Publicar en Instagram"
         : `${BOTON[quedan]}: publicar`;
     return [[{ text: texto, callback_data: callback("pub", runId, pieza, quedan, quedan) }]];
   }
