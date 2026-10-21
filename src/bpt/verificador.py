@@ -86,7 +86,9 @@ def permitidas(evidencia) -> set[str]:
                 walk(w)
 
     walk(evidencia)
-    return base | horas
+    # La zafra de la LVBP se escribe "2026-27": con 2026 en la evidencia, vale el 27.
+    zafras = {f"{(int(n) + 1) % 100:02d}" for n in base if n.isdigit() and 1900 <= int(n) <= 2100}
+    return base | horas | {V._norm(z) for z in zafras}
 
 
 def contenido_visible(especial: dict) -> dict:
@@ -285,7 +287,8 @@ def verificar(especial: dict, evidencia: list | None = None, get: Fuente | None 
     """Revisa un especial ya cargado. `evidencia` reemplaza a la que traiga el especial."""
     if evidencia is None:
         evidencia = especial.get("evidencia")
-    v = Verificacion(parcial=not evidencia, consultas=len(evidencia or []))
+    # None = sin evidencia (verificación parcial). Una lista vacía sí exige: nada respalda nada.
+    v = Verificacion(parcial=evidencia is None, consultas=len(evidencia or []))
     visible = contenido_visible(especial)
     en_laminas = cifras_de(visible)
     textos = textos_de(especial)
@@ -297,7 +300,7 @@ def verificar(especial: dict, evidencia: list | None = None, get: Fuente | None 
     respaldo = permitidas(evidencia) if evidencia else set()
     sin: list[str] = []
     # Capa 2: láminas contra la evidencia
-    if evidencia:
+    if evidencia is not None:
         sin += sorted((n for n in en_laminas if n not in respaldo), key=_orden)
     # Capa 1: textos contra láminas (o evidencia)
     base_textos = (en_laminas | {n.split(".")[0] for n in en_laminas if "." in n}

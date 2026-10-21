@@ -313,6 +313,44 @@ def cmd_especial(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_editor(args: argparse.Namespace) -> int:
+    """Agente editor: busca la historia, consulta los datos y arma un especial verificado."""
+    from bpt import editor
+    from bpt.editor.agente import EditorError
+    from bpt.historia import hoy_ven
+    from bpt.redactor.agente import LlaveInvalida
+
+    fecha = args.fecha or hoy_ven()
+    aprendizajes = None
+    if args.aprendizajes and Path(args.aprendizajes).exists():
+        aprendizajes = Path(args.aprendizajes).read_text(encoding="utf-8").strip() or None
+    tema = (args.tema or "").strip() or None
+    print(f"🧠 Editor MBP · {fecha}" + (f" · tema: {tema}" if tema else " · tema libre"))
+    try:
+        r = editor.ejecutar(fecha, tema, salida=Path(args.salida), handle=args.handle,
+                            aprendizajes=aprendizajes)
+    except (EditorError, LlaveInvalida, RuntimeError) as e:
+        print(f"[error] Editor: {e}", file=sys.stderr)
+        return 1
+    ed = r["editor"]
+    print(f"[ok] {r['titular']}")
+    print(f"     Por qué: {ed['por_que']}")
+    print(f"     Láminas: {', '.join(r['tarjetas'])}")
+    print(f"     {r['verificacion']['resumen']}")
+    for a in r["alertas"]:
+        print(f"  ⚠️ {a}")
+    costo = ed.get("costo_usd")
+    print(f"     {ed['consultas']} consultas · {ed['vueltas']} vueltas · "
+          f"{ed['correcciones']} correcciones" + (f" · ~US$ {costo:.3f}" if costo else ""))
+    for i in ed["otras_ideas"]:
+        print(f"     💡 {i}")
+    print(f"Carpeta: {r['carpeta']}")
+    if args.github_output:
+        with open(args.github_output, "a", encoding="utf-8") as f:
+            f.write(f"carpeta={r['carpeta']}\n")
+    return 0
+
+
 def cmd_verificar(args: argparse.Namespace) -> int:
     """Verifica un especial sin dibujarlo: cifras, evidencia, hechos y reglas de marca."""
     import json
@@ -698,6 +736,15 @@ def main(argv: list[str] | None = None) -> int:
     es.add_argument("--handle", default=theme.HANDLE)
     es.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
     es.set_defaults(func=cmd_especial)
+
+    ed = sub.add_parser("editor", help="Agente editor: propone y arma un especial verificado")
+    ed.add_argument("--fecha", default=None, help="AAAA-MM-DD; por defecto, hoy (hora de Venezuela)")
+    ed.add_argument("--tema", default=None, help="Tema pedido; vacío = el agente elige")
+    ed.add_argument("--salida", default="output/editor")
+    ed.add_argument("--handle", default=theme.HANDLE)
+    ed.add_argument("--aprendizajes", default=None, help="Archivo con lo aprendido de las métricas")
+    ed.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
+    ed.set_defaults(func=cmd_editor)
 
     ve = sub.add_parser("verificar", help="Verificar las cifras de un especial (sin dibujarlo)")
     ve.add_argument("--archivo", required=True)

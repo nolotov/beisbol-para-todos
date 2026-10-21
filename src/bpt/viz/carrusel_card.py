@@ -9,6 +9,8 @@ datos que no salen de un resultado del día. Tipos:
   - cara_a_cara: tabla de estadísticas de los dos equipos con su puesto en MLB.
   - camino:      cómo llegó cada equipo (récord y series de postemporada).
   - figuras:     los jugadores a seguir de cada equipo, en dos columnas.
+  - portada_tema: portada de un tema que no es un duelo (un jugador, una liga, una racha):
+                 titular, dato grande y hasta 3 datos de apoyo. No usa "equipos".
 
 Los equipos se nombran en el bloque "equipos" del especial ({"A": {...}, "B": {...}}) con su
 nombre y color. Venezolanos en verde LVBP (regla de marca). Sin logos.
@@ -110,6 +112,45 @@ def _portada(fig, num, l, eq):
                  color=theme.BG, va="center", family=num)
         fig.text(X0 + 0.035, y_r + 0.036, r["texto"], fontsize=17, color=theme.BG,
                  va="center", linespacing=1.3)
+
+
+def _portada_tema(fig, num, l, eq):
+    fig.text(X0, 0.905, l.get("etiqueta", "MBP"), fontsize=15, color=theme.ACCENT, va="top",
+             family=num)
+    fig.text(X0, 0.870, l["titulo"], fontsize=l.get("tamano_titulo", 66), weight="bold",
+             color=theme.TEXT, va="top", linespacing=0.92)
+    lineas = l["titulo"].count("\n") + 1
+    y = 0.870 - 0.074 * lineas - 0.022
+    if l.get("subtitulo"):
+        fig.text(X0, y, l["subtitulo"], fontsize=19, color=theme.MUTED, va="top",
+                 linespacing=1.35)
+        y -= 0.031 * (l["subtitulo"].count("\n") + 1) + 0.03
+    d = l.get("dato")
+    if d:
+        alto = 0.20
+        y -= alto
+        color = theme.LVBP if es_venezolano(d) else theme.ACCENT
+        _caja(fig, X0, y, ANCHO, alto, color)
+        fig.text(X0 + 0.04, y + alto * 0.62, d["cifra"], fontsize=d.get("tamano", 72),
+                 weight="bold", color=theme.BG, va="center", family=num)
+        fig.text(X0 + 0.04, y + alto * 0.20, d["texto"], fontsize=17, color=theme.BG,
+                 va="center", linespacing=1.3)
+        y -= 0.03
+    puntos = l.get("puntos", [])[:3]
+    if puntos:
+        n = len(puntos)
+        sep = 0.02
+        w = (ANCHO - sep * (n - 1)) / n
+        alto = 0.17
+        for i, p in enumerate(puntos):
+            x = X0 + i * (w + sep)
+            _caja(fig, x, y - alto, w, alto, theme.SURFACE)
+            color = theme.LVBP if es_venezolano(p) else theme.ACCENT
+            _caja(fig, x, y - 0.008, w, 0.008, color, r=0.003)
+            fig.text(x + 0.025, y - 0.06, p["cifra"], fontsize=p.get("tamano", 34),
+                     weight="bold", color=theme.TEXT, va="center", family=num)
+            fig.text(x + 0.025, y - 0.12, p["texto"], fontsize=13, color=theme.MUTED,
+                     va="center", linespacing=1.3)
 
 
 def _cifras(fig, num, l, eq, y):
@@ -252,8 +293,12 @@ TIPOS = {"cifras": _cifras, "barras": _barras, "cara_a_cara": _cara_a_cara,
          "camino": _camino, "figuras": _figuras}
 
 
+# Tipos que dibujan a los dos equipos del duelo: necesitan "equipos" con A y B.
+CON_EQUIPOS = {"portada", "cara_a_cara", "camino", "figuras"}
+
+
 def tipos_validos() -> set[str]:
-    return set(TIPOS) | {"portada"}
+    return set(TIPOS) | {"portada", "portada_tema"}
 
 
 def render_lamina(l: dict, equipos: dict, out_path: Path, pagina: str = "",
@@ -261,8 +306,11 @@ def render_lamina(l: dict, equipos: dict, out_path: Path, pagina: str = "",
     fonts = theme.apply()
     num = fonts["number"]
     fig = plt.figure(figsize=(W, H), dpi=100)
+    equipos = equipos or {}
     if l["tipo"] == "portada":
         _portada(fig, num, l, equipos)
+    elif l["tipo"] == "portada_tema":
+        _portada_tema(fig, num, l, equipos)
     else:
         y = _cabecera(fig, num, l)
         TIPOS[l["tipo"]](fig, num, l, equipos, y)

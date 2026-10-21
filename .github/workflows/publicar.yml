@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: "Número del run de 'Resultados MLB/LVBP' o 'Historia del día' que trae el paquete"
+        description: "Número del run de 'Resultados MLB/LVBP', 'Historia del día', 'Especial MBP' o 'Editor MBP' que trae el paquete"
         required: true
       pieza:
         description: "1, 2... (juego MLB, en el orden de Telegram), jornada (LVBP) o 1 (historia)"
@@ -101,9 +101,9 @@ jobs:
         id: paquete
         run: |
           NOMBRE=$(gh run view "$RUN_ID" -R "$REPO" --json workflowName --jq .workflowName 2>/dev/null || true)
-          if [[ "$NOMBRE" != Resultados* && "$NOMBRE" != "Historia del día" && "$NOMBRE" != "Especial MBP" ]]; then
-            echo "el run $RUN_ID no es de resultados, historia ni especial" > motivo.txt
-            echo "::error::El run $RUN_ID no es de 'Resultados MLB/LVBP', 'Historia del día' ni 'Especial MBP' ($NOMBRE)"; exit 1
+          if [[ "$NOMBRE" != Resultados* && "$NOMBRE" != "Historia del día" && "$NOMBRE" != "Especial MBP" && "$NOMBRE" != "Editor MBP" ]]; then
+            echo "el run $RUN_ID no es de resultados, historia, especial ni editor" > motivo.txt
+            echo "::error::El run $RUN_ID no es de 'Resultados MLB/LVBP', 'Historia del día', 'Especial MBP' ni 'Editor MBP' ($NOMBRE)"; exit 1
           fi
           if ! gh run download "$RUN_ID" -R "$REPO" -D paquete; then
             echo "no encontré el paquete del run $RUN_ID (¿venció o aún se está subiendo?)" > motivo.txt

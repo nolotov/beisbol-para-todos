@@ -298,7 +298,11 @@ def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: boo
     if not resumen.get("total") or not imagenes:
         return 0
     if resumen.get("especial"):
-        leyenda = f"📲 Historia especial · {resumen['titular']}"
+        prefijo = "🧠 Propuesta del editor (historia)" if resumen.get("editor") else \
+            "📲 Historia especial"
+        leyenda = f"{prefijo} · {resumen['titular']}"
+        if (resumen.get("editor") or {}).get("por_que"):
+            leyenda += f"\nPor qué ahora: {resumen['editor']['por_que']}"
         ver = resumen.get("verificacion") or {}
         if ver.get("resumen"):
             leyenda += "\n" + ver["resumen"]

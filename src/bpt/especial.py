@@ -56,12 +56,13 @@ def validar_estructura(datos: dict) -> dict:
     if not datos.get("rosters") and not datos.get("laminas"):
         raise EspecialError("al especial le faltan 'rosters' o 'laminas'")
     if datos.get("laminas"):
-        from bpt.viz.carrusel_card import tipos_validos
-        if set(datos.get("equipos", {})) != {"A", "B"}:
-            raise EspecialError("un especial con 'laminas' necesita 'equipos' con A y B")
+        from bpt.viz.carrusel_card import CON_EQUIPOS, tipos_validos
         for i, l in enumerate(datos["laminas"], 1):
             if l.get("tipo") not in tipos_validos():
                 raise EspecialError(f"lámina {i}: tipo desconocido '{l.get('tipo')}'")
+        usa_equipos = any(l["tipo"] in CON_EQUIPOS for l in datos["laminas"])
+        if (usa_equipos or datos.get("equipos")) and set(datos.get("equipos", {})) != {"A", "B"}:
+            raise EspecialError("un especial con duelo necesita 'equipos' con A y B")
     t = datos["textos"]
     if not t.get("instagram") or not t.get("hilo_x"):
         raise EspecialError("el especial necesita caption de Instagram e hilo")
@@ -102,6 +103,8 @@ def _generar_historia(datos: dict, carpeta: Path, handle: str,
     resumen = {"formato": HISTORIA, "especial": True, "slug": datos["slug"],
                "fecha": datos.get("fecha", ""), "titular": datos["titular"], "total": 1,
                "tarjetas": [ARCHIVO_HISTORIA], "ligas": {}, "verificacion": ver.to_dict()}
+    if datos.get("editor"):
+        resumen["editor"] = datos["editor"]
     (carpeta / "resumen.json").write_text(json.dumps(resumen, ensure_ascii=False, indent=1),
                                           encoding="utf-8")
     resumen["carpeta"] = str(carpeta)
@@ -149,7 +152,7 @@ def generar_datos(datos: dict, salida: Path = SALIDA, handle: str = theme.HANDLE
         total = len(laminas)
         for i, l in enumerate(laminas, 1):
             nombre = f"{i:02d}_{l['tipo']}.png"
-            render_lamina(l, datos["equipos"], carpeta / nombre, pagina=f"{i}/{total}",
+            render_lamina(l, datos.get("equipos", {}), carpeta / nombre, pagina=f"{i}/{total}",
                           fuente=fuente, handle=handle)
             tarjetas.append(nombre)
     for r in datos.get("rosters", []):
