@@ -290,3 +290,39 @@ def test_ya_publicados_ignora_la_evidencia(tmp_path):
                                      encoding="utf-8")
     (tmp_path / "a.evidencia.json").write_text("[]", encoding="utf-8")
     assert editor.ya_publicados(tmp_path) == ["2026-10-20 · A"]
+
+
+def test_con_el_sdk_real_usa_streaming(monkeypatch):
+    """El SDK rechaza max_tokens alto sin streaming (ValueError antes de llamar a la API)."""
+    import anthropic
+
+    client = anthropic.Anthropic(api_key="sk-ant-prueba-sin-red", max_retries=0,
+                                 base_url="http://127.0.0.1:9")
+    with pytest.raises(ValueError, match="Streaming is required"):
+        client.messages.create(model=agente.MODELO, max_tokens=agente.MAX_TOKENS,
+                               messages=[{"role": "user", "content": "hola"}])
+    # Por stream no hay ValueError: falla recién al conectarse (no hay servidor)
+    with pytest.raises(anthropic.APIConnectionError):
+        agente._llamar_modelo(client, model=agente.MODELO, max_tokens=agente.MAX_TOKENS,
+                              messages=[{"role": "user", "content": "hola"}],
+                              output_config={"effort": "low"})
+
+
+def test_cliente_con_stream_devuelve_el_mensaje_final():
+    final = _resp(NS(type="text", text="x"), stop="end_turn")
+
+    class Stream:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def get_final_message(self):
+            return final
+
+    class Cliente:
+        def __init__(self):
+            self.messages = NS(stream=lambda **kw: Stream())
+
+    assert agente._llamar_modelo(Cliente(), model="m") is final

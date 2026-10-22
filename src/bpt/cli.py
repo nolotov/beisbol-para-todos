@@ -330,7 +330,10 @@ def cmd_editor(args: argparse.Namespace) -> int:
         r = editor.ejecutar(fecha, tema, salida=Path(args.salida), handle=args.handle,
                             aprendizajes=aprendizajes)
     except (EditorError, LlaveInvalida, RuntimeError) as e:
-        print(f"[error] Editor: {e}", file=sys.stderr)
+        print(f"[error] Editor: {e}")
+        return 1
+    except Exception as e:  # noqa: BLE001 - que el motivo llegue al resumen y a Telegram
+        print(f"[error] Editor ({type(e).__name__}): {str(e)[:500]}")
         return 1
     ed = r["editor"]
     print(f"[ok] {r['titular']}")

@@ -75,7 +75,7 @@ jobs:
           [ -n "$FECHA" ] && ARGS+=(--fecha "$FECHA")
           [ -n "$TEMA" ] && ARGS+=(--tema "$TEMA")
           [ -f aprendizajes.md ] && ARGS+=(--aprendizajes aprendizajes.md)
-          python -m bpt editor "${ARGS[@]}" --github-output "$GITHUB_OUTPUT" | tee salida.txt
+          python -m bpt editor "${ARGS[@]}" --github-output "$GITHUB_OUTPUT" 2>&1 | tee salida.txt
 
       # Reels (variable de repo REELS = 1): video vertical con las láminas y la voz del guion.
       # Si falla, el paquete sigue igual, sin Reel.
@@ -106,9 +106,11 @@ jobs:
         if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
         run: |
           URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          MOTIVO=$(grep -m1 '^\[error\]' salida.txt 2>/dev/null | cut -c1-400 || true)
           curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
-            --data-urlencode text="⚠️ MBP: el editor no pudo armar la propuesta. Revisa: ${URL}"
+            --data-urlencode text="⚠️ MBP: el editor no pudo armar la propuesta. ${MOTIVO}
+          Revisa: ${URL}"
 
       - name: Resumen del run
         if: always()
