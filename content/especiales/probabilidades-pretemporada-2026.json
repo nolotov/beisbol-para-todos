@@ -1,0 +1,406 @@
+{
+ "slug": "probabilidades-pretemporada-2026",
+ "fecha": "2026-10-22",
+ "titular": "Nadie los veía venir · Rays y Cerveceros contra las proyecciones de marzo",
+ "fuente": "FanGraphs (24-mar-2026) · DraftKings · BetMGM",
+ "equipos": {
+  "A": {
+   "nombre": "Rays",
+   "liga": "Campeón de la Liga Americana",
+   "color": "#7FB2E5"
+  },
+  "B": {
+   "nombre": "Cerveceros",
+   "liga": "Campeón de la Liga Nacional",
+   "color": "#F5B700"
+  }
+ },
+ "laminas": [
+  {
+   "tipo": "portada",
+   "etiqueta": "MBP  ·  SERIE MUNDIAL 2026  ·  LO QUE DECÍA MARZO",
+   "titulo": "NADIE LOS\nVEÍA VENIR",
+   "subtitulo": "Así veían los números a Rays y Cerveceros\nel día antes de arrancar la temporada",
+   "datos": {
+    "A": [
+     {
+      "cifra": "80-82",
+      "texto": "récord proyectado · terminó 98-64"
+     },
+     {
+      "cifra": "1,4 %",
+      "texto": "de ganar la Serie Mundial"
+     },
+     {
+      "cifra": "80 a 1",
+      "texto": "en apuestas · puesto 22 de 30"
+     }
+    ],
+    "B": [
+     {
+      "cifra": "83-79",
+      "texto": "récord proyectado · terminó 103-59"
+     },
+     {
+      "cifra": "1,9 %",
+      "texto": "de ganar la Serie Mundial"
+     },
+     {
+      "cifra": "35 a 1",
+      "texto": "en apuestas · puesto 14 de 30"
+     }
+    ]
+   },
+   "remate": {
+    "cifra": "1 en 765",
+    "texto": "La probabilidad de que estos dos se vieran en la\nSerie Mundial, según las proyecciones de marzo."
+   }
+  },
+  {
+   "tipo": "barras",
+   "titulo": "LOS FAVORITOS\nERAN OTROS",
+   "subtitulo": "Probabilidad de ganar la Serie Mundial en marzo",
+   "barras": [
+    {
+     "etiqueta": "Dodgers",
+     "detalle": "1.º de 30 · barridos por MIL",
+     "valor": 24.6,
+     "texto": "24,6 %"
+    },
+    {
+     "etiqueta": "Marineros",
+     "detalle": "2.º de 30 · favorito de la LA",
+     "valor": 9.5,
+     "texto": "9,5 %"
+    },
+    {
+     "etiqueta": "Cerveceros",
+     "detalle": "15.º de 30",
+     "equipo": "B",
+     "valor": 1.9,
+     "texto": "1,9 %"
+    },
+    {
+     "etiqueta": "Rays",
+     "detalle": "18.º de 30",
+     "equipo": "A",
+     "valor": 1.4,
+     "texto": "1,4 %"
+    }
+   ],
+   "conclusion": {
+    "cifra": "3,9 %",
+    "texto": "Banderín (llegar a la Serie Mundial): 3,9 %\npara Milwaukee (7.º de la Nacional) y 3,4 %\npara Tampa Bay (10.º de 15 en la Americana)."
+   },
+   "fuente": "FanGraphs, 24-mar-2026 · 20.000 simulaciones"
+  },
+  {
+   "tipo": "cara_a_cara",
+   "titulo": "MARZO VS.\nOCTUBRE",
+   "subtitulo": "Lo que proyectaban los números y lo que pasó",
+   "filas": [
+    {
+     "stat": "Récord proyectado",
+     "ayuda": "FanGraphs, antes del Día Inaugural",
+     "A": "80-82",
+     "B": "83-79"
+    },
+    {
+     "stat": "Récord real",
+     "A": "98-64",
+     "rank_A": "mejor de la LA",
+     "B": "103-59",
+     "rank_B": "mejor de MLB",
+     "mejor": "ambos"
+    },
+    {
+     "stat": "Línea de victorias",
+     "ayuda": "casas de apuestas (BetMGM)",
+     "A": "77,5",
+     "B": "84,5"
+    },
+    {
+     "stat": "La superaron por",
+     "A": "+20,5",
+     "B": "+18,5",
+     "mejor": "ambos"
+    },
+    {
+     "stat": "Ganar su división",
+     "A": "6,8 %",
+     "rank_A": "5.º de 5",
+     "B": "24,3 %",
+     "rank_B": "3.º de 5"
+    },
+    {
+     "stat": "Ir a postemporada",
+     "A": "29,5 %",
+     "B": "41,7 %"
+    },
+    {
+     "stat": "Mejor récord de su liga",
+     "ayuda": "estimación MBP",
+     "A": "2,5 %",
+     "rank_A": "10.º de 15",
+     "B": "1,5 %",
+     "rank_B": "7.º de 15"
+    },
+    {
+     "stat": "Ganar el banderín",
+     "A": "3,4 %",
+     "rank_A": "10.º de 15",
+     "B": "3,9 %",
+     "rank_B": "7.º de 15"
+    },
+    {
+     "stat": "Ganar la Serie Mundial",
+     "A": "1,4 %",
+     "rank_A": "18.º de 30",
+     "B": "1,9 %",
+     "rank_B": "15.º de 30"
+    }
+   ],
+   "nota": "En color, lo que pasó. Puestos entre los equipos de su liga o de MLB.",
+   "fuente": "FanGraphs (24-mar-2026) · BetMGM"
+  },
+  {
+   "tipo": "barras",
+   "etiqueta": "MBP  ·  ESTE DE LA LIGA AMERICANA",
+   "titulo": "EL ÚLTIMO\nDE LA FILA",
+   "subtitulo": "Probabilidad de ganar el Este de la Americana en marzo.\nTampa Bay era el menos probable de los cinco... y ganó\nla división con 98 victorias.",
+   "barras": [
+    {
+     "etiqueta": "Yankees",
+     "detalle": "favorito",
+     "valor": 38.3,
+     "texto": "38,3 %"
+    },
+    {
+     "etiqueta": "Medias Rojas",
+     "valor": 23.8,
+     "texto": "23,8 %"
+    },
+    {
+     "etiqueta": "Azulejos",
+     "detalle": "campeón de la LA 2025",
+     "valor": 17.9,
+     "texto": "17,9 %"
+    },
+    {
+     "etiqueta": "Orioles",
+     "valor": 13.1,
+     "texto": "13,1 %"
+    },
+    {
+     "etiqueta": "Rays",
+     "detalle": "5.º de 5 · ganó la división",
+     "equipo": "A",
+     "valor": 6.8,
+     "texto": "6,8 %"
+    }
+   ],
+   "fuente": "FanGraphs, 24-mar-2026",
+   "nota": "Después barrió a los Yankees, los favoritos de marzo, en la Serie Divisional."
+  },
+  {
+   "tipo": "barras",
+   "etiqueta": "MBP  ·  CENTRAL DE LA LIGA NACIONAL",
+   "titulo": "TERCEROS EN\nSU PROPIA CASA",
+   "subtitulo": "Probabilidad de ganar la Central de la Nacional en marzo.\nMilwaukee era tercero... y terminó con el mejor récord\nde las Grandes Ligas: 103 victorias.",
+   "barras": [
+    {
+     "etiqueta": "Cachorros",
+     "detalle": "favorito",
+     "valor": 35.6,
+     "texto": "35,6 %"
+    },
+    {
+     "etiqueta": "Piratas",
+     "valor": 27.6,
+     "texto": "27,6 %"
+    },
+    {
+     "etiqueta": "Cerveceros",
+     "detalle": "3.º de 5 · ganó la división",
+     "equipo": "B",
+     "valor": 24.3,
+     "texto": "24,3 %"
+    },
+    {
+     "etiqueta": "Rojos",
+     "valor": 8.5,
+     "texto": "8,5 %"
+    },
+    {
+     "etiqueta": "Cardenales",
+     "valor": 4.0,
+     "texto": "4,0 %"
+    }
+   ],
+   "fuente": "FanGraphs, 24-mar-2026",
+   "nota": "Su línea de victorias en las casas de apuestas era 84,5. La superó por 18,5."
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "EL MEJOR RÉCORD:\nCASI IMPOSIBLE",
+   "subtitulo": "Lo que daban las proyecciones de marzo",
+   "ancho_cifra": 0.25,
+   "items": [
+    {
+     "cifra": "2,5 %",
+     "equipo": "A",
+     "texto": "Rays con el mejor récord de la Americana:\n10.º de 15. El favorito era Seattle (26 %)."
+    },
+    {
+     "cifra": "1,5 %",
+     "equipo": "B",
+     "texto": "Cerveceros con el mejor récord de la Nacional:\n7.º de 15. Los Dodgers tenían 62 %."
+    },
+    {
+     "cifra": "1 %",
+     "equipo": "B",
+     "texto": "Cerveceros con el mejor récord de todo MLB.\nLo lograron: 103-59."
+    },
+    {
+     "cifra": "18",
+     "equipo": "B",
+     "texto": "Simulaciones de 20.001 en las que Milwaukee\nllegaba a 103 victorias: 1 de cada 1.100."
+    },
+    {
+     "cifra": "46",
+     "equipo": "A",
+     "texto": "Simulaciones de 20.001 en las que Tampa Bay\nllegaba a 98 victorias: 1 de cada 435."
+    }
+   ],
+   "nota": "Mejor récord: estimación MBP con las proyecciones de FanGraphs (400.000 temporadas simuladas).",
+   "fuente": "FanGraphs, 24-mar-2026 · cálculos MBP"
+  },
+  {
+   "tipo": "cifras",
+   "etiqueta": "MBP  ·  CÓMO SE ARMARON",
+   "titulo": "MILWAUKEE:\nCASA Y CAMBIOS",
+   "subtitulo": "10 de 26 son de la casa, 15 llegaron por cambio\ny solo 1 por agencia libre",
+   "ancho_cifra": 0.22,
+   "items": [
+    {
+     "cifra": "$1,8 M",
+     "venezolano": true,
+     "tamano": 32,
+     "texto": "Jackson Chourio firmó en 2021 desde Venezuela.\nAntes de debutar le dieron 8 años y $82 M."
+    },
+    {
+     "cifra": "2.ª",
+     "equipo": "B",
+     "texto": "Ronda en la que eligieron a Jacob Misiorowski\nen 2022: lo convencieron de no ir a LSU."
+    },
+    {
+     "cifra": "3",
+     "venezolano": true,
+     "texto": "Equipos en el cambio que trajo a William Contreras\n(dic-2022, con Braves y Atléticos). Pagaron con\nEsteury Ruiz, que había llegado por Josh Hader."
+    },
+    {
+     "cifra": "VENDER",
+     "equipo": "B",
+     "tamano": 28,
+     "texto": "Corbin Burnes a Baltimore (2024) trajo a Joey Ortiz.\nFreddy Peralta a los Mets (ene-2026) trajo a\nlos prospectos Jett Williams y Brandon Sproat."
+    },
+    {
+     "cifra": "3-ago",
+     "tamano": 32,
+     "venezolano": true,
+     "texto": "Fecha límite: Dustin May y JoJo Romero desde\nSan Luis; el venezolano Antonio Senzatela, de Colorado."
+    }
+   ],
+   "nota": "Los 10 de la casa: 7 del draft y 3 firmas internacionales (Chourio, Luis Lara y Abner Uribe).",
+   "fuente": "Datos: MLB.com · AP"
+  },
+  {
+   "tipo": "cifras",
+   "etiqueta": "MBP  ·  CÓMO SE ARMARON",
+   "titulo": "TAMPA BAY:\nEL ARTE DEL CAMBIO",
+   "subtitulo": "16 de 26 llegaron por cambio: más que cualquier\nequipo de postemporada. Solo 4 son de la casa",
+   "ancho_cifra": 0.22,
+   "items": [
+    {
+     "cifra": "18",
+     "equipo": "A",
+     "texto": "Años de Junior Caminero cuando llegó de Cleveland\n(nov-2021) por Tobias Myers. Solo había jugado en\nla Dominicana. En 2026: 42 jonrones."
+    },
+    {
+     "cifra": "37",
+     "equipo": "A",
+     "texto": "Selección del draft 2025 que le dieron a Baltimore\npor Bryan Baker. Cerró con 41 salvados y 1.44 de EFE."
+    },
+    {
+     "cifra": "$13 M",
+     "equipo": "A",
+     "tamano": 32,
+     "texto": "Un año por Nick Martinez en febrero, la firma\nde agente libre que más pesó: fue al Juego de Estrellas."
+    },
+    {
+     "cifra": "2-ago",
+     "equipo": "A",
+     "tamano": 32,
+     "texto": "Freddy Peralta llegó de los Mets por tres prospectos.\nFue el MVP de la Serie de Campeonato."
+    },
+    {
+     "cifra": "DIC",
+     "equipo": "A",
+     "tamano": 32,
+     "texto": "En diciembre parecían vender: cambiaron a Brandon\nLowe (Pittsburgh) y Shane Baz (Baltimore) por\nprospectos. Las casas les pusieron 77,5 victorias."
+    }
+   ],
+   "nota": "Jonathan Aranda, uno de los 4 de la casa, fue comprado a los Toros de Tijuana en 2015 por $130.000.",
+   "fuente": "Datos: MLB.com · AP"
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "SE ARMARON\nEL UNO AL OTRO",
+   "subtitulo": "Los hilos que unen a los dos rosters",
+   "ancho_cifra": 0.24,
+   "items": [
+    {
+     "cifra": "2021",
+     "equipo": "A",
+     "tamano": 34,
+     "texto": "Los Rays sacaron a Drew Rasmussen de Milwaukee\nen el cambio de Willy Adames. Se espera que abra el J1."
+    },
+    {
+     "cifra": "2018",
+     "equipo": "B",
+     "tamano": 34,
+     "texto": "Tampa Bay mandó a Jake Bauers a Cleveland en el\ncambio que le trajo a Yandy Díaz. Hoy Bauers es\nel MVP de la Serie de Campeonato de Milwaukee."
+    },
+    {
+     "cifra": "2 viajes",
+     "equipo": "A",
+     "tamano": 26,
+     "texto": "Peralta: de Milwaukee a los Mets en enero y de los\nMets a Tampa Bay en agosto. Ahora los enfrenta."
+    },
+    {
+     "cifra": "Myers",
+     "tamano": 28,
+     "texto": "El pitcher que Tampa dio por Caminero pasó luego por\nMilwaukee y salió con Peralta rumbo a Nueva York."
+    },
+    {
+     "cifra": "9",
+     "equipo": "B",
+     "texto": "Años de Matt Arnold en los Rays antes de llegar a\nMilwaukee, donde hoy dirige las operaciones."
+    }
+   ],
+   "fuente": "Datos: MLB.com · AP"
+  }
+ ],
+ "textos": {
+  "angulo": "Probabilidades de pretemporada (FanGraphs, apuestas) de Rays y Cerveceros vs. lo que pasó, y los movimientos que armaron ambos rosters.",
+  "instagram": "📉 En marzo, nadie veía venir esta Serie Mundial.\n\n📊 Las proyecciones de FanGraphs le daban a Milwaukee 1,9 % de ser campeón (15.º de 30) y a Tampa Bay 1,4 % (18.º). Que se vieran en la Serie: 1 en 765.\n\n🏟️ Divisiones: los Rays eran 5.º de 5 en el Este (6,8 %) y los Cerveceros 3.º en la Central (24,3 %). Los dos la ganaron.\n\n🥇 Mejor récord de su liga: 2,5 % para Tampa Bay y 1,5 % para Milwaukee. Terminaron 98-64 y 103-59, este último el mejor de MLB.\n\n🔧 Cómo se armaron: Milwaukee con 10 peloteros de la casa (Chourio firmó por $1,8 M) y 15 por cambio. Tampa Bay con 16 por cambio, como Caminero, que llegó con 18 años por Tobias Myers.\n\n🔁 Y se armaron el uno al otro: Rasmussen salió de Milwaukee, Bauers salió de Tampa, y Peralta jugó en los dos este año.\n\n🇻🇪 Chourio, Contreras y Senzatela, piezas venezolanas de Milwaukee.\n\n¿Cuál te sorprendió más? 👇\n\nCuotas citadas solo como dato histórico. +18 · Juega con responsabilidad.\n\n#SerieMundial #WorldSeries #Rays #Brewers #MLB #Sabermetría #MBP",
+  "hilo_x": [
+   "📉 En marzo, nadie veía venir esta Serie Mundial. FanGraphs le daba 1,9 % a Milwaukee (15.º de 30) y 1,4 % a Tampa Bay (18.º). Que se vieran en la Serie: 1 en 765. 🧵",
+   "🏟️ Divisiones: Rays 5.º de 5 en el Este (6,8 %), Cerveceros 3.º en la Central (24,3 %). Las casas les ponían 77,5 y 84,5 victorias. Ganaron 98 y 103.",
+   "🥇 ¿Mejor récord de su liga? 2,5 % para Tampa Bay y 1,5 % para Milwaukee. En solo 18 de 20.001 simulaciones Milwaukee llegaba a 103 triunfos. Lo hizo.",
+   "🔧 Milwaukee: 10 de la casa (Chourio, $1,8 M en 2021) y 15 por cambio. Tampa Bay: 16 por cambio, como Caminero, que llegó con 18 años por Tobias Myers, y Peralta en agosto.",
+   "🔁 Se armaron el uno al otro: Rasmussen salió de Milwaukee en el cambio de Adames y Bauers salió de Tampa en el de Yandy Díaz. ¿Cuál dato te sorprendió más? 👇"
+  ],
+  "guion": "En marzo, nadie veía venir esta Serie Mundial. Las proyecciones le daban a Milwaukee menos de 2 % de ser campeón, y a Tampa Bay apenas 1,4 %. Que se vieran en la Serie: una entre 765. Los Rays eran los últimos de su división en la proyección; los Cerveceros, terceros. Los dos ganaron su división y terminaron con el mejor récord de su liga. ¿Cómo? Milwaukee con talento de la casa, como Chourio, y Tampa con cambios, como Caminero, que llegó con 18 años. Y se armaron el uno al otro: Rasmussen salió de Milwaukee y Bauers de Tampa."
+ }
+}
