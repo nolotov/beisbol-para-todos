@@ -87,6 +87,17 @@ def revisar_entrega(e: dict, evidencia: list[dict]) -> tuple[list[str], verifica
     return problemas, v
 
 
+def _llamar_modelo(client, **kw):
+    """Con max_tokens alto el SDK exige streaming (si no, lanza ValueError: "Streaming is
+    required for operations that may take longer than 10 minutes"). Se usa stream y se
+    espera el mensaje completo; los clientes de prueba sin stream usan create."""
+    stream = getattr(client.messages, "stream", None)
+    if stream is None:
+        return client.messages.create(**kw)
+    with stream(**kw) as s:
+        return s.get_final_message()
+
+
 def _marcar_cache(mensajes: list[dict]) -> None:
     """Un punto de caché en el último bloque del último mensaje (y solo ahí): cada vuelta
     relee todo lo anterior al 5 % del precio."""
@@ -120,9 +131,9 @@ def editar(fecha: str, tema: str | None = None, *, client=None, caja: Caja | Non
 
     for vuelta in range(1, MAX_VUELTAS + 1):
         _marcar_cache(mensajes)
-        r = client.messages.create(model=modelo, max_tokens=MAX_TOKENS, system=sistema,
-                                   tools=herramientas, messages=mensajes,
-                                   output_config={"effort": ESFUERZO})
+        r = _llamar_modelo(client, model=modelo, max_tokens=MAX_TOKENS, system=sistema,
+                           tools=herramientas, messages=mensajes,
+                           output_config={"effort": ESFUERZO})
         uso = R.sumar_uso(uso, R.uso_de(r))
         mensajes.append({"role": "assistant", "content": r.content})
         if r.stop_reason == "max_tokens":
