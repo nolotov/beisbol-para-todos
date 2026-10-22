@@ -193,6 +193,34 @@ class Instagram:
             enlace = ""
         return Publicado(media_id, enlace or PERFIL_HISTORIAS)
 
+    def publicar_reel(self, url: str, caption: str, espera_max: float = 300.0,
+                      pausa: float = 10.0) -> Publicado:
+        """Un video como Reel (media_type=REELS, también en el feed). Meta descarga el video
+        de `url` y lo procesa: tarda más que una imagen, por eso la espera es más larga."""
+        problemas = revisar_caption(caption)
+        if problemas:
+            raise InstagramError("; ".join(problemas))
+        # El carrusel de la misma pieza tiene el mismo caption: solo cuenta un video igual
+        clave = caption.strip()
+        for m in self._llamar("GET", f"{self.user_id}/media",
+                              {"fields": "id,caption,permalink,media_type",
+                               "limit": 10}).get("data", []):
+            if (m.get("media_type") in ("VIDEO", "REELS")
+                    and (m.get("caption") or "").strip() == clave):
+                return Publicado(m["id"], m.get("permalink", ""), duplicado=True)
+        final = self._llamar("POST", f"{self.user_id}/media",
+                             {"media_type": "REELS", "video_url": url, "caption": caption,
+                              "share_to_feed": "true"})["id"]
+        antes = (self.pausa, self.espera_max)
+        self.pausa, self.espera_max = pausa, espera_max
+        try:
+            self.esperar(final)
+        finally:
+            self.pausa, self.espera_max = antes
+        media_id = self._llamar("POST", f"{self.user_id}/media_publish",
+                                {"creation_id": final})["id"]
+        return Publicado(media_id, self.permalink(media_id))
+
     def publicar(self, urls: list[str], caption: str) -> Publicado:
         """Una imagen = post simple; de 2 a 10 = carrusel."""
         if not urls:

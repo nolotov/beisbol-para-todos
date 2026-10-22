@@ -104,6 +104,13 @@ class Telegram:
                 "reply_markup": json.dumps({"inline_keyboard": filas or []})}
         self._llamar("editMessageText", data)
 
+    def video(self, archivo: Path, leyenda: str | None = None) -> None:
+        """Un video (hasta 50 MB por la API de bots), reproducible en el chat."""
+        with open(archivo, "rb") as f:
+            self._llamar("sendVideo", {"chat_id": self.chat_id, "caption": leyenda or "",
+                                       "supports_streaming": "true", "width": "1080",
+                                       "height": "1920"}, {"video": f})
+
     def album(self, imagenes: list[Path], como_archivo: bool = False,
               leyenda: str | None = None) -> None:
         """Hasta 10 imágenes en un solo mensaje (fotos o documentos)."""
@@ -161,11 +168,11 @@ def callback_publicar(run_id: str, pieza: str, destino: str = "i", quedan: str =
 
 
 def texto_publicar(titular: str, alertas: bool, historia: bool = False,
-                   quedan: str = "i") -> str:
+                   quedan: str = "i", reel: bool = False) -> str:
     """El primer párrafo es la "base" que el relé conserva al editar el mensaje."""
     from bpt.publicar import redes
     aviso = " · ⚠️ con alertas" if alertas else ""
-    icono = "📲" if historia else "📸"
+    icono = "🎬" if reel else "📲" if historia else "📸"
     return f"{icono} {titular}{aviso}\n\n{redes.pregunta(quedan)}"
 
 
@@ -183,8 +190,28 @@ def ofrecer_publicar(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
         return False
     run_id = os.environ["GITHUB_RUN_ID"]
     historia = p.tipo == piezas.HISTORIA
-    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia, quedan),
+    tg.botones(texto_publicar(p.titular, p.tiene_alertas, historia, quedan,
+                              reel=p.tipo == piezas.REEL),
                redes.menu(run_id, p.id, quedan, historia))
+    return True
+
+
+def ofrecer_reel(tg: "Telegram", carpeta: Path, pieza_id: str) -> bool:
+    """Si la pieza tiene Reel (reel_<id>.mp4), lo manda y ofrece publicarlo en Instagram."""
+    carpeta = Path(carpeta)
+    video = carpeta / f"reel_{pieza_id}.mp4"
+    if not video.exists():
+        return False
+    info = {}
+    try:
+        resumen = json.loads((carpeta / "resumen.json").read_text(encoding="utf-8"))
+        info = (resumen.get("reels") or {}).get(pieza_id) or {}
+    except (OSError, ValueError):
+        pass
+    detalle = f" · {info['duracion']:.0f} s" if info.get("duracion") else ""
+    voz = "" if not info else (" · con voz" if info.get("voz") else " · sin voz: ponle música")
+    tg.video(video, leyenda=f"🎬 Reel{detalle}{voz}")
+    ofrecer_publicar(tg, carpeta, f"r{pieza_id}")
     return True
 
 
@@ -249,6 +276,7 @@ def enviar_dia(carpeta: Path, tg: Telegram | None = None, originales: bool = Tru
             tg.texto(f"𝕏 {i}/{len(hilo)}\n\n{tuit}")
         tg.texto("🎙️ GUION (30-45 s)\n\n" + t["guion"])
         ofrecer_publicar(tg, carpeta, str(n))
+        ofrecer_reel(tg, carpeta, str(n))
     return len(juegos)
 
 
@@ -289,6 +317,7 @@ def _enviar_jornada(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
     if r is not None:
         _textos(tg, r["textos"])
         ofrecer_publicar(tg, carpeta, "jornada")
+        ofrecer_reel(tg, carpeta, "jornada")
     return len(juegos)
 
 
@@ -297,16 +326,35 @@ def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: boo
     imagenes = [carpeta / t for t in resumen.get("tarjetas", []) if (carpeta / t).exists()]
     if not resumen.get("total") or not imagenes:
         return 0
-    lineas = []
-    for liga, datos in resumen.get("ligas", {}).items():
-        n = len(datos["juegos"])
-        lineas.append(f"{liga}: {n} juego{'s' if n != 1 else ''}")
-    leyenda = "📲 Historia de hoy · " + " · ".join(lineas)
+    if resumen.get("especial"):
+        prefijo = "🧠 Propuesta del editor (historia)" if resumen.get("editor") else \
+            "📲 Historia especial"
+        leyenda = f"{prefijo} · {resumen['titular']}"
+        if (resumen.get("editor") or {}).get("por_que"):
+            leyenda += f"\nPor qué ahora: {resumen['editor']['por_que']}"
+        ver = resumen.get("verificacion") or {}
+        if ver.get("resumen"):
+            leyenda += "\n" + ver["resumen"]
+            if not ver.get("ok"):
+                leyenda += "\n⚠️ " + "\n⚠️ ".join(_alertas_verificacion(ver))
+    else:
+        lineas = []
+        for liga, datos in resumen.get("ligas", {}).items():
+            n = len(datos["juegos"])
+            lineas.append(f"{liga}: {n} juego{'s' if n != 1 else ''}")
+        leyenda = "📲 Historia de hoy · " + " · ".join(lineas)
     tg.album(imagenes[:1], leyenda=leyenda)
     if originales:
         tg.album(imagenes[:1], como_archivo=True, leyenda="Original para la historia")
     ofrecer_publicar(tg, carpeta, "1")
     return resumen["total"]
+
+
+def _alertas_verificacion(ver: dict) -> list[str]:
+    salida = list(ver.get("alertas") or [])
+    if ver.get("cifras_sin_respaldo"):
+        salida.append("cifras sin respaldo: " + ", ".join(ver["cifras_sin_respaldo"]))
+    return salida
 
 
 def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
@@ -319,13 +367,25 @@ def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
         enc = "Sin textos: solo láminas."
     else:
         enc = encabezado(r, 1, 1).split("\n", 1)[1]
-    tg.texto(f"⭐ Especial · {resumen['titular']}\n{enc}\n\nNada se publica sin tu ok. 👇")
+    ver = (resumen.get("verificacion") or {}).get("resumen")
+    if ver:
+        enc += "\n" + ver
+    editor = resumen.get("editor") or {}
+    cabeza = "🧠 Propuesta del editor" if editor else "⭐ Especial"
+    extra = ""
+    if editor.get("por_que"):
+        extra += f"\n\nPor qué ahora: {editor['por_que']}"
+    if editor.get("otras_ideas"):
+        extra += "\n\nOtras ideas (pídelas con el workflow «Editor MBP» y el tema):\n" + \
+            "\n".join(f"• {i}" for i in editor["otras_ideas"][:5])
+    tg.texto(f"{cabeza} · {resumen['titular']}\n{enc}{extra}\n\nNada se publica sin tu ok. 👇")
     tg.album(imagenes)
     if originales:
         tg.album(imagenes, como_archivo=True, leyenda="Originales para subir")
     if r is not None:
         _textos(tg, r["textos"])
         ofrecer_publicar(tg, carpeta, "1")
+        ofrecer_reel(tg, carpeta, "1")
     return 1
 
 

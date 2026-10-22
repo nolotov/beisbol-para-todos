@@ -44,6 +44,15 @@ jobs:
         id: gen
         run: python -m bpt especial --archivo "$ARCHIVO" --github-output "$GITHUB_OUTPUT" | tee salida.txt
 
+      # Reels (variable de repo REELS = 1): video vertical con las láminas y la voz del guion.
+      # Si falla, el paquete sigue igual, sin Reel.
+      - name: Armar Reels
+        if: ${{ vars.REELS == '1' && steps.gen.outputs.carpeta != '' }}
+        continue-on-error: true
+        run: |
+          pip install -q -e ".[video]"
+          python -m bpt reel --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
       # El paquete se sube ANTES de Telegram: el botón de publicar lo descarga desde aquí.
       - uses: actions/upload-artifact@v7
         with:

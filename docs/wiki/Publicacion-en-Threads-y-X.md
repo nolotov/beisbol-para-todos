@@ -72,6 +72,10 @@ Estos tokens (OAuth 1.0a) no vencen: no hay renovación. Si se filtran, se regen
 
 Además del paquete diario, el workflow **Especial MBP** (a mano) arma una publicación desde un JSON de `content/especiales/` (portada, rosters y textos) y la manda a Telegram con el mismo menú de redes. `publicar.yml` acepta sus runs igual que los de resultados. El primero fue `latinos-serie-mundial.json`: el mejor latino por posición entre los que jugaron una Serie Mundial, un roster por liga.
 
+Un especial con `"tipo": "historia"` es una historia de Instagram (una lámina 1080x1920, sin caption): sale por el mismo workflow y llega con el botón 📲, solo para Instagram. La primera fue `rays-banderin-2026.json` (Rays a la Serie Mundial, 19-oct-2026).
+
+Un especial con `laminas` (y `equipos` A/B) es un carrusel por bloques: portada, cifras, barras, cara a cara, camino y figuras. El primero fue `previa-serie-mundial-2026.json` (Rays vs. Cerveceros, 9 láminas).
+
 ## Fallas habituales
 
 | Mensaje | Causa | Acción |

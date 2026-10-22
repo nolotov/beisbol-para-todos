@@ -1,0 +1,119 @@
+# Editor MBP: el agente editor busca la historia del día (o arma el tema pedido), consulta
+# los datos en MLB Stats API, arma el especial, lo verifica cifra por cifra y lo manda a
+# Telegram como propuesta, con el menú de redes de siempre. Nada se publica sin tu ok.
+#
+# A mano: Actions -> "Editor MBP" -> Run workflow (tema opcional).
+# Diario: el cron solo corre si la variable de repo EDITOR_DIARIO vale 1.
+name: Editor MBP
+
+on:
+  schedule:
+    # 14:43 UTC = 11:43 en Santiago (UTC-3): después de los resultados de la mañana y antes
+    # de la tarde, cuando la audiencia en Venezuela está conectada.
+    - cron: "43 14 * * *"
+  workflow_dispatch:
+    inputs:
+      tema:
+        description: "Tema (ej. 'el mejor venezolano de la semana en la LVBP'). Vacío = el agente elige"
+        required: false
+      fecha:
+        description: "Fecha (AAAA-MM-DD). Vacío = hoy en hora de Venezuela"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editor
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  editor:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.EDITOR_DIARIO == '1' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      BPT_MODELO_EDITOR: ${{ vars.MODELO_EDITOR || 'claude-sonnet-5-5' }}
+      TEMA: ${{ inputs.tema }}
+      FECHA: ${{ inputs.fecha }}
+    steps:
+      - name: Validar entrada
+        run: |
+          [[ -z "$FECHA" || "$FECHA" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "::error::fecha inválida"; exit 1; }
+          [[ ${#TEMA} -le 300 ]] || { echo "::error::tema demasiado largo"; exit 1; }
+          [[ -n "$ANTHROPIC_API_KEY" ]] || { echo "::error::falta el secreto ANTHROPIC_API_KEY"; exit 1; }
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar
+        run: pip install -e .
+
+      # Lo aprendido de las métricas (workflow "Métricas MBP") vive en la rama metricas.
+      - name: Traer los aprendizajes de las métricas
+        run: |
+          if git fetch -q --depth 1 origin metricas 2>/dev/null; then
+            git show FETCH_HEAD:aprendizajes.md > aprendizajes.md 2>/dev/null || rm -f aprendizajes.md
+          fi
+          [ -f aprendizajes.md ] && echo "Con aprendizajes de métricas" || echo "Sin aprendizajes todavía"
+
+      - name: Armar la propuesta
+        id: gen
+        run: |
+          ARGS=()
+          [ -n "$FECHA" ] && ARGS+=(--fecha "$FECHA")
+          [ -n "$TEMA" ] && ARGS+=(--tema "$TEMA")
+          [ -f aprendizajes.md ] && ARGS+=(--aprendizajes aprendizajes.md)
+          python -m bpt editor "${ARGS[@]}" --github-output "$GITHUB_OUTPUT" | tee salida.txt
+
+      # Reels (variable de repo REELS = 1): video vertical con las láminas y la voz del guion.
+      # Si falla, el paquete sigue igual, sin Reel.
+      - name: Armar Reels
+        if: ${{ vars.REELS == '1' && steps.gen.outputs.carpeta != '' }}
+        continue-on-error: true
+        run: |
+          pip install -q -e ".[video]"
+          python -m bpt reel --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      # El paquete se sube ANTES de Telegram: el botón de publicar lo descarga desde aquí.
+      - uses: actions/upload-artifact@v7
+        if: steps.gen.outputs.carpeta != ''
+        with:
+          name: editor-${{ github.run_number }}
+          path: ${{ steps.gen.outputs.carpeta }}
+          retention-days: 30
+
+      - name: Enviar a Telegram
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' }}
+        env:
+          BPT_PUBLICAR_INSTAGRAM: ${{ vars.PUBLICAR_INSTAGRAM }}
+          BPT_PUBLICAR_THREADS: ${{ vars.PUBLICAR_THREADS }}
+          BPT_PUBLICAR_X: ${{ vars.PUBLICAR_X }}
+        run: python -m bpt notificar --carpeta "${{ steps.gen.outputs.carpeta }}" | tee -a salida.txt
+
+      - name: Avisar por Telegram si algo falló
+        if: ${{ failure() && env.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -o /dev/null "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode text="⚠️ MBP: el editor no pudo armar la propuesta. Revisa: ${URL}"
+
+      - name: Resumen del run
+        if: always()
+        run: |
+          echo '### Editor MBP' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat salida.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

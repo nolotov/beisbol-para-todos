@@ -1,0 +1,33 @@
+{
+ "slug": "rays-banderin-2026",
+ "tipo": "historia",
+ "fecha": "2026-10-19",
+ "titular": "Rays a la Serie Mundial",
+ "fuente": "Datos: MLB Stats API",
+ "historia": {
+  "liga": "MLB",
+  "antetitulo": "MBP  ·  SERIE DE CAMPEONATO · LIGA AMERICANA",
+  "titulo": ["¡LOS RAYS VAN", "A LA SERIE", "MUNDIAL!"],
+  "marcador": {
+   "visitante": "Guardianes",
+   "local": "Rays",
+   "carreras_v": 3,
+   "carreras_l": 7,
+   "nota": "Final · Juego 6 · Tampa Bay gana la serie 4-2"
+  },
+  "figuras": [
+   {"nombre": "Junior Caminero", "pais": "dominicano", "linea": "2-4 · HR · 2 CI · 2 CA · 1 BB"},
+   {"nombre": "Yandy Díaz", "pais": "cubano", "linea": "1-5 · HR · 2 CI"},
+   {"nombre": "Freddy Peralta", "pais": "dominicano", "linea": "5.1 IP · 5 H · 1 CL · 3 K"}
+  ],
+  "dato": {
+   "cifra": "3",
+   "texto": "triunfos seguidos para remontar:\niban abajo 2-1 en la serie"
+  },
+  "proximo": {
+   "titulo": "Serie Mundial vs. Cerveceros",
+   "linea1": "Juego 1 · viernes 23 de octubre",
+   "linea2": "8:03 p. m. hora de Venezuela · en Milwaukee · 3.er banderín de los Rays"
+  }
+ }
+}
