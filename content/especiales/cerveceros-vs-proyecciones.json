@@ -1,0 +1,263 @@
+{
+ "slug": "cerveceros-vs-proyecciones",
+ "fecha": "2026-10-22",
+ "titular": "El equipo que las proyecciones nunca entienden · Cerveceros 2021-2026",
+ "fuente": "Datos: FanGraphs (ZiPS) · Baseball Prospectus",
+ "equipos": {
+  "A": {
+   "nombre": "Proyección",
+   "liga": "ZiPS, antes de cada temporada",
+   "color": "#8A94A6"
+  },
+  "B": {
+   "nombre": "Cerveceros",
+   "liga": "Lo que ganaron de verdad",
+   "color": "#F5B700"
+  }
+ },
+ "laminas": [
+  {
+   "tipo": "portada",
+   "etiqueta": "MBP  ·  PROYECCIONES VS. REALIDAD",
+   "titulo": "LOS QUE NADIE\nSABE PROYECTAR",
+   "subtitulo": "Lo que pronosticó ZiPS para Milwaukee y lo que pasó\n2021-2026",
+   "datos": {
+    "A": [
+     {
+      "cifra": "502",
+      "texto": "victorias proyectadas en 6 años"
+     },
+     {
+      "cifra": "83,7",
+      "texto": "victorias por temporada"
+     },
+     {
+      "cifra": "85",
+      "texto": "para 2026"
+     }
+    ],
+    "B": [
+     {
+      "cifra": "566",
+      "texto": "victorias reales en 6 años"
+     },
+     {
+      "cifra": "94,3",
+      "texto": "victorias por temporada"
+     },
+     {
+      "cifra": "103",
+      "texto": "en 2026 · mejor de MLB"
+     }
+    ]
+   },
+   "remate": {
+    "cifra": "+64",
+    "texto": "Victorias por encima de lo proyectado en seis temporadas.\nSuperaron la proyección en cinco de las seis."
+   }
+  },
+  {
+   "tipo": "cara_a_cara",
+   "titulo": "AÑO TRAS AÑO",
+   "subtitulo": "Victorias proyectadas por ZiPS en marzo y victorias reales\n(debajo, la diferencia)",
+   "filas": [
+    {
+     "stat": "2021",
+     "A": "83",
+     "B": "95",
+     "rank_B": "+12",
+     "mejor": "B"
+    },
+    {
+     "stat": "2022",
+     "ayuda": "el único año por debajo",
+     "A": "88",
+     "B": "86",
+     "rank_B": "−2",
+     "mejor": "A"
+    },
+    {
+     "stat": "2023",
+     "A": "84",
+     "B": "92",
+     "rank_B": "+8",
+     "mejor": "B"
+    },
+    {
+     "stat": "2024",
+     "A": "78",
+     "B": "93",
+     "rank_B": "+15",
+     "mejor": "B"
+    },
+    {
+     "stat": "2025",
+     "A": "84",
+     "B": "97",
+     "rank_B": "+13",
+     "mejor": "B"
+    },
+    {
+     "stat": "2026",
+     "ayuda": "ZiPS ya venía corregido",
+     "A": "85",
+     "B": "103",
+     "rank_B": "+18",
+     "mejor": "B"
+    },
+    {
+     "stat": "Total",
+     "A": "502",
+     "B": "566",
+     "rank_B": "+64",
+     "mejor": "B"
+    }
+   ],
+   "nota": "En color, quién quedó por encima cada año.\nZiPS es el sistema de proyecciones de Dan Szymborski que publica FanGraphs.",
+   "fuente": "Datos: FanGraphs (ZiPS)",
+   "etiqueta": "MBP  ·  PROYECCIONES VS. REALIDAD"
+  },
+  {
+   "tipo": "barras",
+   "titulo": "EL ERROR MÁS\nGRANDE DE MLB",
+   "subtitulo": "Victorias de más sobre la proyección de ZiPS, 2005-2025",
+   "barras": [
+    {
+     "etiqueta": "Cerveceros",
+     "detalle": "1.º de 30",
+     "equipo": "B",
+     "valor": 70,
+     "texto": "+70"
+    },
+    {
+     "etiqueta": "Dodgers",
+     "detalle": "2.º",
+     "valor": 67,
+     "texto": "+67"
+    },
+    {
+     "etiqueta": "Yankees",
+     "detalle": "3.º",
+     "valor": 62,
+     "texto": "+62"
+    }
+   ],
+   "conclusion": {
+    "cifra": "2/3",
+    "texto": "Casi dos tercios de esas 70 victorias\nllegaron en solo cinco años: 2021-2025.\nEl patrón es reciente y cada vez más fuerte."
+   },
+   "ancho_cifra": 0.2,
+   "nota": "Milwaukee: 1.655 victorias proyectadas y 1.725 reales en 21 temporadas.",
+   "fuente": "FanGraphs · Szymborski, may-2026",
+   "etiqueta": "MBP  ·  PROYECCIONES VS. REALIDAD"
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "NO ES SOLO\nUN SISTEMA",
+   "subtitulo": "Todos los pronósticos se quedaron cortos",
+   "ancho_cifra": 0.22,
+   "items": [
+    {
+     "cifra": "80",
+     "texto": "Victorias que proyectó PECOTA (Baseball Prospectus)\npara 2025, por debajo de .500. Ganaron 97."
+    },
+    {
+     "cifra": "81",
+     "texto": "PECOTA para 2026: otra vez por debajo de .500.\nGanaron 103, el récord de la franquicia."
+    },
+    {
+     "cifra": "83",
+     "texto": "Proyección de FanGraphs (con ZiPS y Steamer) para\n2026: 3.º de su división, detrás de Cachorros y Piratas."
+    },
+    {
+     "cifra": "84,5",
+     "tamano": 34,
+     "texto": "Línea de victorias de las casas de apuestas en 2026\n(BetMGM). La superaron por 18,5."
+    }
+   ],
+   "nota": "Steamer y ZiPS son los dos sistemas de proyección que combina FanGraphs.",
+   "fuente": "Datos: Baseball Prospectus · FanGraphs · BetMGM",
+   "etiqueta": "MBP  ·  PROYECCIONES VS. REALIDAD"
+  },
+  {
+   "tipo": "cifras",
+   "titulo": "¿POR QUÉ\nFALLAN?",
+   "subtitulo": "La respuesta del propio creador de ZiPS",
+   "ancho_cifra": 0.25,
+   "items": [
+    {
+     "cifra": "46 → 12",
+     "equipo": "B",
+     "tamano": 30,
+     "texto": "Con los turnos que de verdad recibió cada jugador,\nel error de ZiPS en 2021-25 baja de 46 a 12 victorias.\nEl problema no es cuánto vale cada uno: es quién juega."
+    },
+    {
+     "cifra": "81 %",
+     "equipo": "B",
+     "texto": "De los bateadores que rinden por encima de lo\nesperado, a cuántos Milwaukee les da más turnos.\nEn MLB es el 61 % y nadie más pasa del 70 %."
+    },
+    {
+     "cifra": "28/33",
+     "equipo": "B",
+     "tamano": 34,
+     "texto": "Bateadores que superaron su wRC+ proyectado\n(producción ofensiva, 100 = promedio) y que\nrecibieron más turnos de los que ZiPS esperaba."
+    },
+    {
+     "cifra": "NO",
+     "texto": "No es suerte con las lesiones: pierden un poco más\nde victorias por la lista de lesionados que el promedio."
+    },
+    {
+     "cifra": "OJO",
+     "equipo": "B",
+     "texto": "La otra explicación: quizás su oficina evalúa el\ntalento mejor de lo que un modelo puede medir."
+    }
+   ],
+   "nota": "En resumen: Milwaukee detecta rápido quién está rindiendo y le da el puesto.",
+   "fuente": "FanGraphs · Szymborski, may-2026",
+   "etiqueta": "MBP  ·  PROYECCIONES VS. REALIDAD"
+  },
+  {
+   "tipo": "cifras",
+   "etiqueta": "MBP  ·  2026",
+   "titulo": "LO CORRIGIERON\nY IGUAL FALLÓ",
+   "subtitulo": "Para 2026, ZiPS le dio más turnos a la banca de Milwaukee",
+   "ancho_cifra": 0.22,
+   "items": [
+    {
+     "cifra": "85",
+     "texto": "Victorias que proyectó el ZiPS ya corregido,\nmás generoso con los suplentes de Milwaukee."
+    },
+    {
+     "cifra": "103",
+     "equipo": "B",
+     "texto": "Ganaron 103: mejor récord de MLB y récord de\nla franquicia (el anterior era 97, en 2025)."
+    },
+    {
+     "cifra": "+18",
+     "equipo": "B",
+     "texto": "Su mayor diferencia del período sobre ZiPS,\njusto el año en que el sistema se ajustó."
+    },
+    {
+     "cifra": "1.80",
+     "equipo": "B",
+     "tamano": 36,
+     "texto": "EFE de Jacob Misiorowski, con 252 ponches:\nel tipo de salto que ningún modelo anticipa."
+    }
+   ],
+   "nota": "El promedio de las proyecciones dice 84. La realidad de seis años dice 94.",
+   "fuente": "Datos: FanGraphs (ZiPS) · MLB Stats API"
+  }
+ ],
+ "textos": {
+  "angulo": "Los Cerveceros superan sus proyecciones año tras año: ZiPS 2021-2026, comparación con otros sistemas y la explicación del creador de ZiPS.",
+  "instagram": "🤖 El equipo que las proyecciones nunca entienden: los Cerveceros.\n\n📊 ZiPS, el sistema de proyecciones que publica FanGraphs, les pronosticó 502 victorias entre 2021 y 2026. Ganaron 566: +64. Superaron la proyección en cinco de seis temporadas.\n\n🏆 Entre 2005 y 2025, ningún equipo le ganó más a ZiPS: +70 victorias, por encima de Dodgers (+67) y Yankees (+62).\n\n🔍 ¿Por qué? Según el propio creador de ZiPS, el problema no es cuánto vale cada pelotero, sino quién juega. Milwaukee le da más turnos al 81 % de sus bateadores que están rindiendo de más; en MLB es el 61 %.\n\n📉 Para 2026 corrigieron el modelo y proyectó 85 victorias. Ganaron 103.\n\nEl promedio de las proyecciones dice 84. Seis años de realidad dicen 94. ¿Les crees a los modelos o a Milwaukee? 👇\n\n#Brewers #Cerveceros #SerieMundial #Sabermetría #MLB #MBP",
+  "hilo_x": [
+   "🤖 El equipo que las proyecciones nunca entienden: ZiPS le pronosticó a Milwaukee 502 victorias entre 2021 y 2026. Ganaron 566. Son +64, y superaron la proyección en 5 de 6 años. 🧵",
+   "📊 Año por año: 83→95, 88→86, 84→92, 78→93, 84→97 y 85→103. El único año por debajo fue 2022, y por solo dos juegos.",
+   "🏆 Entre 2005 y 2025, nadie le ganó más a ZiPS: Cerveceros +70, Dodgers +67, Yankees +62. Y casi dos tercios de ese +70 llegó en 2021-2025.",
+   "🔍 La explicación del creador de ZiPS: no es cuánto vale cada pelotero, es quién juega. Milwaukee le da más turnos al 81 % de los bateadores que rinden de más (61 % en MLB).",
+   "📉 Para 2026 ajustaron el modelo: 85 victorias. Milwaukee ganó 103, récord de la franquicia. ¿Les crees a los modelos o a Milwaukee? 👇"
+  ],
+  "guion": "Hay un equipo que las proyecciones no logran entender: los Cerveceros. Entre 2021 y 2026, ZiPS les pronosticó 502 victorias. Ganaron 566. Entre 2005 y 2025, ningún equipo le ganó más a ese sistema. ¿Por qué? Según su propio creador, no es que valoren mal a los peloteros: es que Milwaukee detecta rápido quién está rindiendo y le da el puesto. Para 2026 corrigieron el modelo y les dio 85 victorias. Ganaron 103."
+ }
+}
