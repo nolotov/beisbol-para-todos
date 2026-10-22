@@ -302,6 +302,8 @@ def cmd_especial(args: argparse.Namespace) -> int:
         return 1
     print(f"[ok] {r['titular']}")
     print(f"     Láminas: {', '.join(r['tarjetas'])}")
+    if r.get("verificacion"):
+        print(f"     {r['verificacion']['resumen']}")
     for a in r["alertas"]:
         print(f"  ⚠️ {a}")
     print(f"Carpeta: {r['carpeta']}")
@@ -309,6 +311,111 @@ def cmd_especial(args: argparse.Namespace) -> int:
         with open(args.github_output, "a", encoding="utf-8") as f:
             f.write(f"carpeta={r['carpeta']}\n")
     return 0
+
+
+def cmd_editor(args: argparse.Namespace) -> int:
+    """Agente editor: busca la historia, consulta los datos y arma un especial verificado."""
+    from bpt import editor
+    from bpt.editor.agente import EditorError
+    from bpt.historia import hoy_ven
+    from bpt.redactor.agente import LlaveInvalida
+
+    fecha = args.fecha or hoy_ven()
+    aprendizajes = None
+    if args.aprendizajes and Path(args.aprendizajes).exists():
+        aprendizajes = Path(args.aprendizajes).read_text(encoding="utf-8").strip() or None
+    tema = (args.tema or "").strip() or None
+    print(f"🧠 Editor MBP · {fecha}" + (f" · tema: {tema}" if tema else " · tema libre"))
+    try:
+        r = editor.ejecutar(fecha, tema, salida=Path(args.salida), handle=args.handle,
+                            aprendizajes=aprendizajes)
+    except (EditorError, LlaveInvalida, RuntimeError) as e:
+        print(f"[error] Editor: {e}", file=sys.stderr)
+        return 1
+    ed = r["editor"]
+    print(f"[ok] {r['titular']}")
+    print(f"     Por qué: {ed['por_que']}")
+    print(f"     Láminas: {', '.join(r['tarjetas'])}")
+    print(f"     {r['verificacion']['resumen']}")
+    for a in r["alertas"]:
+        print(f"  ⚠️ {a}")
+    costo = ed.get("costo_usd")
+    print(f"     {ed['consultas']} consultas · {ed['vueltas']} vueltas · "
+          f"{ed['correcciones']} correcciones" + (f" · ~US$ {costo:.3f}" if costo else ""))
+    for i in ed["otras_ideas"]:
+        print(f"     💡 {i}")
+    print(f"Carpeta: {r['carpeta']}")
+    if args.github_output:
+        with open(args.github_output, "a", encoding="utf-8") as f:
+            f.write(f"carpeta={r['carpeta']}\n")
+    return 0
+
+
+def cmd_metricas(args: argparse.Namespace) -> int:
+    """Métricas de lo publicado: foto, informe para Telegram y aprendizajes para el editor."""
+    from bpt import metricas
+    from bpt.notificar import telegram
+    foto, texto, apr, img = metricas.ejecutar(Path(args.registro), Path(args.salida),
+                                             _clientes(), imagen=Path(args.imagen))
+    print(texto)
+    if apr:
+        print("\n--- aprendizajes.md ---\n" + apr)
+    if args.enviar:
+        tg = _tg_opcional()
+        if tg is None:
+            print("[aviso] Sin credenciales de Telegram: no se envía el informe", file=sys.stderr)
+        else:
+            try:
+                if img:
+                    tg.album([img], leyenda="📈 Alcance por formato")
+                tg.texto(texto)
+            except telegram.TelegramError as e:
+                print(f"[error] Telegram: {e}", file=sys.stderr)
+                return 1
+    return 0
+
+
+def cmd_reel(args: argparse.Namespace) -> int:
+    """Reels de un paquete: láminas + voz venezolana del guion (reel_<id>.mp4)."""
+    from bpt.video import reel
+    carpeta = Path(args.carpeta)
+    if not (carpeta / "resumen.json").exists():
+        print(f"[error] No existe {carpeta / 'resumen.json'}", file=sys.stderr)
+        return 1
+    try:
+        hechos = reel.armar_paquete(carpeta, voz=not args.sin_voz, handle=args.handle)
+    except reel.ReelError as e:
+        print(f"[error] Reel: {e}", file=sys.stderr)
+        return 1
+    if not hechos:
+        print("[aviso] Ninguna pieza con guion: no hay Reels")
+    for h in hechos:
+        voz = "con voz" if h["voz"] else f"SIN voz · {h['aviso']}"
+        print(f"[ok] Pieza {h['pieza']}: {h['archivo']} · {h['duracion']} s · {voz}")
+    return 0
+
+
+def cmd_verificar(args: argparse.Namespace) -> int:
+    """Verifica un especial sin dibujarlo: cifras, evidencia, hechos y reglas de marca."""
+    import json
+
+    from bpt import especial, verificador
+    try:
+        datos = especial.cargar(Path(args.archivo))
+    except (especial.EspecialError, FileNotFoundError, KeyError, ValueError) as e:
+        print(f"[error] {e}", file=sys.stderr)
+        return 1
+    evidencia = (json.loads(Path(args.evidencia).read_text(encoding="utf-8"))
+                 if args.evidencia else None)
+    v = verificador.verificar(datos, evidencia=evidencia, hechos=not args.sin_hechos)
+    print(v.resumen())
+    if v.cifras_sin_respaldo:
+        print("  ❌ Cifras sin respaldo: " + ", ".join(v.cifras_sin_respaldo))
+    for a in v.alertas:
+        print(f"  ⚠️ {a}")
+    if v.ok:
+        print("  ✅ Todo en orden")
+    return 0 if v.ok else 2
 
 
 def cmd_notificar(args: argparse.Namespace) -> int:
@@ -522,6 +629,12 @@ def cmd_publicar_redes(args: argparse.Namespace) -> int:
     for r in resultados:
         print(("[ok] " if r.ok else "[error] ") + r.linea(plan.get("tipo") == "historia")
               .replace("\n", " · "))
+    if args.registro:
+        filas = flujo.registro(plan, resultados, args.run_id)
+        if filas:
+            with open(args.registro, "a", encoding="utf-8") as f:
+                for fila in filas:
+                    f.write(json.dumps(fila, ensure_ascii=False) + "\n")
     tg = _tg_opcional() if args.message_id else None
     if tg:
         try:
@@ -674,6 +787,34 @@ def main(argv: list[str] | None = None) -> int:
     es.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
     es.set_defaults(func=cmd_especial)
 
+    ed = sub.add_parser("editor", help="Agente editor: propone y arma un especial verificado")
+    ed.add_argument("--fecha", default=None, help="AAAA-MM-DD; por defecto, hoy (hora de Venezuela)")
+    ed.add_argument("--tema", default=None, help="Tema pedido; vacío = el agente elige")
+    ed.add_argument("--salida", default="output/editor")
+    ed.add_argument("--handle", default=theme.HANDLE)
+    ed.add_argument("--aprendizajes", default=None, help="Archivo con lo aprendido de las métricas")
+    ed.add_argument("--github-output", default=None, help=argparse.SUPPRESS)
+    ed.set_defaults(func=cmd_editor)
+
+    me = sub.add_parser("metricas", help="Métricas de lo publicado e informe semanal")
+    me.add_argument("--registro", default="metricas/publicaciones.jsonl")
+    me.add_argument("--salida", default="metricas", help="Carpeta de la rama metricas")
+    me.add_argument("--imagen", default="output/metricas/informe.png")
+    me.add_argument("--enviar", action="store_true", help="Mandar el informe por Telegram")
+    me.set_defaults(func=cmd_metricas)
+
+    rl = sub.add_parser("reel", help="Reels de un paquete (láminas + voz del guion)")
+    rl.add_argument("--carpeta", required=True, help="Carpeta del paquete (con resumen.json)")
+    rl.add_argument("--sin-voz", action="store_true", help="Mudo (para ponerle música en la app)")
+    rl.add_argument("--handle", default=theme.HANDLE)
+    rl.set_defaults(func=cmd_reel)
+
+    ve = sub.add_parser("verificar", help="Verificar las cifras de un especial (sin dibujarlo)")
+    ve.add_argument("--archivo", required=True)
+    ve.add_argument("--evidencia", default=None, help="JSON con la evidencia (reemplaza la del especial)")
+    ve.add_argument("--sin-hechos", action="store_true", help="No consultar MLB Stats API")
+    ve.set_defaults(func=cmd_verificar)
+
     nt = sub.add_parser("notificar", help="Enviar el paquete del día a Telegram")
     nt.add_argument("--fecha", default=None, help="YYYY-MM-DD; por defecto, ayer (hora del Este)")
     nt.add_argument("--carpeta", default=None, help="Carpeta con resumen.json (ignora --fecha)")
@@ -744,6 +885,8 @@ def main(argv: list[str] | None = None) -> int:
     pz.add_argument("--carpeta", default="publico", help="Carpeta local de los JPEG (X)")
     pz.add_argument("--run-id", default="0", help="Run del paquete (para el botón de reintentar)")
     pz.add_argument("--message-id", default=None, help="Mensaje de Telegram del botón")
+    pz.add_argument("--registro", default=None,
+                    help="Archivo .jsonl donde anotar lo publicado (para las métricas)")
     pz.add_argument("--motivo", default="motivo.txt")
     pz.add_argument("--avisado", default="avisado.txt",
                     help="Se crea si el resultado ya se avisó en Telegram")

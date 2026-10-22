@@ -136,3 +136,14 @@ test("letras de red raras se rechazan", async () => {
   assert.equal(await atender(toque("pub:1:2:z:itx"), ENV, http), "desconocido");
   assert.equal(await atender(toque("pub:1:2:i:"), ENV, http), "desconocido");
 });
+
+test("el Reel de una pieza (r1) se confirma y dispara con su id", async () => {
+  const { http, llamadas } = httpFalso();
+  assert.equal(await atender(toque("pub:123:r1"), ENV, http), "confirmar");
+  assert.equal(await atender(toque("ok:123:r1"), ENV, http), "disparado");
+  const gh = llamadas.find((l) => l.url.includes("api.github.com"));
+  assert.equal(gh.cuerpo.inputs.pieza, "r1");
+  assert.equal(menu("123", "r1", "i")[0][0].text, "🎬 Publicar Reel en Instagram");
+  assert.equal(menu("123", "1", "i")[0][0].text, "📸 Publicar en Instagram");
+  assert.equal(await atender(toque("pub:123:x1"), ENV, http), "desconocido");
+});
