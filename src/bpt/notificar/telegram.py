@@ -416,7 +416,8 @@ def poner_webhook(token: str, url: str, secreto: str, http=requests) -> None:
         raise TelegramError("el secreto debe tener 16 a 256 caracteres A-Z, a-z, 0-9, _ o -")
     Telegram(token, "", pausa=0, http=http)._llamar("setWebhook", {
         "url": url, "secret_token": secreto, "drop_pending_updates": "true",
-        "allowed_updates": json.dumps(["callback_query"])})
+        # callback_query: los botones; message: /editor y las notas de voz (0.16.0)
+        "allowed_updates": json.dumps(["callback_query", "message"])})
 
 
 def quitar_webhook(token: str, http=requests) -> None:
