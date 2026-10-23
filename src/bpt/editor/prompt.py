@@ -72,7 +72,8 @@ cierre?}}, B: {{...}}}}}}
   - figuras: jugadores a seguir de cada equipo (requiere "equipos"). {{etiqueta, titulo, \
 subtitulo?, jugadores: {{A: [hasta 4 {{rol, nombre, pais?, linea, nota?, venezolano?}}], B: \
 [...]}}}}
-  "equipos" (solo para duelos): {{"A": {{nombre, liga, color: "#RRGGBB"}}, "B": {{...}}}}. \
+  "equipos" (solo para duelos): {{"A": {{nombre, corto, liga, color: "#RRGGBB"}}, "B": \
+{{...}}}}; `corto` es el nombre de una palabra ("Cerveceros") para las columnas estrechas. \
 La etiqueta va como "MBP  ·  LVBP 2026-27" o "MBP  ·  SERIE MUNDIAL 2026".
 B) Historia de Instagram (una noticia puntual: un batazo, un récord, un clasificado): \
 `"tipo": "historia"` y un bloque `historia` {{liga: "MLB"|"LVBP", antetitulo, titulo: \

@@ -63,6 +63,95 @@ def _ajustado(fig, x, y, texto, ancho, alto=None, fontsize=15.5, minimo=9.0, **k
         tam = max(minimo, tam - 1)
 
 
+def _corto(nombre: str) -> str:
+    """Nombre corto de un equipo: lo que va antes de " de " ("Cerveceros de Milwaukee" ->
+    "Cerveceros"). Si no hay " de ", el nombre completo."""
+    import re
+    partes = re.split(r"\s+de\s+", nombre.strip(), maxsplit=1, flags=re.IGNORECASE)
+    return partes[0] if partes and partes[0] else nombre
+
+
+def _repartir(texto: str, n: int) -> str:
+    """Parte cada línea larga del texto en `n` líneas parejas (para titulares)."""
+    import math
+    import textwrap
+    out = []
+    for linea in texto.split("\n"):
+        if n <= 1 or " " not in linea.strip():
+            out.append(linea)
+            continue
+        out.append(textwrap.fill(linea, max(math.ceil(len(linea) / n), 6),
+                                 break_long_words=False))
+    return "\n".join(out)
+
+
+def _probar(fig, x, y, texto, ancho, fontsize, piso, alto=None, **kw):
+    """Achica `texto` desde `fontsize` hasta `piso` hasta que quepa en `ancho` (y `alto`).
+    Devuelve (texto dibujado, tamaño) o (None, None) si no cabe ni al piso."""
+    renderer = fig.canvas.get_renderer()
+    inv = fig.transFigure.inverted()
+    tam = fontsize
+    while True:
+        t = fig.text(x, y, texto, fontsize=tam, **kw)
+        caja = t.get_window_extent(renderer).transformed(inv)
+        if caja.width <= ancho + 1e-6 and (alto is None or caja.height <= alto + 1e-6):
+            return t, tam
+        t.remove()
+        if tam <= piso:
+            return None, None
+        tam = max(piso, tam - 1)
+
+
+def _titular(fig, x, y, texto, ancho, fontsize, max_lineas=3, alto=None, piso=0.70,
+             minimo=0.45, **kw):
+    """Titular que nunca se sale de la lámina. Primero prueba el texto tal cual (achicando
+    hasta `piso` x el tamaño); si no cabe, lo reparte en 2..`max_lineas` líneas; como
+    último recurso achica hasta `minimo` x el tamaño. Devuelve (texto, tamaño, líneas)."""
+    lineas_autor = texto.count("\n") + 1
+    candidatos = [texto] + [_repartir(texto, n) for n in range(2, max_lineas + 1)
+                            if n > lineas_autor or "\n" not in texto]
+    vistos = []
+    for c in candidatos:
+        if c in vistos:
+            continue
+        vistos.append(c)
+        t, tam = _probar(fig, x, y, c, ancho, fontsize, fontsize * piso, alto, **kw)
+        if t is not None:
+            return t, tam, c.count("\n") + 1
+    c = vistos[-1]
+    t, tam = _probar(fig, x, y, c, ancho, fontsize, fontsize * minimo, alto, **kw)
+    if t is None:
+        tam = fontsize * minimo
+        t = fig.text(x, y, c, fontsize=tam, **kw)
+    return t, tam, c.count("\n") + 1
+
+
+def _completos_caben(fig, eq: dict, ancho, fontsize, **kw) -> bool:
+    """¿Caben los dos nombres completos? Si uno no cabe, los dos van cortos (parejos)."""
+    for clave in ("A", "B"):
+        if clave in eq:
+            t, _ = _probar(fig, 0, 0, eq[clave]["nombre"].upper(), ancho, fontsize,
+                           fontsize * 0.75, **kw)
+            if t is None:
+                return False
+            t.remove()
+    return True
+
+
+def _nombre_equipo(fig, x, y, e: dict, ancho, fontsize, completo_ok=True, **kw):
+    """Nombre del equipo en MAYÚSCULAS que cabe en su columna: achica un poco; si aun así
+    no cabe (o `completo_ok` es False porque el rival no cabe), usa el nombre corto
+    (`corto` del bloque "equipos" o lo que va antes de " de "); y si tampoco, achica."""
+    completo = e["nombre"].upper()
+    corto = (e.get("corto") or _corto(e["nombre"])).upper()
+    for c in dict.fromkeys((completo, corto) if completo_ok else (corto,)):
+        t, _ = _probar(fig, x, y, c, ancho, fontsize, fontsize * 0.75, **kw)
+        if t is not None:
+            return t
+    t, _ = _probar(fig, x, y, corto, ancho, fontsize, fontsize * 0.4, **kw)
+    return t if t is not None else fig.text(x, y, corto, fontsize=fontsize * 0.4, **kw)
+
+
 def _ancho(fig, t) -> float:
     return t.get_window_extent(fig.canvas.get_renderer()).transformed(
         fig.transFigure.inverted()).width
@@ -94,15 +183,14 @@ def _cabecera(fig, num, l: dict, color=theme.ACCENT) -> float:
     """Etiqueta, título y subtítulo. Devuelve la altura (fracción) donde empieza el cuerpo."""
     fig.text(X0, 0.955, l.get("etiqueta", "MBP  ·  SERIE MUNDIAL 2026"), fontsize=14,
              color=color, va="top", family=num)
-    titulo = l["titulo"]
-    fig.text(X0, 0.927, titulo, fontsize=l.get("tamano_titulo", 44), weight="bold",
-             color=theme.TEXT, va="top", linespacing=0.95)
-    lineas = titulo.count("\n") + 1
-    y = 0.927 - 0.052 * lineas - 0.016
+    base = l.get("tamano_titulo", 44)
+    _, tam, lineas = _titular(fig, X0, 0.927, l["titulo"], ANCHO, base, weight="bold",
+                              color=theme.TEXT, va="top", linespacing=0.95)
+    y = 0.927 - 0.052 * lineas * (tam / 44) - 0.016
     if l.get("subtitulo"):
-        fig.text(X0, y, l["subtitulo"], fontsize=17, color=theme.MUTED, va="top",
-                 linespacing=1.3)
-        y -= 0.026 * (l["subtitulo"].count("\n") + 1) + 0.014
+        _, tam, n = _titular(fig, X0, y, l["subtitulo"], ANCHO, 17, max_lineas=3, piso=0.8,
+                             color=theme.MUTED, va="top", linespacing=1.3)
+        y -= 0.026 * n * (tam / 17) + 0.014
     return y - 0.016
 
 
@@ -124,25 +212,25 @@ def _pie(fig, num, l: dict, pagina: str, fuente: str, handle: str):
 def _portada(fig, num, l, eq):
     fig.text(X0, 0.905, l.get("etiqueta", "MBP  ·  PREVIA"), fontsize=15, color=theme.ACCENT,
              va="top", family=num)
-    fig.text(X0, 0.870, l["titulo"], fontsize=66, weight="bold", color=theme.TEXT, va="top",
-             linespacing=0.92)
-    lineas = l["titulo"].count("\n") + 1
-    y = 0.870 - 0.074 * lineas - 0.022
+    _, tam, lineas = _titular(fig, X0, 0.870, l["titulo"], ANCHO, 66, weight="bold",
+                              color=theme.TEXT, va="top", linespacing=0.92)
+    y = 0.870 - 0.074 * lineas * (tam / 66) - 0.022
     if l.get("subtitulo"):
-        fig.text(X0, y, l["subtitulo"], fontsize=19, color=theme.MUTED, va="top",
-                 linespacing=1.35)
-        y -= 0.031 * (l["subtitulo"].count("\n") + 1) + 0.03
+        _, tam, n = _titular(fig, X0, y, l["subtitulo"], ANCHO, 19, max_lineas=3, piso=0.8,
+                             color=theme.MUTED, va="top", linespacing=1.35)
+        y -= 0.031 * n * (tam / 19) + 0.03
 
     # Dos bloques, uno por equipo, con "VS" al medio
     alto, w = 0.335, 0.405
     base = y - alto
+    completo_ok = _completos_caben(fig, eq, w - 0.05, 30, weight="bold")
     for i, clave in enumerate(("A", "B")):
         e = eq[clave]
         x = X0 if i == 0 else X1 - w
         _caja(fig, x, base, w, alto, theme.SURFACE)
         _caja(fig, x, base + alto - 0.010, w, 0.010, e["color"], r=0.004)
-        fig.text(x + 0.03, base + alto - 0.045, e["nombre"].upper(), fontsize=30,
-                 weight="bold", color=e["color"], va="center")
+        _nombre_equipo(fig, x + 0.03, base + alto - 0.045, e, w - 0.05, 30, completo_ok,
+                       weight="bold", color=e["color"], va="center")
         fig.text(x + 0.03, base + alto - 0.078, e.get("liga", ""), fontsize=13,
                  color=theme.MUTED, va="center")
         yy = base + alto - 0.125
@@ -169,14 +257,13 @@ def _portada(fig, num, l, eq):
 def _portada_tema(fig, num, l, eq):
     fig.text(X0, 0.905, l.get("etiqueta", "MBP"), fontsize=15, color=theme.ACCENT, va="top",
              family=num)
-    fig.text(X0, 0.870, l["titulo"], fontsize=l.get("tamano_titulo", 66), weight="bold",
-             color=theme.TEXT, va="top", linespacing=0.92)
-    lineas = l["titulo"].count("\n") + 1
-    y = 0.870 - 0.074 * lineas - 0.022
+    _, tam, lineas = _titular(fig, X0, 0.870, l["titulo"], ANCHO, l.get("tamano_titulo", 66), weight="bold",
+                              color=theme.TEXT, va="top", linespacing=0.92)
+    y = 0.870 - 0.074 * lineas * (tam / 66) - 0.022
     if l.get("subtitulo"):
-        fig.text(X0, y, l["subtitulo"], fontsize=19, color=theme.MUTED, va="top",
-                 linespacing=1.35)
-        y -= 0.031 * (l["subtitulo"].count("\n") + 1) + 0.03
+        _, tam, n = _titular(fig, X0, y, l["subtitulo"], ANCHO, 19, max_lineas=3, piso=0.8,
+                             color=theme.MUTED, va="top", linespacing=1.35)
+        y -= 0.031 * n * (tam / 19) + 0.03
     d = l.get("dato")
     if d:
         alto = 0.20
@@ -251,9 +338,10 @@ def _barras(fig, num, l, eq, y):
 
 def _cara_a_cara(fig, num, l, eq, y):
     xa, xb = 0.60, 0.84             # centros de las columnas de cada equipo
+    completo_ok = _completos_caben(fig, eq, (xb - xa) - 0.02, 17, weight="bold")
     for clave, x in (("A", xa), ("B", xb)):
-        fig.text(x, y, eq[clave]["nombre"].upper(), fontsize=17, weight="bold",
-                 color=eq[clave]["color"], va="center", ha="center")
+        _nombre_equipo(fig, x, y, eq[clave], (xb - xa) - 0.02, 17, completo_ok, weight="bold",
+                       color=eq[clave]["color"], va="center", ha="center")
     y -= 0.040
     filas = l["filas"]
     paso = min(0.064, (y - 0.10) / max(len(filas), 1))
@@ -279,12 +367,13 @@ def _cara_a_cara(fig, num, l, eq, y):
 
 def _camino(fig, num, l, eq, y):
     w = 0.425
+    completo_ok = _completos_caben(fig, eq, w, 22, weight="bold")
     for i, clave in enumerate(("A", "B")):
         e, c = eq[clave], l["equipos"][clave]
         x = X0 if i == 0 else X1 - w
         yy = y
-        fig.text(x, yy, e["nombre"].upper(), fontsize=22, weight="bold", color=e["color"],
-                 va="center")
+        _nombre_equipo(fig, x, yy, e, w, 22, completo_ok, weight="bold", color=e["color"],
+                       va="center")
         yy -= 0.058
         fig.text(x, yy, c["record"], fontsize=48, weight="bold", family=num,
                  color=theme.TEXT, va="center")
@@ -312,11 +401,12 @@ def _camino(fig, num, l, eq, y):
 
 def _figuras(fig, num, l, eq, y):
     w = 0.425
+    completo_ok = _completos_caben(fig, eq, w, 20, weight="bold")
     for i, clave in enumerate(("A", "B")):
         e = eq[clave]
         x = X0 if i == 0 else X1 - w
-        fig.text(x, y, e["nombre"].upper(), fontsize=20, weight="bold", color=e["color"],
-                 va="center")
+        _nombre_equipo(fig, x, y, e, w, 20, completo_ok, weight="bold", color=e["color"],
+                       va="center")
         yy = y - 0.030
         jugadores = l["jugadores"][clave]
         paso = min(0.128, (yy - 0.095) / max(len(jugadores), 1))
