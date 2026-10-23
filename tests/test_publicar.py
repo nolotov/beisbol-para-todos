@@ -341,7 +341,7 @@ def test_webhook_valida_url_y_secreto():
     telegram.poner_webhook(TOKEN_TG, "https://relay.workers.dev", "s" * 32, http=tele)
     (c,) = tele.llamadas
     assert c["metodo"] == "setWebhook" and c["data"]["secret_token"] == "s" * 32
-    assert json.loads(c["data"]["allowed_updates"]) == ["callback_query"]
+    assert json.loads(c["data"]["allowed_updates"]) == ["callback_query", "message"]
 
 
 # --- Historia del día ---------------------------------------------------------------

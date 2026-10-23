@@ -79,6 +79,25 @@ Láminas nuevas: `portada_tema` (portada de un tema que no es un duelo: titular,
 
 Costo: depende de cuántas consultas haga. Cada corrida imprime tokens y costo estimado en el resumen del run (`uso.json`). Contrastar con *Settings → Billing* tras la primera semana.
 
+### Pedirle al editor desde Telegram (0.16.0)
+
+Además del botón de Actions, el editor se pide desde el chat del bot:
+
+| Mensaje | Qué pasa |
+| --- | --- |
+| `/editor duelo de abridores del Juego 1` | Dispara **Editor MBP** con ese tema y responde "⏳ armando…" |
+| `/editor` | Tema libre: el editor elige la historia |
+| Nota de voz ("Gaby, hazme un especial del cañonero de Lara") | El relé la transcribe con Whisper (Workers AI), responde "🎙️ Entendí: «…» ¿Armo el especial?" y dispara solo con ✅ |
+| Cualquier otro texto | Responde la ayuda |
+
+Solo responde a `TELEGRAM_CHAT_ID`; cualquier otra persona recibe "No autorizado". Las notas de más de 90 s se rechazan. El tema viaja dentro del mensaje de confirmación: el relé sigue sin guardar nada.
+
+**Configuración (una vez):**
+
+1. Redesplegar el relé con el `worker.js` nuevo.
+2. Solo para la voz: en el Worker, **Settings → Bindings → Add → Workers AI**, nombre `AI` (con `wrangler deploy` ya va en `wrangler.toml`). Whisper consume la cuota gratuita diaria de Workers AI; unos audios cortos al día caben de sobra, pero conviene mirarlo en el panel.
+3. Volver a registrar el webhook para que Telegram también le mande los mensajes (antes solo mandaba los toques de botones): `python -m bpt telegram-webhook --url https://mbp-telegram-relay.<cuenta>.workers.dev`. Imprime un secreto nuevo: pegarlo en el Worker como `TELEGRAM_WEBHOOK_SECRET` enseguida (mientras tanto los botones responden 401). Verificar con `python -m bpt telegram-webhook`.
+
 ## 3. Métricas (0.14.0)
 
 `src/bpt/metricas/`. Tres piezas:
@@ -116,4 +135,4 @@ Edge-tts usa el servicio de voz de Microsoft Edge sin llave: es gratuito pero no
 
 ## Pruebas
 
-254 pruebas de Python (`python -m pytest -q`) y 13 del relé (`node --test infra/telegram-relay/worker.test.mjs`). El editor se prueba con un modelo y una MLB Stats API simulados; los Reels, con ffmpeg real y voz simulada.
+264 pruebas de Python (`python -m pytest -q`) y 23 del relé (`node --test infra/telegram-relay/worker.test.mjs`). El editor se prueba con un modelo y una MLB Stats API simulados; los Reels, con ffmpeg real y voz simulada.

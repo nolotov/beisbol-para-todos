@@ -7,6 +7,10 @@
 //                     otras redes, el workflow edita este mensaje con el enlace o el error;
 //                     si quedan, sus botones siguen aquí y el resultado llega como respuesta.
 //   4. "No"        -> vuelve a dejar el menú de redes.
+//   5. Mensajes tuyos al bot (0.16.0):
+//        /editor <tema>  -> dispara "Editor MBP" con ese tema (sin tema, elige el editor)
+//        nota de voz     -> la transcribe con Workers AI (Whisper), te muestra lo que entendió
+//                           y espera tu ✅ antes de disparar el editor
 // No guarda nada ni publica nada por su cuenta: solo traduce un toque en un workflow_dispatch.
 //
 // Variables (Settings > Variables and Secrets del Worker, todas como "Secret"):
@@ -16,8 +20,20 @@
 //   GITHUB_TOKEN            token fine-grained del repo con permiso Actions: Read and write
 //   GITHUB_REPO             nolotov/beisbol-para-todos   (puede ser variable normal)
 //   GITHUB_REF              main                         (opcional, por defecto main)
+//   AI                      binding de Workers AI (solo para las notas de voz)
 
 const WORKFLOW = "publicar.yml";
+const WORKFLOW_EDITOR = "editor.yml";
+const MODELO_VOZ = "@cf/openai/whisper-large-v3-turbo";
+const MAX_TEMA = 300;        // el mismo límite que valida editor.yml
+const MAX_SEG_VOZ = 90;
+// Vocabulario para que Whisper no confunda nombres de la pelota
+const CONTEXTO_VOZ =
+  "Gaby, especial de béisbol: LVBP, MLB, Serie Mundial, Magallanes, Caracas, Lara, Zulia, " +
+  "La Guaira, Aragua, Anzoátegui, Margarita, Cerveceros, Rays, jonrón, abridor, ponches.";
+const AYUDA =
+  "Para pedir un especial:\n• /editor <tema>  (ej. /editor duelo de abridores del Juego 1)\n" +
+  "• /editor solo: el editor elige la historia\n• o mándame una nota de voz con el tema";
 // accion:run:pieza  (formato corto: solo Instagram)  o  accion:run:pieza:destino:quedan
 // destino y quedan son letras de red: i = Instagram, t = Threads, x = X.
 // La pieza "r1", "rjornada"... es el Reel de esa pieza (solo Instagram).
@@ -86,10 +102,9 @@ export default {
       return new Response("ok");
     }
     const cq = update.callback_query;
-    if (!cq) return new Response("ok"); // mensajes normales: se ignoran
-
     try {
-      await atender(cq, env);
+      if (update.message) await atenderMensaje(update.message, env);
+      else if (cq) await atender(cq, env);
     } catch (e) {
       // Siempre 200: si no, Telegram reintenta el mismo toque una y otra vez.
       console.log("error atendiendo el toque:", String(e && e.message ? e.message : e));
@@ -106,6 +121,8 @@ export async function atender(cq, env, http = fetch) {
     await tg("answerCallbackQuery", { callback_query_id: cq.id, text: "No autorizado" });
     return "no-autorizado";
   }
+
+  if (/^ed:(ok|no)$/.test(cq.data || "")) return atenderEditor(cq, env, http);
 
   const m = DATA.exec(cq.data || "");
   const msg = cq.message || {};
@@ -159,8 +176,20 @@ export async function atender(cq, env, http = fetch) {
     inputs.destino = destino;
     inputs.quedan = quedan;
   }
-  const r = await http(
-    `https://api.github.com/repos/${env.GITHUB_REPO}/actions/workflows/${WORKFLOW}/dispatches`,
+  const r = await disparar(env, WORKFLOW, inputs, http);
+  if (r.status !== 204) {
+    const detalle = (await r.text()).slice(0, 200);
+    await editar(`${base}\n\n❌ No pude disparar la publicación en GitHub (HTTP ${r.status}). ${detalle}`, [
+      [{ text: "🔁 Reintentar", callback_data: callback("pub", runId, pieza, destino, quedan) }],
+    ]);
+    return "error-github";
+  }
+  return "disparado";
+}
+
+function disparar(env, workflow, inputs, http) {
+  return http(
+    `https://api.github.com/repos/${env.GITHUB_REPO}/actions/workflows/${workflow}/dispatches`,
     {
       method: "POST",
       headers: {
@@ -173,14 +202,146 @@ export async function atender(cq, env, http = fetch) {
       body: JSON.stringify({ ref: env.GITHUB_REF || "main", inputs }),
     },
   );
-  if (r.status !== 204) {
-    const detalle = (await r.text()).slice(0, 200);
-    await editar(`${base}\n\n❌ No pude disparar la publicación en GitHub (HTTP ${r.status}). ${detalle}`, [
-      [{ text: "🔁 Reintentar", callback_data: callback("pub", runId, pieza, destino, quedan) }],
+}
+
+// --- Editor por Telegram (texto y voz) ---------------------------------------------
+
+// "Gaby, hazme un especial..." -> "hazme un especial..." (el editor entiende la frase)
+export function limpiarTema(texto) {
+  let t = String(texto || "").replace(/\s+/g, " ").trim();
+  t = t.replace(/^(oye\s+)?gab(y|i)\b[\s,.:;!¡-]*/i, "").trim();
+  t = t.replace(/[.\s]+$/, "");
+  return t.slice(0, MAX_TEMA);
+}
+
+export function comandoEditor(texto) {
+  const m = /^\/editor(?:@\w+)?(?:\s+([\s\S]*))?$/i.exec(String(texto || "").trim());
+  return m ? { tema: limpiarTema(m[1] || "") } : null;
+}
+
+// El tema viaja en el propio mensaje de confirmación (el relé no guarda nada)
+export function temaDeConfirmacion(texto) {
+  const m = /«([\s\S]*)»/.exec(String(texto || ""));
+  return m ? limpiarTema(m[1]) : null;
+}
+
+function base64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let bin = "";
+  for (let k = 0; k < bytes.length; k += 0x8000) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(k, k + 0x8000));
+  }
+  return btoa(bin);
+}
+
+async function dispararEditor(env, tema, http) {
+  const inputs = tema ? { tema } : {};
+  const r = await disparar(env, WORKFLOW_EDITOR, inputs, http);
+  if (r.status === 204) return null;
+  return `HTTP ${r.status} ${(await r.text()).slice(0, 160)}`;
+}
+
+const enArmado = (tema) =>
+  tema
+    ? `⏳ Editor: armando la propuesta sobre «${tema}». Te llega aquí en unos minutos.`
+    : "⏳ Editor: tema libre, él elige la historia. Te llega aquí en unos minutos.";
+
+export async function atenderMensaje(msg, env, http = fetch) {
+  const tg = (metodo, cuerpo) => telegram(env, metodo, cuerpo, http);
+  const permitido = String(env.TELEGRAM_CHAT_ID || "").trim();
+  const chat = msg.chat && msg.chat.id;
+  if (String(msg.from && msg.from.id) !== permitido || String(chat) !== permitido) {
+    if (chat) await tg("sendMessage", { chat_id: chat, text: "No autorizado" });
+    return "no-autorizado";
+  }
+  const responder = (text, filas) =>
+    tg("sendMessage", {
+      chat_id: chat,
+      text,
+      disable_web_page_preview: true,
+      reply_parameters: { message_id: msg.message_id, allow_sending_without_reply: true },
+      ...(filas ? { reply_markup: { inline_keyboard: filas } } : {}),
+    });
+
+  const nota = msg.voice || msg.audio;
+  if (nota) {
+    if (!env.AI) {
+      await responder("Para entender notas de voz falta conectar Workers AI al relé (binding AI). Mientras tanto: /editor <tema>.");
+      return "sin-ai";
+    }
+    if ((nota.duration || 0) > MAX_SEG_VOZ) {
+      await responder(`La nota dura más de ${MAX_SEG_VOZ} s: mándame una más corta con el tema.`);
+      return "voz-larga";
+    }
+    let texto = "";
+    try {
+      const info = await tg("getFile", { file_id: nota.file_id });
+      const audio = await http(
+        `https://api.telegram.org/file/bot${env.TELEGRAM_BOT_TOKEN}/${info.file_path}`,
+      );
+      const res = await env.AI.run(MODELO_VOZ, {
+        audio: base64(await audio.arrayBuffer()),
+        language: "es",
+        initial_prompt: CONTEXTO_VOZ,
+      });
+      texto = limpiarTema(res && res.text);
+    } catch (e) {
+      await responder("No pude transcribir la nota 🙈 Prueba otra vez o escribe /editor <tema>.");
+      return "error-voz";
+    }
+    if (!texto) {
+      await responder("No entendí nada en la nota. Prueba otra vez o escribe /editor <tema>.");
+      return "voz-vacia";
+    }
+    await responder(`🎙️ Entendí:\n«${texto}»\n\n¿Armo el especial?`, [
+      [
+        { text: "✅ Sí, armarlo", callback_data: "ed:ok" },
+        { text: "↩️ No", callback_data: "ed:no" },
+      ],
+    ]);
+    return "confirmar-voz";
+  }
+
+  const cmd = comandoEditor(msg.text);
+  if (cmd) {
+    const error = await dispararEditor(env, cmd.tema, http);
+    await responder(error ? `❌ No pude lanzar el editor en GitHub (${error}).` : enArmado(cmd.tema));
+    return error ? "error-github" : "editor";
+  }
+  await responder(AYUDA);
+  return "ayuda";
+}
+
+export async function atenderEditor(cq, env, http = fetch) {
+  const tg = (metodo, cuerpo) => telegram(env, metodo, cuerpo, http);
+  const msg = cq.message || {};
+  const editar = (text, filas) =>
+    tg("editMessageText", {
+      chat_id: msg.chat.id,
+      message_id: msg.message_id,
+      text,
+      reply_markup: { inline_keyboard: filas || [] },
+    });
+  if (cq.data === "ed:no") {
+    await tg("answerCallbackQuery", { callback_query_id: cq.id, text: "Cancelado" });
+    await editar("↩️ Cancelado. Mándame otra nota de voz o escribe /editor <tema>.");
+    return "cancelado";
+  }
+  const tema = temaDeConfirmacion(msg.text);
+  if (tema === null) {
+    await tg("answerCallbackQuery", { callback_query_id: cq.id, text: "No encontré el tema" });
+    return "sin-tema";
+  }
+  await tg("answerCallbackQuery", { callback_query_id: cq.id, text: "Lanzando el editor…" });
+  await editar(enArmado(tema));            // sin botones: evita el doble toque
+  const error = await dispararEditor(env, tema, http);
+  if (error) {
+    await editar(`❌ No pude lanzar el editor en GitHub (${error}).\n\n«${tema}»`, [
+      [{ text: "🔁 Reintentar", callback_data: "ed:ok" }],
     ]);
     return "error-github";
   }
-  return "disparado";
+  return "editor";
 }
 
 async function telegram(env, metodo, cuerpo, http) {
