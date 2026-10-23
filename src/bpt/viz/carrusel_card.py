@@ -38,6 +38,31 @@ def _caja(fig, x, y, w, h, color, r=0.012, **kw):
                                   transform=fig.transFigure, color=color, linewidth=0, **kw))
 
 
+def _envolver(texto: str, por_linea: int) -> str:
+    """Parte en líneas de hasta `por_linea` caracteres, respetando los \n del autor."""
+    import textwrap
+    return "\n".join(textwrap.fill(p, max(por_linea, 8)) if len(p) > por_linea else p
+                     for p in texto.split("\n"))
+
+
+def _ajustado(fig, x, y, texto, ancho, alto=None, fontsize=15.5, minimo=9.0, **kw):
+    """Texto que cabe en su caja: se parte en líneas y, si aun así no cabe en `ancho` (y
+    `alto`, en fracción de la figura), se achica la letra hasta `minimo`. Así una
+    explicación larga ("percentil 99 en velocidad de salida…") no se sale del recuadro."""
+    renderer = fig.canvas.get_renderer()
+    tam = fontsize
+    while True:
+        # caracteres por línea estimados con el ancho medio de un carácter (~0,5 em)
+        por_linea = int(ancho * W * 72 / (tam * 0.5))
+        t = fig.text(x, y, _envolver(texto, por_linea), fontsize=tam, **kw)
+        caja = t.get_window_extent(renderer).transformed(fig.transFigure.inverted())
+        cabe = caja.width <= ancho + 1e-6 and (alto is None or caja.height <= alto + 1e-6)
+        if cabe or tam <= minimo:
+            return t
+        t.remove()
+        tam = max(minimo, tam - 1)
+
+
 def _cabecera(fig, num, l: dict, color=theme.ACCENT) -> float:
     """Etiqueta, título y subtítulo. Devuelve la altura (fracción) donde empieza el cuerpo."""
     fig.text(X0, 0.955, l.get("etiqueta", "MBP  ·  SERIE MUNDIAL 2026"), fontsize=14,
@@ -56,8 +81,8 @@ def _cabecera(fig, num, l: dict, color=theme.ACCENT) -> float:
 
 def _pie(fig, num, l: dict, pagina: str, fuente: str, handle: str):
     if l.get("nota"):
-        fig.text(X0, 0.068, l["nota"], fontsize=11.5, color=theme.MUTED, va="center",
-                 linespacing=1.3)
+        _ajustado(fig, X0, 0.068, l["nota"], ANCHO, 0.04, fontsize=11.5, minimo=9,
+                  color=theme.MUTED, va="center", linespacing=1.3)
     fig.text(X0, 0.034, l.get("fuente", fuente), fontsize=10, color=theme.MUTED, va="center",
              family=num)
     if pagina:
@@ -97,8 +122,8 @@ def _portada(fig, num, l, eq):
         for d in l.get("datos", {}).get(clave, [])[:3]:
             fig.text(x + 0.03, yy, d["cifra"], fontsize=30, weight="bold", family=num,
                      color=theme.TEXT, va="center")
-            fig.text(x + 0.03, yy - 0.029, d["texto"], fontsize=13.5, color=theme.MUTED,
-                     va="center")
+            _ajustado(fig, x + 0.03, yy - 0.029, d["texto"], w - 0.05, 0.03, fontsize=13.5,
+                      color=theme.MUTED, va="center")
             yy -= 0.076
     fig.text(0.5, base + alto / 2, "VS", fontsize=26, weight="bold", color=theme.MUTED,
              va="center", ha="center", family=num)
@@ -110,8 +135,8 @@ def _portada(fig, num, l, eq):
         _caja(fig, X0, y_r, ANCHO, alto_r, theme.ACCENT)
         fig.text(X0 + 0.035, y_r + alto_r - 0.040, r["cifra"], fontsize=46, weight="bold",
                  color=theme.BG, va="center", family=num)
-        fig.text(X0 + 0.035, y_r + 0.036, r["texto"], fontsize=17, color=theme.BG,
-                 va="center", linespacing=1.3)
+        _ajustado(fig, X0 + 0.035, y_r + 0.036, r["texto"], ANCHO - 0.07, 0.06, fontsize=17,
+                  color=theme.BG, va="center", linespacing=1.3)
 
 
 def _portada_tema(fig, num, l, eq):
@@ -133,8 +158,8 @@ def _portada_tema(fig, num, l, eq):
         _caja(fig, X0, y, ANCHO, alto, color)
         fig.text(X0 + 0.04, y + alto * 0.62, d["cifra"], fontsize=d.get("tamano", 72),
                  weight="bold", color=theme.BG, va="center", family=num)
-        fig.text(X0 + 0.04, y + alto * 0.20, d["texto"], fontsize=17, color=theme.BG,
-                 va="center", linespacing=1.3)
+        _ajustado(fig, X0 + 0.04, y + alto * 0.20, d["texto"], ANCHO - 0.08, 0.075,
+                  fontsize=17, color=theme.BG, va="center", linespacing=1.3)
         y -= 0.03
     puntos = l.get("puntos", [])[:3]
     if puntos:
@@ -149,8 +174,8 @@ def _portada_tema(fig, num, l, eq):
             _caja(fig, x, y - 0.008, w, 0.008, color, r=0.003)
             fig.text(x + 0.025, y - 0.06, p["cifra"], fontsize=p.get("tamano", 34),
                      weight="bold", color=theme.TEXT, va="center", family=num)
-            fig.text(x + 0.025, y - 0.12, p["texto"], fontsize=13, color=theme.MUTED,
-                     va="center", linespacing=1.3)
+            _ajustado(fig, x + 0.025, y - 0.12, p["texto"], w - 0.04, 0.08, fontsize=13,
+                      color=theme.MUTED, va="center", linespacing=1.3)
 
 
 def _cifras(fig, num, l, eq, y):
@@ -166,8 +191,9 @@ def _cifras(fig, num, l, eq, y):
         _caja(fig, X0, y - alto, 0.008, alto, color, r=0.003)
         fig.text(X0 + 0.03, y - alto / 2, it["cifra"], fontsize=it.get("tamano", 40),
                  weight="bold", color=color, va="center", family=num)
-        fig.text(X0 + 0.03 + ancho_cifra, y - alto / 2, it["texto"], fontsize=15.5,
-                 color=theme.TEXT, va="center", linespacing=1.3)
+        _ajustado(fig, X0 + 0.03 + ancho_cifra, y - alto / 2, it["texto"],
+                  ANCHO - 0.05 - ancho_cifra, alto - 0.014, fontsize=15.5,
+                  color=theme.TEXT, va="center", linespacing=1.3)
         y -= paso
 
 
@@ -181,8 +207,8 @@ def _barras(fig, num, l, eq, y):
         fig.text(X0, y + 0.010, b["etiqueta"], fontsize=22, weight="bold", color=theme.TEXT,
                  va="center")
         if b.get("detalle"):
-            fig.text(X0, y - 0.020, b["detalle"], fontsize=13, color=theme.MUTED,
-                     va="center")
+            _ajustado(fig, X0, y - 0.020, b["detalle"], 0.33 - X0 - 0.01, 0.025, fontsize=13,
+                      color=theme.MUTED, va="center")
         largo = 0.44 * b["valor"] / tope
         _caja(fig, 0.33, y - 0.026, largo, 0.052, color, r=0.006)
         fig.text(0.33 + largo + 0.015, y, b["texto"], fontsize=23, weight="bold",
@@ -195,8 +221,9 @@ def _barras(fig, num, l, eq, y):
         _caja(fig, X0, y - alto, ANCHO, alto, theme.SURFACE)
         fig.text(X0 + 0.035, y - alto / 2, c["cifra"], fontsize=48, weight="bold",
                  color=theme.ACCENT, va="center", family=num)
-        fig.text(X0 + 0.035 + l.get("ancho_cifra", 0.24), y - alto / 2, c["texto"],
-                 fontsize=16, color=theme.TEXT, va="center", linespacing=1.3)
+        ac = l.get("ancho_cifra", 0.24)
+        _ajustado(fig, X0 + 0.035 + ac, y - alto / 2, c["texto"], ANCHO - 0.06 - ac,
+                  alto - 0.02, fontsize=16, color=theme.TEXT, va="center", linespacing=1.3)
 
 
 def _cara_a_cara(fig, num, l, eq, y):
@@ -213,7 +240,8 @@ def _cara_a_cara(fig, num, l, eq, y):
         fig.text(X0 + 0.01, y + 0.008, f["stat"], fontsize=16.5, color=theme.TEXT,
                  va="center", weight="bold")
         if f.get("ayuda"):
-            fig.text(X0 + 0.01, y - 0.014, f["ayuda"], fontsize=10.5, color=theme.MUTED,
+            _ajustado(fig, X0 + 0.01, y - 0.014, f["ayuda"], 0.48 - X0, 0.02, fontsize=10.5,
+                      minimo=8, color=theme.MUTED,
                      va="center")
         for clave, x in (("A", xa), ("B", xb)):
             gana = f.get("mejor") in (clave, "ambos")
@@ -255,8 +283,8 @@ def _camino(fig, num, l, eq, y):
                          family=num, color=theme.MUTED, va="center")
             yy -= alto + 0.018
         if c.get("cierre"):
-            fig.text(x, yy - 0.012, c["cierre"], fontsize=15, color=theme.TEXT, va="top",
-                     linespacing=1.4)
+            _ajustado(fig, x, yy - 0.012, c["cierre"], w, max(yy - 0.11, 0.04), fontsize=15,
+                      color=theme.TEXT, va="top", linespacing=1.4)
 
 
 def _figuras(fig, num, l, eq, y):
@@ -281,11 +309,11 @@ def _figuras(fig, num, l, eq, y):
                          color=theme.LVBP if ven else theme.MUTED, va="center", ha="right")
             fig.text(x + 0.022, yy - 0.046, j["nombre"], fontsize=18, weight="bold",
                      color=theme.LVBP if ven else theme.TEXT, va="center")
-            fig.text(x + 0.022, yy - 0.072, j["linea"], fontsize=12, family=num,
-                     color=theme.TEXT, va="center")
+            _ajustado(fig, x + 0.022, yy - 0.072, j["linea"], w - 0.035, 0.02, fontsize=12,
+                      minimo=8.5, family=num, color=theme.TEXT, va="center")
             if j.get("nota"):
-                fig.text(x + 0.022, yy - 0.095, j["nota"], fontsize=11, color=theme.MUTED,
-                         va="center")
+                _ajustado(fig, x + 0.022, yy - 0.095, j["nota"], w - 0.035, 0.02, fontsize=11,
+                          minimo=8, color=theme.MUTED, va="center")
             yy -= paso
 
 
