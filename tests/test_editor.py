@@ -372,3 +372,57 @@ def test_texto_largo_no_se_sale_del_recuadro():
     corto = C._ajustado(fig, 0.3, 0.3, "promedio", 0.6, 0.1, fontsize=15.5)
     assert corto.get_text() == "promedio" and corto.get_fontsize() == 15.5
     plt.close(fig)
+
+
+def test_cifra_ancha_no_pisa_su_texto():
+    """Caso real (lámina 3 del editor): "2.27 vs. 1.30" pisaba la explicación."""
+    from bpt.viz.carrusel_card import render_lamina
+    l = {"tipo": "barras", "titulo": "PERO EL\nESTILO MANDA", "subtitulo": "Ponches por 9",
+         "barras": [{"etiqueta": "Martinez", "valor": 5.45, "texto": "5.45"},
+                    {"etiqueta": "Misiorowski", "valor": 12.98, "texto": "12.98"}],
+         "conclusion": {"cifra": "2.27 vs. 1.30",
+                        "texto": "boletos por 9 entradas: Misiorowski vs. Martinez"}}
+    p = []
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        render_lamina(l, {}, Path(d) / "a.png", problemas=p)
+        cif = {"tipo": "cifras", "titulo": "X", "items": [
+            {"cifra": "103-59 vs. 98-64", "texto": "récord de la temporada regular de cada uno"}]}
+        render_lamina(cif, {}, Path(d) / "b.png", problemas=p)
+    assert p == []
+
+
+def test_el_control_detecta_textos_encimados():
+    import matplotlib.pyplot as plt
+    from bpt.viz import carrusel_card as C
+    fig = plt.figure(figsize=(C.W, C.H), dpi=100)
+    fig.text(0.1, 0.5, "2.27 vs. 1.30", fontsize=48)
+    fig.text(0.3, 0.5, "boletos por 9 entradas", fontsize=16)
+    fig.text(0.9, 0.2, "se sale por la derecha de la lámina", fontsize=16)
+    p = C.textos_encimados(fig)
+    plt.close(fig)
+    assert any("pisa a" in x for x in p) and any("se sale" in x for x in p)
+
+
+def test_especial_con_textos_encimados_llega_con_alertas(tmp_path, monkeypatch):
+    monkeypatch.setenv("BPT_VERIFICAR_HECHOS", "0")
+    from bpt import especial
+    from bpt.viz import carrusel_card as C
+    real = C.textos_encimados
+    monkeypatch.setattr(C, "textos_encimados", lambda fig: ["«a» pisa a «b»"] + real(fig))
+    e = {"slug": "x", "titular": "X", "laminas": [{"tipo": "cifras", "titulo": "X",
+                                                  "items": [{"cifra": "1", "texto": "uno"}]}],
+         "textos": {"instagram": "Uno 1 ⚾", "hilo_x": ["1", "1", "1"]}}
+    r = especial.generar_datos(e, tmp_path)
+    assert "lámina 1: «a» pisa a «b»" in r["alertas"]
+
+
+def test_ningun_especial_del_repo_tiene_textos_encimados(tmp_path, monkeypatch):
+    """Guardia de regresión: un arreglo de diseño no puede encimar textos en lo que ya existe."""
+    monkeypatch.setenv("BPT_VERIFICAR_HECHOS", "0")
+    from bpt import especial
+    for archivo in sorted(Path("content/especiales").glob("*.json")):
+        if archivo.name.endswith(".evidencia.json"):
+            continue
+        r = especial.generar(archivo, tmp_path)
+        assert not [a for a in r["alertas"] if a.startswith("lámina")], archivo.name

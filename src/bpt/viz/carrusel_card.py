@@ -63,6 +63,33 @@ def _ajustado(fig, x, y, texto, ancho, alto=None, fontsize=15.5, minimo=9.0, **k
         tam = max(minimo, tam - 1)
 
 
+def _ancho(fig, t) -> float:
+    return t.get_window_extent(fig.canvas.get_renderer()).transformed(
+        fig.transFigure.inverted()).width
+
+
+def _cifra_y_texto(fig, x, y, cifra, texto, ancho_total, alto, ancho_cifra, tam_cifra,
+                   tam_texto, color_cifra, color_texto, num, sep=0.025):
+    """Cifra grande a la izquierda y su explicación a la derecha, sin pisarse.
+
+    `ancho_cifra` es el espacio reservado (para que las filas queden alineadas); si la cifra
+    real mide más ("2.27 vs. 1.30"), el texto se corre a su derecha y, si con eso al texto
+    le queda menos del 40 % del ancho, la cifra se achica."""
+    tam = tam_cifra
+    while True:
+        tc = fig.text(x, y, cifra, fontsize=tam, weight="bold", color=color_cifra,
+                      va="center", family=num)
+        w = _ancho(fig, tc)
+        if w <= ancho_total * 0.6 or tam <= 18:
+            break
+        tc.remove()
+        tam -= 2
+    x_texto = x + max(ancho_cifra, w + sep)
+    _ajustado(fig, x_texto, y, texto, x + ancho_total - x_texto, alto, fontsize=tam_texto,
+              color=color_texto, va="center", linespacing=1.3)
+    return tc
+
+
 def _cabecera(fig, num, l: dict, color=theme.ACCENT) -> float:
     """Etiqueta, título y subtítulo. Devuelve la altura (fracción) donde empieza el cuerpo."""
     fig.text(X0, 0.955, l.get("etiqueta", "MBP  ·  SERIE MUNDIAL 2026"), fontsize=14,
@@ -189,11 +216,9 @@ def _cifras(fig, num, l, eq, y):
         color = (theme.LVBP if es_venezolano(it)
                  else eq[it["equipo"]]["color"] if it.get("equipo") in eq else theme.ACCENT)
         _caja(fig, X0, y - alto, 0.008, alto, color, r=0.003)
-        fig.text(X0 + 0.03, y - alto / 2, it["cifra"], fontsize=it.get("tamano", 40),
-                 weight="bold", color=color, va="center", family=num)
-        _ajustado(fig, X0 + 0.03 + ancho_cifra, y - alto / 2, it["texto"],
-                  ANCHO - 0.05 - ancho_cifra, alto - 0.014, fontsize=15.5,
-                  color=theme.TEXT, va="center", linespacing=1.3)
+        _cifra_y_texto(fig, X0 + 0.03, y - alto / 2, it["cifra"], it["texto"],
+                       ANCHO - 0.05, alto - 0.014, ancho_cifra, it.get("tamano", 40), 15.5,
+                       color, theme.TEXT, num)
         y -= paso
 
 
@@ -219,11 +244,9 @@ def _barras(fig, num, l, eq, y):
         alto = 0.15
         y -= 0.03
         _caja(fig, X0, y - alto, ANCHO, alto, theme.SURFACE)
-        fig.text(X0 + 0.035, y - alto / 2, c["cifra"], fontsize=48, weight="bold",
-                 color=theme.ACCENT, va="center", family=num)
-        ac = l.get("ancho_cifra", 0.24)
-        _ajustado(fig, X0 + 0.035 + ac, y - alto / 2, c["texto"], ANCHO - 0.06 - ac,
-                  alto - 0.02, fontsize=16, color=theme.TEXT, va="center", linespacing=1.3)
+        _cifra_y_texto(fig, X0 + 0.035, y - alto / 2, c["cifra"], c["texto"], ANCHO - 0.06,
+                       alto - 0.02, l.get("ancho_cifra", 0.24), 48, 16, theme.ACCENT,
+                       theme.TEXT, num)
 
 
 def _cara_a_cara(fig, num, l, eq, y):
@@ -329,8 +352,35 @@ def tipos_validos() -> set[str]:
     return set(TIPOS) | {"portada", "portada_tema"}
 
 
+def textos_encimados(fig, margen: float = 0.004) -> list[str]:
+    """Control de diseño: textos que se pisan entre sí o que se salen de la lámina.
+    Devuelve una descripción corta de cada choque (vacío = todo en orden)."""
+    renderer = fig.canvas.get_renderer()
+    inv = fig.transFigure.inverted()
+    cajas = []
+    for t in fig.texts:
+        texto = t.get_text().strip()
+        if texto:
+            cajas.append((texto, t.get_window_extent(renderer).transformed(inv)))
+    corto = lambda x: x.replace("\n", " ")[:28]  # noqa: E731
+    problemas = []
+    for texto, c in cajas:
+        if c.x0 < -margen or c.x1 > 1 + margen or c.y0 < -margen or c.y1 > 1 + margen:
+            problemas.append(f"«{corto(texto)}» se sale de la lámina")
+    for i in range(len(cajas)):
+        for j in range(i + 1, len(cajas)):
+            (ta, a), (tb, b) = cajas[i], cajas[j]
+            ancho = min(a.x1, b.x1) - max(a.x0, b.x0)
+            alto = min(a.y1, b.y1) - max(a.y0, b.y0)
+            if ancho > margen and alto > margen:
+                problemas.append(f"«{corto(ta)}» pisa a «{corto(tb)}»")
+    return problemas
+
+
 def render_lamina(l: dict, equipos: dict, out_path: Path, pagina: str = "",
-                  fuente: str = "Datos: MLB Stats API", handle: str = theme.HANDLE) -> Path:
+                  fuente: str = "Datos: MLB Stats API", handle: str = theme.HANDLE,
+                  problemas: list | None = None) -> Path:
+    """Dibuja la lámina. Con `problemas` (una lista), le agrega los textos encimados."""
     fonts = theme.apply()
     num = fonts["number"]
     fig = plt.figure(figsize=(W, H), dpi=100)
@@ -343,6 +393,8 @@ def render_lamina(l: dict, equipos: dict, out_path: Path, pagina: str = "",
         y = _cabecera(fig, num, l)
         TIPOS[l["tipo"]](fig, num, l, equipos, y)
     _pie(fig, num, l, pagina, fuente, handle)
+    if problemas is not None:
+        problemas.extend(textos_encimados(fig))
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=100)
