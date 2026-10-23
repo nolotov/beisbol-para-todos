@@ -138,6 +138,7 @@ def generar_datos(datos: dict, salida: Path = SALIDA, handle: str = theme.HANDLE
         return _generar_historia(datos, carpeta, handle, evidencia)
     fuente = datos.get("fuente", "Datos: Baseball-Reference")
     tarjetas = []
+    diseno: list[str] = []      # textos encimados o fuera de la lámina
 
     if datos.get("portada"):
         p = datos["portada"]
@@ -152,8 +153,10 @@ def generar_datos(datos: dict, salida: Path = SALIDA, handle: str = theme.HANDLE
         total = len(laminas)
         for i, l in enumerate(laminas, 1):
             nombre = f"{i:02d}_{l['tipo']}.png"
+            choques: list[str] = []
             render_lamina(l, datos.get("equipos", {}), carpeta / nombre, pagina=f"{i}/{total}",
-                          fuente=fuente, handle=handle)
+                          fuente=fuente, handle=handle, problemas=choques)
+            diseno += [f"lámina {i}: {c}" for c in choques]
             tarjetas.append(nombre)
     for r in datos.get("rosters", []):
         render_roster(r["titulo"], r.get("subtitulo", ""), r["jugadores"],
@@ -162,7 +165,7 @@ def generar_datos(datos: dict, salida: Path = SALIDA, handle: str = theme.HANDLE
         tarjetas.append(r["archivo"])
 
     ver = verificar(datos, evidencia)
-    alertas = revisar_textos(datos["textos"]) + ver.alertas
+    alertas = revisar_textos(datos["textos"]) + diseno + ver.alertas
     sin = ver.cifras_sin_respaldo
     resumen = {"formato": "especial", "slug": datos["slug"], "fecha": datos.get("fecha", ""),
                "titular": datos["titular"], "tarjetas": tarjetas,
