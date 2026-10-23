@@ -124,6 +124,8 @@ def editar(fecha: str, tema: str | None = None, *, client=None, caja: Caja | Non
     sistema = [{"type": "text", "text": prompt.SISTEMA, "cache_control": {"type": "ephemeral"}}]
     mensajes: list[dict] = [{"role": "user", "content": prompt.mensaje_inicial(
         fecha, tema, ya_publicados or [], aprendizajes)}]
+    recordatorio_tema = (f"\n\nRecuerda: el tema obligatorio es «{tema}». Si te desviaste, "
+                         "vuelve a él." if tema else "")
     uso = {"entrada": 0, "salida": 0, "cache_escrito": 0, "cache_leido": 0}
     consultas = correcciones = empujones = 0
     bitacora: list[str] = []
@@ -148,7 +150,8 @@ def editar(fecha: str, tema: str | None = None, *, client=None, caja: Caja | Non
                 raise EditorError("el modelo terminó sin entregar el especial")
             empujones += 1
             mensajes.append({"role": "user", "content": "Aún no entregas. Termina las "
-                             "consultas que falten y llama a `entregar_especial`."})
+                             "consultas que falten y llama a `entregar_especial`."
+                             + recordatorio_tema})
             continue
 
         resultados = []
@@ -165,7 +168,8 @@ def editar(fecha: str, tema: str | None = None, *, client=None, caja: Caja | Non
                     log(f"  ↩️ entrega devuelta: {len(problemas)} observación(es)")
                     resultados.append({"type": "tool_result", "tool_use_id": b.id,
                                        "is_error": True, "content": "Corrige y vuelve a "
-                                       "entregar:\n- " + "\n- ".join(problemas)})
+                                       "entregar:\n- " + "\n- ".join(problemas)
+                                       + recordatorio_tema})
                 else:
                     aceptado = True
                     bitacora.append(f"vuelta {vuelta}: entregado"

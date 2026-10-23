@@ -373,6 +373,11 @@ def _enviar_especial(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
     editor = resumen.get("editor") or {}
     cabeza = "🧠 Propuesta del editor" if editor else "⭐ Especial"
     extra = ""
+    if editor:
+        extra += (f"\n\nTema pedido: {editor['tema']}" if editor.get("tema")
+                  else "\n\nTema: libre (lo eligió el editor)")
+        if editor.get("herramientas"):
+            extra += f"\nConsultó: {editor['herramientas']}"
     if editor.get("por_que"):
         extra += f"\n\nPor qué ahora: {editor['por_que']}"
     if editor.get("otras_ideas"):

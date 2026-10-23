@@ -31,6 +31,11 @@ def ya_publicados(carpeta: Path = CONTENIDO) -> list[str]:
     return salida
 
 
+def _conteo(nombres: list[str]) -> str:
+    from collections import Counter
+    return ", ".join(f"{n} ×{k}" if k > 1 else n for n, k in Counter(nombres).items())
+
+
 def ejecutar(fecha: str, tema: str | None = None, salida: Path = SALIDA,
              handle: str = theme.HANDLE, aprendizajes: str | None = None, client=None,
              caja=None, log=print) -> dict:
@@ -42,7 +47,8 @@ def ejecutar(fecha: str, tema: str | None = None, salida: Path = SALIDA,
     e["editor"] = {"por_que": r.por_que, "otras_ideas": r.otras_ideas, "tema": tema,
                    "modelo": r.uso.get("modelo"), "costo_usd": r.uso.get("costo_usd"),
                    "vueltas": r.vueltas, "correcciones": r.correcciones,
-                   "consultas": len(r.evidencia)}
+                   "consultas": len(r.evidencia),
+                   "herramientas": _conteo([x["herramienta"] for x in r.evidencia])}
     resumen = E.generar_datos(e, salida, handle, evidencia=r.evidencia)
     carpeta = Path(resumen["carpeta"])
     # Con estos dos archivos copiados a content/especiales/ el especial queda en el repo con
