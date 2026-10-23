@@ -357,3 +357,18 @@ def test_telegram_dice_el_tema_y_las_consultas(tmp_path, monkeypatch):
     telegram.enviar_dia(Path(r["carpeta"]), tg=tg)
     assert "Tema pedido: el cañonero de Lara" in textos[0]
     assert "Consultó: calendario, tabla_posiciones, buscar_jugador, stats_jugador" in textos[0]
+
+
+def test_texto_largo_no_se_sale_del_recuadro():
+    import matplotlib.pyplot as plt
+    from bpt.viz import carrusel_card as C
+    fig = plt.figure(figsize=(C.W, C.H), dpi=100)
+    largo = ("percentil en velocidad de salida promedio: le pega más duro que casi cualquier "
+             "bateador de las Grandes Ligas esta temporada")
+    t = C._ajustado(fig, 0.3, 0.5, largo, 0.6, 0.1, fontsize=15.5, va="center")
+    caja = t.get_window_extent(fig.canvas.get_renderer()).transformed(fig.transFigure.inverted())
+    assert caja.width <= 0.6 and caja.height <= 0.1
+    assert "\n" in t.get_text()
+    corto = C._ajustado(fig, 0.3, 0.3, "promedio", 0.6, 0.1, fontsize=15.5)
+    assert corto.get_text() == "promedio" and corto.get_fontsize() == 15.5
+    plt.close(fig)
