@@ -141,15 +141,20 @@ def mensaje_inicial(fecha: str, tema: str | None, ya_publicados: list[str],
                     aprendizajes: str | None = None) -> str:
     partes = [f"Hoy es {fecha} (hora de Venezuela)."]
     if tema:
-        partes.append(f"Tema pedido por el editor: {tema}. Arma el especial sobre eso; si los "
-                      "datos no lo sostienen, dilo en `por_que` y entrega la versión que sí "
-                      "se sostenga.")
+        partes.append(
+            f"TEMA OBLIGATORIO, pedido por el editor humano: «{tema}».\n"
+            "El especial tiene que ser sobre ESE tema y ningún otro. No lo cambies por otra "
+            "historia aunque te parezca más fuerte ni aunque se parezca a un especial ya hecho: "
+            "busca un ángulo nuevo dentro del mismo tema. Si faltan datos (por ejemplo, aún no "
+            "anuncian un abridor), arma la mejor pieza posible sobre el tema con lo que sí está "
+            "y dilo en `por_que`. Las otras historias que encuentres van en `otras_ideas`.")
     else:
         partes.append("Busca tú la mejor historia del día. Empieza por el calendario de los "
                       "últimos 3 días y los próximos 3 de MLB y de la LVBP.")
     if ya_publicados:
-        partes.append("Especiales ya hechos (no los repitas):\n" +
-                      "\n".join(f"- {t}" for t in ya_publicados[-15:]))
+        titulo = ("Especiales ya hechos (no copies su contenido; si alguno toca el mismo tema, "
+                  "busca otro ángulo):" if tema else "Especiales ya hechos (no los repitas):")
+        partes.append(titulo + "\n" + "\n".join(f"- {t}" for t in ya_publicados[-15:]))
     if aprendizajes:
         partes.append("Lo que ha funcionado en redes (métricas de las últimas semanas):\n" +
                       aprendizajes)
