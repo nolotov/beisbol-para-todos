@@ -1,7 +1,9 @@
 // Pruebas del relé sin red: node --test infra/telegram-relay/worker.test.mjs
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import worker, { atender, menu, nombres, menos } from "./worker.js";
+import worker, {
+  atender, menu, nombres, menos, atenderMensaje, comandoEditor, limpiarTema, temaDeConfirmacion,
+} from "./worker.js";
 
 const ENV = {
   TELEGRAM_BOT_TOKEN: "123:abc",
@@ -146,4 +148,125 @@ test("el Reel de una pieza (r1) se confirma y dispara con su id", async () => {
   assert.equal(menu("123", "r1", "i")[0][0].text, "🎬 Publicar Reel en Instagram");
   assert.equal(menu("123", "1", "i")[0][0].text, "📸 Publicar en Instagram");
   assert.equal(await atender(toque("pub:123:x1"), ENV, http), "desconocido");
+});
+
+// --- Editor por Telegram (texto y voz) ---------------------------------------------
+
+function httpEditor(estadoGithub = 204) {
+  const llamadas = [];
+  const http = async (url, opts) => {
+    const cuerpo = opts && opts.body ? JSON.parse(opts.body) : null;
+    llamadas.push({ url, cuerpo });
+    if (url.includes("api.github.com")) return { status: estadoGithub, text: async () => "detalle" };
+    if (url.includes("/file/bot")) return { arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer };
+    const result = url.endsWith("/getFile") ? { file_path: "voice/f.oga" } : { message_id: 9 };
+    return { status: 200, json: async () => ({ ok: true, result }) };
+  };
+  return { http, llamadas };
+}
+
+const mensaje = (extra, from = 42) => ({ message_id: 5, from: { id: from }, chat: { id: from }, ...extra });
+const enviados = (llamadas) => llamadas.filter((l) => l.url.endsWith("/sendMessage")).map((l) => l.cuerpo);
+const despacho = (llamadas) => llamadas.find((l) => l.url.includes("api.github.com"));
+
+test("comando /editor: con tema, sin tema y con @bot", () => {
+  assert.deepEqual(comandoEditor("/editor duelo de abridores"), { tema: "duelo de abridores" });
+  assert.deepEqual(comandoEditor("/editor"), { tema: "" });
+  assert.deepEqual(comandoEditor("/editor@MbpBot  Lara "), { tema: "Lara" });
+  assert.equal(comandoEditor("/editorial"), null);
+  assert.equal(comandoEditor("hola"), null);
+  assert.equal(limpiarTema("Gaby, hazme un especial del cañonero de Lara."),
+    "hazme un especial del cañonero de Lara");
+  assert.equal(limpiarTema("x".repeat(400)).length, 300);
+});
+
+test("/editor dispara editor.yml con el tema y avisa", async () => {
+  const { http, llamadas } = httpEditor();
+  assert.equal(await atenderMensaje(mensaje({ text: "/editor el cañonero de Lara" }), ENV, http), "editor");
+  const gh = despacho(llamadas);
+  assert.ok(gh.url.endsWith("/actions/workflows/editor.yml/dispatches"));
+  assert.deepEqual(gh.cuerpo, { ref: "main", inputs: { tema: "el cañonero de Lara" } });
+  assert.match(enviados(llamadas)[0].text, /armando la propuesta sobre «el cañonero de Lara»/);
+});
+
+test("/editor sin tema manda inputs vacíos (tema libre)", async () => {
+  const { http, llamadas } = httpEditor();
+  await atenderMensaje(mensaje({ text: "/editor" }), ENV, http);
+  assert.deepEqual(despacho(llamadas).cuerpo.inputs, {});
+});
+
+test("mensajes de otra persona no disparan nada", async () => {
+  const { http, llamadas } = httpEditor();
+  assert.equal(await atenderMensaje(mensaje({ text: "/editor x" }, 99), ENV, http), "no-autorizado");
+  assert.equal(despacho(llamadas), undefined);
+  assert.equal(enviados(llamadas)[0].text, "No autorizado");
+});
+
+test("texto que no es comando recibe la ayuda", async () => {
+  const { http, llamadas } = httpEditor();
+  assert.equal(await atenderMensaje(mensaje({ text: "hola" }), ENV, http), "ayuda");
+  assert.match(enviados(llamadas)[0].text, /\/editor/);
+});
+
+test("nota de voz: transcribe, pide confirmación y NO dispara todavía", async () => {
+  const { http, llamadas } = httpEditor();
+  const pedidos = [];
+  const env = { ...ENV, AI: { run: async (modelo, entrada) => {
+    pedidos.push({ modelo, entrada });
+    return { text: " Gaby, el cañonero de Lara. " };
+  } } };
+  const r = await atenderMensaje(mensaje({ voice: { file_id: "v1", duration: 6 } }), env, http);
+  assert.equal(r, "confirmar-voz");
+  assert.equal(pedidos[0].modelo, "@cf/openai/whisper-large-v3-turbo");
+  assert.equal(pedidos[0].entrada.audio, "AQID");          // base64 de [1,2,3]
+  assert.equal(pedidos[0].entrada.language, "es");
+  const conf = enviados(llamadas)[0];
+  assert.equal(conf.text, "🎙️ Entendí:\n«el cañonero de Lara»\n\n¿Armo el especial?");
+  assert.deepEqual(conf.reply_markup.inline_keyboard[0].map((b) => b.callback_data), ["ed:ok", "ed:no"]);
+  assert.equal(despacho(llamadas), undefined);
+  assert.equal(temaDeConfirmacion(conf.text), "el cañonero de Lara");
+});
+
+test("nota de voz sin Workers AI o muy larga: lo explica", async () => {
+  const { http, llamadas } = httpEditor();
+  assert.equal(await atenderMensaje(mensaje({ voice: { file_id: "v", duration: 5 } }), ENV, http), "sin-ai");
+  const env = { ...ENV, AI: { run: async () => ({ text: "x" }) } };
+  assert.equal(await atenderMensaje(mensaje({ voice: { file_id: "v", duration: 200 } }), env, http), "voz-larga");
+  assert.equal(despacho(llamadas), undefined);
+});
+
+test("✅ de la nota de voz dispara el editor con el tema del mensaje", async () => {
+  const { http, llamadas } = httpEditor();
+  const cq = { id: "c", from: { id: 42 }, data: "ed:ok",
+    message: { message_id: 8, chat: { id: 42 }, text: "🎙️ Entendí:\n«duelo del Juego 1»\n\n¿Armo el especial?" } };
+  assert.equal(await atender(cq, ENV, http), "editor");
+  assert.deepEqual(despacho(llamadas).cuerpo.inputs, { tema: "duelo del Juego 1" });
+  const edit = llamadas.find((l) => l.url.endsWith("/editMessageText")).cuerpo;
+  assert.deepEqual(edit.reply_markup.inline_keyboard, []);  // sin botones: no hay doble toque
+});
+
+test("↩️ de la nota de voz cancela sin disparar; otro usuario no puede confirmar", async () => {
+  const { http, llamadas } = httpEditor();
+  const base = { id: "c", data: "ed:no", message: { message_id: 8, chat: { id: 42 }, text: "«x»" } };
+  assert.equal(await atender({ ...base, from: { id: 42 } }, ENV, http), "cancelado");
+  assert.equal(await atender({ ...base, data: "ed:ok", from: { id: 7 } }, ENV, http), "no-autorizado");
+  assert.equal(despacho(llamadas), undefined);
+});
+
+test("el webhook enruta mensajes y toques", async () => {
+  const req = (cuerpo) => new Request("https://relay/", { method: "POST", body: JSON.stringify(cuerpo),
+    headers: { "X-Telegram-Bot-Api-Secret-Token": "s3creto" } });
+  const original = globalThis.fetch;
+  const urls = [];
+  globalThis.fetch = async (url, opts) => {
+    urls.push(url);
+    if (String(url).includes("api.github.com")) return { status: 204, text: async () => "" };
+    return { status: 200, json: async () => ({ ok: true, result: {} }) };
+  };
+  try {
+    await worker.fetch(req({ message: mensaje({ text: "/editor Lara" }) }), ENV);
+    assert.ok(urls.some((u) => String(u).includes("editor.yml/dispatches")));
+  } finally {
+    globalThis.fetch = original;
+  }
 });

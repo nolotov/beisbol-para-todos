@@ -7,3 +7,8 @@ compatibility_date = "2026-10-01"
 [vars]
 GITHUB_REPO = "nolotov/beisbol-para-todos"
 GITHUB_REF = "main"
+
+# Notas de voz (0.16.0): Whisper en Workers AI. En el panel: Settings > Bindings > Workers AI,
+# nombre "AI".
+[ai]
+binding = "AI"

@@ -232,6 +232,10 @@ python -m bpt editor                                   # tema libre, hoy
 python -m bpt editor --tema "el mejor venezolano de la semana en la LVBP"
 ```
 
+Desde Telegram: escríbele al bot `/editor <tema>` (o `/editor` solo) o mándale una nota de voz
+con el tema; la voz se transcribe en el relé y espera tu ✅. Configuración en la wiki
+([Editor, métricas y Reels](https://github.com/nolotov/beisbol-para-todos/wiki/Editor-metricas-y-Reels)).
+
 En GitHub: Actions → **Editor MBP** → *Run workflow*. Diario a las 11:43 de Santiago con la
 variable de repo `EDITOR_DIARIO = 1`. Modelo: `MODELO_EDITOR` (por defecto Sonnet 5.5).
 
