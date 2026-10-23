@@ -326,3 +326,34 @@ def test_cliente_con_stream_devuelve_el_mensaje_final():
             self.messages = NS(stream=lambda **kw: Stream())
 
     assert agente._llamar_modelo(Cliente(), model="m") is final
+
+
+def test_tema_pedido_es_obligatorio():
+    from bpt.editor import prompt
+    m = prompt.mensaje_inicial("2026-10-22", "duelo de abridores del Juego 1", ["2026-10-20 · Previa"])
+    assert "TEMA OBLIGATORIO" in m and "«duelo de abridores del Juego 1»" in m
+    assert "otro ángulo" in m and "no los repitas" not in m
+    libre = prompt.mensaje_inicial("2026-10-22", None, ["2026-10-20 · Previa"])
+    assert "TEMA OBLIGATORIO" not in libre and "no los repitas" in libre
+
+
+def test_la_devolucion_recuerda_el_tema():
+    client = FakeClient(_guion_del_modelo())
+    agente.editar("2026-10-21", "el cañonero de Lara", client=client, caja=Caja(get=FakeMLB()),
+                  log=lambda *_: None)
+    devuelto = client.pedidos[4]["messages"][-1]["content"][0]["content"]
+    assert "«el cañonero de Lara»" in devuelto
+
+
+def test_telegram_dice_el_tema_y_las_consultas(tmp_path, monkeypatch):
+    monkeypatch.setenv("BPT_VERIFICAR_HECHOS", "0")
+    from bpt.notificar import telegram
+    r = editor.ejecutar("2026-10-21", "el cañonero de Lara", salida=tmp_path,
+                        client=FakeClient(_guion_del_modelo()), caja=Caja(get=FakeMLB()),
+                        log=lambda *_: None)
+    textos = []
+    tg = NS(texto=textos.append, album=lambda *a, **k: None, botones=lambda *a, **k: None,
+            video=lambda *a, **k: None)
+    telegram.enviar_dia(Path(r["carpeta"]), tg=tg)
+    assert "Tema pedido: el cañonero de Lara" in textos[0]
+    assert "Consultó: calendario, tabla_posiciones, buscar_jugador, stats_jugador" in textos[0]
