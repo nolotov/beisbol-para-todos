@@ -79,7 +79,9 @@ cierre?}}, B: {{...}}}}}}
 subtitulo?, jugadores: {{A: [hasta 4 {{rol, nombre, pais?, linea, nota?, venezolano?}}], B: \
 [...]}}}}
   "equipos" (solo para duelos): {{"A": {{nombre, corto, liga, color: "#RRGGBB"}}, "B": \
-{{...}}}}; `corto` es el nombre de una palabra ("Cerveceros") para las columnas estrechas. \
+{{...}}}}; `corto` es el nombre de una palabra ("Cerveceros") para las columnas estrechas; \
+`color` es un color del equipo que se lea sobre fondo azul noche (claro o vivo: oro, rojo, \
+celeste), nunca azul marino ni negro, y distinto del rival. \
 La etiqueta va como "MBP  ·  LVBP 2026-27" o "MBP  ·  SERIE MUNDIAL 2026".
 B) Historia de Instagram (una noticia puntual: un batazo, un récord, un clasificado): \
 `"tipo": "historia"` y un bloque `historia` {{liga: "MLB"|"LVBP", antetitulo, titulo: \

@@ -63,6 +63,85 @@ def _ajustado(fig, x, y, texto, ancho, alto=None, fontsize=15.5, minimo=9.0, **k
         tam = max(minimo, tam - 1)
 
 
+# --- Colores de equipo legibles ------------------------------------------------------------
+# El fondo es azul noche: un color oficial oscuro (azul marino, negro) desaparece sobre él.
+# Antes de dibujar, cada color de equipo se aclara hasta tener contraste suficiente con las
+# tarjetas, y si los dos equipos quedan casi iguales, el segundo pasa a un color de reserva.
+
+CONTRASTE_MINIMO = 3.0                      # WCAG para texto grande y gráficos
+RESERVA = (theme.ACCENT, "#7FB2E5", "#E2463C", theme.TEXT)
+
+
+def _rgb(color: str) -> tuple[float, float, float]:
+    from matplotlib.colors import to_rgb
+    return to_rgb(color)
+
+
+def _luminancia(color) -> float:
+    def canal(c):
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b = (canal(c) for c in _rgb(color))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contraste(a, b) -> float:
+    la, lb = sorted((_luminancia(a), _luminancia(b)), reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+def legible(color: str, fondo: str = theme.SURFACE, minimo: float = CONTRASTE_MINIMO) -> str:
+    """El mismo color, aclarado hacia el blanco lo justo para leerse sobre `fondo`."""
+    from matplotlib.colors import to_hex
+    try:
+        r, g, b = _rgb(color)
+    except ValueError:
+        return theme.ACCENT
+    paso = 0.0
+    while paso <= 1.0:
+        c = to_hex((r + (1 - r) * paso, g + (1 - g) * paso, b + (1 - b) * paso))
+        if contraste(c, fondo) >= minimo:
+            return c
+        paso += 0.05
+    return theme.TEXT
+
+
+def _parecidos(a: str, b: str) -> bool:
+    return sum((x - y) ** 2 for x, y in zip(_rgb(a), _rgb(b))) ** 0.5 < 0.25
+
+
+def colores_legibles(equipos: dict) -> dict:
+    """Copia de "equipos" con colores que se leen y que no se confunden entre sí.
+
+    Un color que ya se lee se respeta; uno algo apagado se aclara un poco; uno muy oscuro
+    (azul marino, negro) no se aclara, porque quedaría gris: pasa a un color vivo de
+    reserva distinto del rival."""
+    out = {k: dict(v) for k, v in (equipos or {}).items()}
+    oscuros = []
+    for clave, v in out.items():
+        if not v.get("color"):
+            continue
+        try:
+            c = contraste(v["color"], theme.SURFACE)
+        except ValueError:
+            c = 0
+        if c >= CONTRASTE_MINIMO:
+            continue
+        if c >= 2.0:
+            v["color"] = legible(v["color"])
+        else:
+            oscuros.append(clave)
+    for clave in oscuros:
+        otros = [v["color"] for k, v in out.items() if k != clave and v.get("color")
+                 and k not in oscuros]
+        out[clave]["color"] = next(c for c in RESERVA
+                                   if not any(_parecidos(c, o) for o in otros))
+        oscuros = [k for k in oscuros if k != clave]
+    a, b = out.get("A", {}).get("color"), out.get("B", {}).get("color")
+    if a and b and _parecidos(a, b):
+        out["B"]["color"] = next(c for c in RESERVA if not _parecidos(a, c))
+    return out
+
+
 def _corto(nombre: str) -> str:
     """Nombre corto de un equipo: lo que va antes de " de " ("Cerveceros de Milwaukee" ->
     "Cerveceros"). Si no hay " de ", el nombre completo."""
@@ -474,7 +553,7 @@ def render_lamina(l: dict, equipos: dict, out_path: Path, pagina: str = "",
     fonts = theme.apply()
     num = fonts["number"]
     fig = plt.figure(figsize=(W, H), dpi=100)
-    equipos = equipos or {}
+    equipos = colores_legibles(equipos)
     if l["tipo"] == "portada":
         _portada(fig, num, l, equipos)
     elif l["tipo"] == "portada_tema":

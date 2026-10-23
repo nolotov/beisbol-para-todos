@@ -70,3 +70,25 @@ def test_si_uno_va_corto_los_dos_van_cortos():
     assert not C._completos_caben(fig, EQUIPOS, 0.22, 17, weight="bold")
     assert C._completos_caben(fig, {"A": {"nombre": "Rays"}, "B": {"nombre": "Mets"}}, 0.22, 17)
     plt.close(fig)
+
+
+def test_color_oscuro_de_equipo_se_aclara_y_se_lee():
+    eq = C.colores_legibles({"A": {"nombre": "Cerveceros", "color": "#12284B"},
+                             "B": {"nombre": "Rays", "color": "#8FBCE6"}})
+    for v in eq.values():
+        assert C.contraste(v["color"], C.theme.SURFACE) >= C.CONTRASTE_MINIMO
+        assert C.contraste(v["color"], C.theme.BG) >= C.CONTRASTE_MINIMO
+    assert not C._parecidos(eq["A"]["color"], eq["B"]["color"])
+
+
+def test_color_que_ya_se_lee_no_cambia():
+    eq = C.colores_legibles({"A": {"nombre": "X", "color": "#F5B700"}})
+    assert eq["A"]["color"].lower() == "#f5b700"
+
+
+def test_lamina_con_azul_marino_se_dibuja(tmp_path):
+    eq = {"A": {"nombre": "Cerveceros de Milwaukee", "color": "#12284B"},
+          "B": {"nombre": "Rays de Tampa Bay", "color": "#8FBCE6"}}
+    problemas: list[str] = []
+    C.render_lamina(LAMINAS[1], eq, tmp_path / "x.png", problemas=problemas)
+    assert problemas == []
