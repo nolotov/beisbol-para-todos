@@ -180,6 +180,25 @@ class Caja:
                          "temporada": _TEMP}, ["nombre", "tipo", "temporada"]),
                 self.percentiles_statcast),
             Herramienta(
+                "probabilidad_serie",
+                "Pronóstico de una serie al mejor de 7 (formato 2-3-2): probabilidad de que la "
+                "gane cada equipo, de que dure 4, 5, 6 o 7 juegos y de cada resultado exacto "
+                "('A en 6'). Usa las carreras anotadas y permitidas de la temporada regular "
+                "(sácalas de tabla_posiciones). A = el equipo con la ventaja de local. Sirve "
+                "también para una serie ya empezada (juegos ganados por cada uno).",
+                _schema({"equipo_a": {"type": "string", "description": "con ventaja de local"},
+                         "carreras_anotadas_a": {"type": "integer"},
+                         "carreras_permitidas_a": {"type": "integer"},
+                         "equipo_b": {"type": "string"},
+                         "carreras_anotadas_b": {"type": "integer"},
+                         "carreras_permitidas_b": {"type": "integer"},
+                         "ganados_a": {"type": "integer", "description": "0 si no ha empezado"},
+                         "ganados_b": {"type": "integer", "description": "0 si no ha empezado"}},
+                        ["equipo_a", "carreras_anotadas_a", "carreras_permitidas_a",
+                         "equipo_b", "carreras_anotadas_b", "carreras_permitidas_b",
+                         "ganados_a", "ganados_b"]),
+                self.probabilidad_serie),
+            Herramienta(
                 "calcular",
                 "Calculadora. TODA cifra derivada (porcentaje, diferencia, suma, promedio) se "
                 "calcula aquí; si la calculas de cabeza, el verificador la marca sin respaldo. "
@@ -359,6 +378,17 @@ class Caja:
             raise HerramientaError(str(e)) from None
         return {"jugador": savant.display_name(fila["player_name"]), "temporada": temporada,
                 "percentiles": {k: int(v) for k, v in savant.player_metrics(fila, tipo)}}
+
+    def probabilidad_serie(self, equipo_a: str, carreras_anotadas_a: int,
+                           carreras_permitidas_a: int, equipo_b: str, carreras_anotadas_b: int,
+                           carreras_permitidas_b: int, ganados_a: int, ganados_b: int) -> dict:
+        from bpt.editor.series import probabilidades
+        try:
+            r = probabilidades(carreras_anotadas_a, carreras_permitidas_a, carreras_anotadas_b,
+                               carreras_permitidas_b, ganados_a, ganados_b)
+        except ValueError as e:
+            raise HerramientaError(str(e)) from None
+        return {"A": equipo_a, "B": equipo_b} | r
 
     def calcular(self, expresion: str, que_es: str) -> dict:
         valor = _evaluar(expresion)
