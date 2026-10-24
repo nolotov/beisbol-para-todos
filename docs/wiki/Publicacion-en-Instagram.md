@@ -20,7 +20,7 @@ sequenceDiagram
     participant T as Telegram
     participant W as Relé (Cloudflare Worker)
     participant P as Workflow publicar.yml
-    participant B as Rama publicaciones
+    participant B as Rama temporal publicaciones-<run>
     participant I as Instagram
     R->>R: sube el paquete como artefacto
     R->>T: paquete + botón "Publicar" (pub:run:pieza)
@@ -52,7 +52,7 @@ Componentes:
 
 **El retraso del cron no afecta.** Los atrasos observados en GitHub Actions afectan a los disparos programados (`schedule`); los `workflow_dispatch` se ejecutan de inmediato.
 
-**Imágenes públicas desde el propio repositorio.** La API de Instagram no recibe archivos: descarga cada imagen desde una URL pública. Como el repositorio es público, el workflow sube los JPEG a la rama `publicaciones` y usa `raw.githubusercontent.com` con el SHA del commit en la URL (inmutable, sin problemas de caché). La rama se reescribe con un único commit en cada publicación, de modo que no acumula historial. Las imágenes son las mismas que se publican, así que exponerlas no revela nada.
+**Imágenes públicas desde el propio repositorio.** La API de Instagram no recibe archivos: descarga cada imagen desde una URL pública. Como el repositorio es público, el workflow sube los JPEG a una rama temporal `publicaciones-<run>` y usa `raw.githubusercontent.com` con el SHA del commit en la URL (inmutable, sin problemas de caché). La rama se borra al terminar la corrida, así que no se acumula nada y varias publicaciones pueden correr a la vez (desde la 0.16.1; antes era una sola rama `publicaciones` con una publicación a la vez, y GitHub cancelaba en silencio las que quedaban en cola). Las imágenes son las mismas que se publican, así que exponerlas no revela nada.
 
 **Confirmación en dos toques.** El primer toque solo cambia el mensaje a "¿Seguro?"; el segundo quita los botones antes de disparar el workflow, lo que impide una publicación doble por un toque repetido.
 
@@ -146,7 +146,7 @@ Controles aplicados:
 - **El relé rechaza todo lo que no venga de Telegram** (cabecera secreta) y todo toque de un usuario distinto al `TELEGRAM_CHAT_ID`.
 - **Entradas validadas en tres puntos:** el relé solo acepta `pub|ok|no:<número>:<1-2 dígitos o jornada>`; el workflow vuelve a validar con expresiones regulares antes de usar las entradas, que además se pasan por variables de entorno y nunca interpoladas en scripts; y Python valida el identificador de la pieza.
 - **El workflow solo acepta runs de los workflows de resultados o de la historia del día**, comprobando el nombre antes de descargar.
-- **Permisos acotados:** `publicar.yml` tiene `contents: write` (para la rama `publicaciones`) y `actions: read`; los workflows de resultados siguen con `contents: read`.
+- **Permisos acotados:** `publicar.yml` tiene `contents: write` (para la rama temporal de cada publicación) y `actions: read`; los workflows de resultados siguen con `contents: read`.
 - **El token de Instagram nunca aparece en registros:** los errores lo reemplazan por `<token>` (verificado por pruebas) y el token renovado se enmascara con `::add-mask::` antes de guardarlo.
 
 ## Límites conocidos
@@ -163,3 +163,10 @@ Controles aplicados:
 - [Instagram Platform: refresh_access_token](https://developers.facebook.com/docs/instagram-platform/reference/refresh_access_token)
 - [Telegram Bot API: setWebhook y callback queries](https://core.telegram.org/bots/api#setwebhook)
 - [GitHub REST API: crear un evento workflow_dispatch](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event)
+
+## Varias piezas seguidas y corridas canceladas (0.16.1)
+
+- **Se pueden aprobar varias piezas seguidas.** Cada corrida de "Publicar en redes" sube sus JPEG a su propia rama temporal y la borra al final, así que corren en paralelo. El grupo de concurrencia es `publicar-<run>-<pieza>-<redes>`: solo frena el doble toque de la misma pieza en las mismas redes.
+- **Por qué cambió.** Con un grupo único, GitHub deja una sola corrida en espera y cancela la anterior sin que arranque ningún paso. El 24-oct-2026 se aprobaron tres piezas en un minuto y la historia del día se quedó en "⏳ Publicando…" para siempre.
+- **Aviso de publicación cancelada** (`aviso-publicar.yml`). Si una corrida termina cancelada, por tiempo o sin poder arrancar, este workflow lee la pieza y el mensaje del título de la corrida (`Publicar · run … · pieza … · redes … · msg …`) y deja en Telegram el ❌ con "🔁 Reintentar". No avisa si otra corrida igual salió bien o sigue en marcha.
+- **Publicar a mano sin Telegram:** en Actions, "Publicar en redes" con el `run_id` del run que **tiene el paquete** (las reruns de "Historia del día" que dicen "ya salió" no generan artefacto) y `message_id` vacío.

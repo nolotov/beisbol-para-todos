@@ -6,11 +6,14 @@
 #
 #   1. Descarga el paquete (artefacto) del run de resultados indicado.
 #   2. Convierte las láminas de la pieza a JPEG (Instagram no acepta PNG).
-#   3. Si va a Instagram o Threads, las sube a la rama `publicaciones` (repo público = URL
-#      pública que Meta descarga). La rama se pisa en cada publicación: no crece.
+#   3. Si va a Instagram o Threads, las sube a una rama temporal `publicaciones-<run>` (repo
+#      público = URL pública que Meta descarga) que se borra al terminar: no crece nada.
 #      A X se le suben los archivos directamente.
 #   4. Publica en cada red y lo cuenta en Telegram (enlaces, errores y "🔁 Reintentar").
 name: Publicar en redes
+# El título lleva la pieza y el mensaje de Telegram: "Aviso de publicación cancelada" los lee
+# de aquí (el evento workflow_run no trae los inputs).
+run-name: "Publicar · run ${{ inputs.run_id }} · pieza ${{ inputs.pieza }} · redes ${{ inputs.destino || 'i' }} · msg ${{ inputs.message_id || '-' }}"
 
 on:
   workflow_dispatch:
@@ -32,11 +35,15 @@ on:
         required: false
 
 permissions:
-  contents: write   # subir los JPEG a la rama publicaciones
+  contents: write   # subir los JPEG a la rama temporal (y borrarla)
   actions: read     # descargar el artefacto del run de resultados
 
+# Cada publicación usa su propia rama temporal, así que varias pueden correr a la vez.
+# El grupo solo frena el doble toque de la MISMA pieza en las MISMAS redes. (Antes era un
+# grupo único: GitHub deja una sola corrida en espera por grupo y cancela la anterior, y así
+# se perdió la historia del 24-oct-2026 al aprobar tres piezas seguidas.)
 concurrency:
-  group: publicar     # una publicación a la vez: la rama publicaciones se pisa en cada una
+  group: publicar-${{ inputs.run_id }}-${{ inputs.pieza }}-${{ inputs.destino || 'i' }}
   cancel-in-progress: false
 
 defaults:
@@ -124,17 +131,20 @@ jobs:
           fi
           echo "titular=$(jq -r .titular plan.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Subir los JPEG a la rama publicaciones
+      - name: Subir los JPEG a una rama temporal
         id: subir
         if: ${{ contains(env.DESTINO, 'i') || contains(env.DESTINO, 't') }}
+        env:
+          RAMA: publicaciones-${{ github.run_id }}
         run: |
           cd publico
-          git init -q -b publicaciones
+          git init -q -b "$RAMA"
           git -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" add -A
           git -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" \
             commit -qm "Pieza $PIEZA del run $RUN_ID"
           SHA=$(git rev-parse HEAD)
-          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" publicaciones
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$RAMA"
+          echo "rama=$RAMA" >> "$GITHUB_OUTPUT"
           BASE="https://raw.githubusercontent.com/${REPO}/${SHA}"
           echo "base=$BASE" >> "$GITHUB_OUTPUT"
           # Instagram descarga las imágenes enseguida: esperar a que la URL responda
@@ -163,7 +173,8 @@ jobs:
         continue-on-error: true
         run: |
           URL="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
-          for intento in 1 2 3; do
+          # Ahora puede haber varias publicaciones a la vez: si otra empujó antes, se reintenta
+          for intento in 1 2 3 4 5 6; do
             rm -rf rama-metricas
             if ! git clone -q --depth 1 --branch metricas "$URL" rama-metricas 2>/dev/null; then
               mkdir rama-metricas && git -C rama-metricas init -q -b metricas
@@ -173,7 +184,7 @@ jobs:
             git -C rama-metricas -c user.name="mbp-bot" -c user.email="mbp-bot@users.noreply.github.com" \
               commit -qm "Publicación: run $RUN_ID, pieza $PIEZA ($DESTINO)"
             if git -C rama-metricas push -q "$URL" HEAD:metricas; then echo "Anotado"; exit 0; fi
-            sleep $((intento * 5))
+            sleep $((intento * 3 + RANDOM % 5))
           done
           echo "::warning::No se pudo anotar la publicación en la rama metricas"
 
@@ -187,6 +198,14 @@ jobs:
                 --destino "$DESTINO" --quedan "$QUEDAN")
           if [ -n "$TITULAR" ]; then ARGS+=(--titular "$TITULAR"); fi
           python -m bpt publicar-fallo "${ARGS[@]}"
+
+      # Cuando el job termina las redes ya copiaron las imágenes: la rama temporal sobra.
+      - name: Borrar la rama temporal
+        if: ${{ always() && steps.subir.outputs.rama != '' }}
+        continue-on-error: true
+        env:
+          RAMA: ${{ steps.subir.outputs.rama }}
+        run: git push -q --delete "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$RAMA"
 
       - name: Resumen
         if: always()
