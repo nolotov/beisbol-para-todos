@@ -1,0 +1,88 @@
+# Aviso de publicación cancelada: si una corrida de "Publicar en redes" termina cancelada o
+# por tiempo, su propio paso "Avisar en Telegram si falló" nunca llega a correr y el mensaje
+# se queda en "⏳ Publicando…". Este workflow lo detecta y deja el ❌ con "🔁 Reintentar".
+#
+# Lee la pieza y el mensaje de Telegram del título de la corrida (run-name de publicar.yml),
+# porque el evento workflow_run no trae los inputs. Si otra corrida con el mismo título salió
+# bien o sigue en marcha (doble toque), no avisa nada.
+#
+# workflow_run solo funciona cuando este archivo está en la rama por defecto (main).
+name: Aviso de publicación cancelada
+
+on:
+  workflow_run:
+    workflows: ["Publicar en redes"]
+    types: [completed]
+
+permissions:
+  actions: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  avisar:
+    if: ${{ contains(fromJSON('["cancelled","timed_out","startup_failure"]'), github.event.workflow_run.conclusion) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      TITULO: ${{ github.event.workflow_run.display_title }}
+      CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+      CANCELADA_ID: ${{ github.event.workflow_run.id }}
+      URL_RUN: ${{ github.event.workflow_run.html_url }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - name: Leer la pieza del título
+        id: titulo
+        run: |
+          RE='^Publicar · run ([0-9]{1,20}) · pieza (r?([0-9]{1,2}|jornada)) · redes ([itx]{1,3}) · msg ([0-9]{1,15}|-)$'
+          if [[ ! "$TITULO" =~ $RE ]]; then
+            echo "Título sin el formato esperado (corrida vieja o a mano): $TITULO"; exit 0
+          fi
+          RUN_ID="${BASH_REMATCH[1]}"; PIEZA="${BASH_REMATCH[2]}"
+          DESTINO="${BASH_REMATCH[4]}"; MSG="${BASH_REMATCH[5]}"
+          if [ "$MSG" = "-" ]; then echo "Lanzada sin mensaje de Telegram: no hay a quién avisar"; exit 0; fi
+          # Doble toque: si otra corrida igual salió bien o sigue en marcha, no se avisa
+          OTRAS=$(gh run list -R "$REPO" -w publicar.yml --limit 50 \
+                    --json databaseId,displayTitle,status,conclusion \
+                    --jq "[.[] | select(.displayTitle == env.TITULO and .databaseId != ${CANCELADA_ID}
+                           and (.status != \"completed\" or .conclusion == \"success\"))] | length")
+          if [ "${OTRAS:-0}" -gt 0 ]; then echo "Hay otra corrida igual viva o exitosa: nada que avisar"; exit 0; fi
+          {
+            echo "avisar=1"; echo "run_id=$RUN_ID"; echo "pieza=$PIEZA"
+            echo "destino=$DESTINO"; echo "msg=$MSG"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v6
+        if: ${{ steps.titulo.outputs.avisar == '1' }}
+
+      - uses: actions/setup-python@v6
+        if: ${{ steps.titulo.outputs.avisar == '1' }}
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Avisar en Telegram
+        if: ${{ steps.titulo.outputs.avisar == '1' }}
+        env:
+          RUN_ID: ${{ steps.titulo.outputs.run_id }}
+          PIEZA: ${{ steps.titulo.outputs.pieza }}
+          DESTINO: ${{ steps.titulo.outputs.destino }}
+          MSG: ${{ steps.titulo.outputs.msg }}
+        run: |
+          pip install -q -e .
+          case "$CONCLUSION" in
+            cancelled) MOTIVO="GitHub canceló la corrida antes de publicar" ;;
+            timed_out) MOTIVO="la corrida se pasó del tiempo límite (revisa si alcanzó a salir antes de reintentar)" ;;
+            *)         MOTIVO="la corrida no pudo arrancar en GitHub" ;;
+          esac
+          # Sin titular: el paquete no se descargó. La historia se reconoce por el run de origen.
+          ORIGEN=$(gh run view "$RUN_ID" -R "$REPO" --json workflowName --jq .workflowName 2>/dev/null || true)
+          ARGS=(--message-id "$MSG" --run-id "$RUN_ID" --pieza "$PIEZA" --destino "$DESTINO"
+                --texto "$MOTIVO" --url-run "$URL_RUN")
+          if [ "$ORIGEN" = "Historia del día" ]; then ARGS+=(--titular "Historia · Juegos de hoy"); fi
+          python -m bpt publicar-fallo "${ARGS[@]}"

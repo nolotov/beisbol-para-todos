@@ -95,6 +95,6 @@ Un especial con `laminas` (y `equipos` A/B) es un carrusel por bloques: portada,
 - **Resultado como respuesta.** El workflow no puede leer el mensaje de Telegram, así que, si en el menú quedan otras redes, no lo edita (borraría sus botones): responde debajo.
 - **Cada red por separado.** Una red sin secretos o caída no frena a las otras; sus clientes se crean recién al publicar.
 - **Duplicados.** Instagram y Threads comparan con los posts recientes y, si ya estaba, devuelven el enlace sin volver a publicar. En X, el rechazo por contenido repetido se informa como tal.
-- **Imágenes.** Instagram y Threads descargan los JPEG desde la rama `publicaciones`; a X se le suben los archivos directamente (no necesita la rama si solo se publica en X).
+- **Imágenes.** Instagram y Threads descargan los JPEG desde la rama temporal de la publicación (`publicaciones-<run>`, se borra al terminar); a X se le suben los archivos directamente (no necesita la rama si solo se publica en X).
 
 Archivos: `src/bpt/publicar/redes.py` (letras, menú y textos), `threads.py`, `x.py`, `flujo.py` (`publicar_redes`, `avisar_resultados`), el comando `bpt publicar-redes` y `.github/workflows/publicar.yml` (entradas `destino` y `quedan`).
