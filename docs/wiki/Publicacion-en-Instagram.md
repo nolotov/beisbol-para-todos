@@ -7,7 +7,10 @@ Desde la versión 0.6.0 cada pieza del paquete diario llega a Telegram con un bo
 Una pieza es un carrusel con su caption:
 
 - **MLB:** una por juego (láminas de resultado, figuras y latinos), con identificador `1`, `2`… según el orden del paquete.
-- **LVBP:** una sola, la de la jornada (marcadores y destacados), con identificador `jornada`. Los extras por juego siguen siendo material para historias y se publican a mano.
+- **LVBP:** la de la jornada (marcadores y destacados), con identificador `jornada`, y desde la 0.17.0 los extras de cada juego (resultado + figuras) de dos formas:
+  - **Post** con id `1`, `2`… (el orden de la jornada): carrusel de 2 láminas a Instagram, Threads y X. Caption y tuit con plantilla desde el box score (`src/bpt/publicar/textos_extra.py`): las cifras salen tal cual de los datos, sin llamadas a Claude. Se publica aunque el redactor de la jornada falle.
+  - **Historia** con id `51`, `52`… (50 + el número del juego): las dos láminas como dos historias seguidas en Instagram. Son 1080x1350, así que se centran sobre un lienzo 1080x1920 con el fondo de la marca. Si la segunda falla después de la primera, no se ofrece reintentar (repetiría la primera).
+  - Ids numéricos a propósito: el relé ya acepta 1-2 dígitos, así que no hubo que redesplegarlo.
 
 Una pieza sin caption (falló el redactor) o sin láminas no lleva botón.
 

@@ -293,7 +293,11 @@ Un carrusel por jornada en `output/resultados/lvbp/AAAA-MM-DD/`:
 2. `lvbp_2_destacados.png`: lo mejor de la jornada al bate (bases ganadas, mínimo 3) y en la
    loma (Game Score de 50 o más, con 3+ entradas), y los jonrones. Si nadie llega al mínimo,
    la lámina lo dice: no se inventan destacados.
-3. Extras para historias: `lvbp_extra_*_resultado.png` y `*_figuras.png` de cada juego.
+3. Extras de cada juego: `lvbp_extra_*_resultado.png` y `*_figuras.png`. Desde la 0.17.0
+   cada juego trae en Telegram su menú para publicarlos como **post** (carrusel de 2 láminas
+   a Instagram, Threads y X; pieza `1`, `2`…) y como **historia** (dos historias en
+   Instagram, ajustadas a 9:16; pieza `51`, `52`…). El caption y el tuit se arman con
+   plantilla desde el box score (`src/bpt/publicar/textos_extra.py`), sin el redactor.
 
 El redactor escribe **un** caption, hilo y guion para toda la jornada, neutral entre los 8
 equipos. Datos: MLB Stats API (liga 135), con nuestras siglas (CAR = Cardenales; la API le dice

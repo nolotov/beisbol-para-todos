@@ -126,6 +126,7 @@ def generar(fecha: str, salida: Path = Path("output/resultados/lvbp"),
             enc = f"MBP  ·  LVBP {cabecera}"
             sub = f"{j.visitante.nombre} en {j.local.nombre}"
             figs = mlb_box.figuras(boxes[j.game_pk]) if j.game_pk in boxes else None
+            antes = len(extras_png)
             if extras:
                 extras_png.append(render_result_card(
                     j, None, carpeta / f"{base}_resultado.png", handle=handle,
@@ -141,7 +142,9 @@ def generar(fecha: str, salida: Path = Path("output/resultados/lvbp"),
             d = j.to_dict()
             d.update({"titular": titular(j), "ganador": j.ganador.abrev,
                       "perdedor": j.perdedor.abrev,
-                      "figuras": figs.to_dict() if figs else None})
+                      "figuras": figs.to_dict() if figs else None,
+                      # Láminas sueltas de este juego: se publican como post o historia
+                      "extras": extras_png[antes:]})
             items.append(d)
 
     resumen = {
