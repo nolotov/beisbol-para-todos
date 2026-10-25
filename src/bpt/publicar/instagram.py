@@ -45,6 +45,14 @@ class InstagramError(RuntimeError):
     pass
 
 
+class PublicacionParcial(InstagramError):
+    """Varias historias seguidas: salieron las primeras y alguna después no."""
+
+    def __init__(self, mensaje: str, permalink: str):
+        super().__init__(mensaje)
+        self.permalink = permalink
+
+
 def _limpiar(texto: str, token: str) -> str:
     return texto.replace(token, "<token>") if token else texto
 

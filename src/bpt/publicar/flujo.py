@@ -28,6 +28,23 @@ def preparar(carpeta: Path, pieza_id: str, destino: Path, prefijo: str, plan_pat
     return plan
 
 
+def historias(cliente, urls: list[str]) -> instagram.Publicado:
+    """Una historia por imagen, en orden (los extras de un juego son dos: resultado y
+    figuras). Si falla una después de la primera, PublicacionParcial: reintentar repetiría
+    las que ya salieron."""
+    primera = None
+    for i, url in enumerate(urls):
+        try:
+            hecho = cliente.publicar_historia(url)
+        except instagram.InstagramError as e:
+            if primera is None:
+                raise
+            raise instagram.PublicacionParcial(
+                f"salieron {i} de {len(urls)} historias ({e})", primera.permalink) from None
+        primera = primera or hecho
+    return primera
+
+
 def _base(plan: dict) -> str:
     icono = "📲" if plan.get("tipo") == piezas.HISTORIA else "📸"
     return f"{icono} {plan.get('titular', 'Pieza')}"
@@ -40,7 +57,7 @@ def publicar_instagram(plan: dict, base_url: str, ig: instagram.Instagram,
         raise instagram.InstagramError("la URL base de las imágenes debe ser https")
     urls = [base_url.rstrip("/") + "/" + rel for rel in plan["archivos"]]
     historia = plan.get("tipo") == piezas.HISTORIA
-    hecho = ig.publicar_historia(urls[0]) if historia else ig.publicar(urls, plan["caption"])
+    hecho = historias(ig, urls) if historia else ig.publicar(urls, plan["caption"])
     if tg and message_id:
         if historia:
             estado = "✅ Historia publicada en Instagram (dura 24 h)"
@@ -110,7 +127,7 @@ def publicar_redes(plan: dict, destino: str, base_url: str | None, carpeta_jpeg:
                 raise instagram.InstagramError("la URL base de las imágenes debe ser https")
             cliente = clientes[red]()
             if red == "i":
-                hecho = (cliente.publicar_historia(urls[0]) if historia
+                hecho = (historias(cliente, urls) if historia
                          else cliente.publicar_reel(urls[0], plan["caption"]) if reel
                          else cliente.publicar(urls, plan["caption"]))
             elif historia:
@@ -124,7 +141,8 @@ def publicar_redes(plan: dict, destino: str, base_url: str | None, carpeta_jpeg:
                                               plan.get("hilo") or [])
             salida.append(Resultado(red, True, hecho.permalink, duplicado=hecho.duplicado,
                                     media_id=str(hecho.media_id or "")))
-        except (th.PublicacionParcial, xx.PublicacionParcial) as e:
+        except (th.PublicacionParcial, xx.PublicacionParcial,
+                instagram.PublicacionParcial) as e:
             salida.append(Resultado(red, False, e.permalink, str(e), parcial=True))
         except ERRORES as e:
             salida.append(Resultado(red, False, motivo=str(e)))

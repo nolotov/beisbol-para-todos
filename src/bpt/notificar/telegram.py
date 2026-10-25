@@ -313,12 +313,32 @@ def _enviar_jornada(carpeta: Path, resumen: dict, r: dict | None, tg: Telegram,
     extras = [carpeta / t for t in resumen.get("extras", []) if (carpeta / t).exists()]
     for k in range(0, len(extras), 10):
         tg.album(extras[k:k + 10], como_archivo=True,
-                 leyenda="Extras para historias: resultado y figuras de cada juego")
+                 leyenda="Extras de cada juego (resultado y figuras): originales")
     if r is not None:
         _textos(tg, r["textos"])
         ofrecer_publicar(tg, carpeta, "jornada")
         ofrecer_reel(tg, carpeta, "jornada")
+    ofrecer_extras(tg, carpeta)
     return len(juegos)
+
+
+def ofrecer_extras(tg: Telegram, carpeta: Path) -> int:
+    """Extras de cada juego de la jornada: el texto del post (plantilla con los datos del box
+    score) y dos menús, uno para el post (resultado + figuras) y otro para la historia."""
+    if not publicar_activo():
+        return 0
+    from bpt.publicar import piezas
+    try:
+        todas = piezas.piezas(carpeta)
+    except (OSError, ValueError, KeyError):
+        return 0
+    posts = [p for p in todas if p.formato == "extra_juego"]
+    for p in posts:
+        tg.texto(f"🗂️ EXTRA · {p.titular}\n\n📸 INSTAGRAM\n\n{p.caption}\n\n"
+                 f"𝕏 / 🧵\n\n" + "\n\n".join(p.hilo))
+        ofrecer_publicar(tg, carpeta, p.id)
+        ofrecer_publicar(tg, carpeta, str(piezas.HISTORIA_EXTRA + int(p.id)))
+    return len(posts)
 
 
 def _enviar_historia(carpeta: Path, resumen: dict, tg: Telegram, originales: bool) -> int:

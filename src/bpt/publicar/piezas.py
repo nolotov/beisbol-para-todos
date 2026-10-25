@@ -2,7 +2,9 @@
 
 Una pieza es un carrusel con su caption:
   - MLB: una por juego, con id "1", "2"... (el orden del paquete de Telegram).
-  - LVBP: una sola, la de la jornada, con id "jornada".
+  - LVBP: la de la jornada, con id "jornada", y los extras de cada juego (resultado +
+    figuras): como post con id "1", "2"... (orden de la jornada) y como historia con id
+    "51", "52"... (50 + el mismo número). Ids numéricos para que el relé no cambie.
   - Especial (content/especiales/*.json): una sola, id "1", con caption e hilo.
   - Historia del día (juegos de hoy): una sola, id "1" y sin caption (las historias no
     llevan). Usa "1" para que el relé de Telegram no necesite cambios.
@@ -22,6 +24,7 @@ JORNADA = "jornada"
 HISTORIA = "historia"
 ESPECIAL = "especial"
 REEL = "reel"
+HISTORIA_EXTRA = 50                     # id de la historia del juego n = 50 + n
 ID_VALIDO = re.compile(r"^r?(\d{1,2}|jornada)$")     # "r1", "rjornada": el reel de esa pieza
 
 
@@ -102,6 +105,7 @@ def piezas(carpeta: Path) -> list[Pieza]:
             salida.append(Pieza(JORNADA, f"{liga} · Jornada del {resumen['fecha']}", imgs,
                                 r["textos"]["instagram"], _alertas(r),
                                 hilo=list(r["textos"].get("hilo_x") or []), formato=JORNADA))
+        salida += extras_lvbp(carpeta, resumen)
         return salida
 
     for n, j in enumerate(resumen.get("juegos", []), 1):
@@ -111,6 +115,33 @@ def piezas(carpeta: Path) -> list[Pieza]:
             salida.append(Pieza(str(n), j["titular"], imgs, r["textos"]["instagram"],
                                 _alertas(r), hilo=list(r["textos"].get("hilo_x") or [])))
     return salida
+
+
+def _laminas_extra(carpeta: Path, resumen: dict, j: dict) -> list[Path]:
+    nombres = j.get("extras")
+    if nombres is None:                 # paquetes anteriores a 0.17.0: por el nombre
+        if not (j.get("visitante") and j.get("local")):
+            return []
+        base = f"lvbp_extra_{j['visitante']['abrev']}-{j['local']['abrev']}_"
+        nombres = [t for t in resumen.get("extras", []) if t.startswith(base)]
+    return [carpeta / t for t in nombres if (carpeta / t).exists()]
+
+
+def extras_lvbp(carpeta: Path, resumen: dict) -> list[Pieza]:
+    """Por cada juego de la jornada con láminas extra: su post y su historia."""
+    from bpt.publicar import textos_extra
+    liga = resumen.get("liga", "LVBP")
+    posts, historias = [], []
+    for n, j in enumerate(resumen.get("juegos", []), 1):
+        imgs = _laminas_extra(carpeta, resumen, j)
+        if not imgs or n >= HISTORIA_EXTRA:
+            continue
+        titular = f"{liga} · {j['titular']}"
+        posts.append(Pieza(str(n), titular, imgs, textos_extra.caption(j),
+                           hilo=textos_extra.hilo(j), formato="extra_juego"))
+        historias.append(Pieza(str(HISTORIA_EXTRA + n), f"Historia · {titular}", imgs, "",
+                               tipo=HISTORIA, formato="historia_extra"))
+    return posts + historias
 
 
 def por_pk_especial(carpeta: Path) -> dict | None:
@@ -160,6 +191,26 @@ def a_jpeg(origen: Path, destino: Path, calidad: int = 95) -> Path:
     return destino
 
 
+HISTORIA_W, HISTORIA_H = 1080, 1920
+
+
+def a_historia(origen: Path, destino: Path, calidad: int = 95) -> Path:
+    """Como a_jpeg, pero en 9:16: si la lámina no lo es (las extra son 1080x1350), se centra
+    sobre un lienzo 1080x1920 del color de su propia esquina (el fondo de la marca), en vez de
+    dejar que Instagram la recorte o le ponga su fondo."""
+    a_jpeg(origen, destino, calidad)
+    with Image.open(destino) as im:
+        if im.width * HISTORIA_H == im.height * HISTORIA_W:
+            return destino
+        escala = min(HISTORIA_W / im.width, HISTORIA_H / im.height)
+        chica = im.resize((round(im.width * escala), round(im.height * escala)),
+                          Image.LANCZOS)
+        lienzo = Image.new("RGB", (HISTORIA_W, HISTORIA_H), im.getpixel((0, 0)))
+    lienzo.paste(chica, ((HISTORIA_W - chica.width) // 2, (HISTORIA_H - chica.height) // 2))
+    lienzo.save(destino, "JPEG", quality=calidad, optimize=True)
+    return destino
+
+
 def preparar(pieza: Pieza, destino: Path, prefijo: str) -> dict:
     """Convierte las láminas a JPEG en `destino/prefijo/` (lo único que se hace público).
 
@@ -178,7 +229,7 @@ def preparar(pieza: Pieza, destino: Path, prefijo: str) -> dict:
         archivos.append(rel)
     for i, img in enumerate(pieza.imagenes if pieza.tipo != REEL else [], 1):
         rel = f"{prefijo}/{i:02d}_{img.stem}.jpg"
-        a_jpeg(img, destino / rel)
+        (a_historia if pieza.tipo == HISTORIA else a_jpeg)(img, destino / rel)
         archivos.append(rel)
     return {"pieza": pieza.id, "tipo": pieza.tipo, "titular": pieza.titular,
             "caption": pieza.caption, "hilo": pieza.hilo, "alertas": pieza.alertas,

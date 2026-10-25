@@ -22,7 +22,7 @@ on:
         description: "Número del run de 'Resultados MLB/LVBP', 'Historia del día', 'Especial MBP' o 'Editor MBP' que trae el paquete"
         required: true
       pieza:
-        description: "1, 2... (juego MLB, en el orden de Telegram), jornada (LVBP), 1 (historia/especial); con r delante, su Reel (r1, rjornada)"
+        description: "1, 2... (juego MLB, o extra LVBP como post), 51, 52... (extra LVBP como historia), jornada (LVBP), 1 (historia/especial); con r delante, su Reel (r1, rjornada)"
         required: true
       message_id:
         description: "Mensaje de Telegram a actualizar (lo llena el relé; vacío = no avisar)"
