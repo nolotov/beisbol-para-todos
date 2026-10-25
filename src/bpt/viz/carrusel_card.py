@@ -90,8 +90,9 @@ def _cifra_y_texto(fig, x, y, cifra, texto, ancho_total, alto, ancho_cifra, tam_
     return tc
 
 
-def _cabecera(fig, num, l: dict, color=theme.ACCENT) -> float:
+def _cabecera(fig, num, l: dict, color=None) -> float:
     """Etiqueta, título y subtítulo. Devuelve la altura (fracción) donde empieza el cuerpo."""
+    color = color or theme.ACCENT     # se lee al dibujar: respeta la paleta del deporte
     fig.text(X0, 0.955, l.get("etiqueta", "MBP  ·  SERIE MUNDIAL 2026"), fontsize=14,
              color=color, va="top", family=num)
     titulo = l["titulo"]

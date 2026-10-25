@@ -41,6 +41,13 @@ def cargar(archivo: Path) -> dict:
 
 
 def validar_estructura(datos: dict) -> dict:
+    try:
+        dep = theme.normalizar_deporte(datos.get("deporte"))
+    except ValueError as e:
+        raise EspecialError(str(e)) from None
+    if dep != "beisbol" and not datos.get("fuente"):
+        # Sin esto, la lámina diría "Datos: MLB Stats API" en un partido de fútbol.
+        raise EspecialError(f"un especial de {dep} necesita su 'fuente'")
     if datos.get("tipo") == HISTORIA:
         for campo in ("slug", "titular", "historia"):
             if campo not in datos:
@@ -49,6 +56,11 @@ def validar_estructura(datos: dict) -> dict:
         for campo in ("titulo", "marcador"):
             if campo not in h:
                 raise EspecialError(f"a la historia especial le falta 'historia.{campo}'")
+        from bpt.viz.historia_especial_card import tanteo
+        try:
+            tanteo(h["marcador"])
+        except KeyError as e:
+            raise EspecialError(f"historia.marcador: {e.args[0]}") from None
         return datos
     for campo in ("slug", "titular", "textos"):
         if campo not in datos:
@@ -129,9 +141,26 @@ def generar(archivo: Path, salida: Path = SALIDA, handle: str = theme.HANDLE,
 
 def generar_datos(datos: dict, salida: Path = SALIDA, handle: str = theme.HANDLE,
                   evidencia: list | None = None) -> dict:
+    """Con "deporte" (futbol, nba, nfl, f1, padel; béisbol si falta) las láminas salen con
+    la paleta de ese deporte (`theme.DEPORTES`)."""
+    validar_estructura(datos)
+    dep = theme.normalizar_deporte(datos.get("deporte"))
+    with theme.deporte(dep):
+        resumen = _generar(datos, salida, handle, evidencia)
+    if dep != "beisbol":
+        resumen["deporte"] = dep
+        # resumen.json también lo lleva: el Reel pinta su barra con la misma paleta
+        archivo = Path(resumen["carpeta"]) / "resumen.json"
+        en_disco = json.loads(archivo.read_text(encoding="utf-8"))
+        en_disco["deporte"] = dep
+        archivo.write_text(json.dumps(en_disco, ensure_ascii=False, indent=1),
+                           encoding="utf-8")
+    return resumen
+
+
+def _generar(datos: dict, salida: Path, handle: str, evidencia: list | None) -> dict:
     from bpt.viz.roster_card import render_portada, render_roster
 
-    validar_estructura(datos)
     carpeta = Path(salida) / datos["slug"]
     carpeta.mkdir(parents=True, exist_ok=True)
     if datos.get("tipo") == HISTORIA:

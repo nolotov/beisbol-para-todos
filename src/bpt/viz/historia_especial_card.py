@@ -16,7 +16,21 @@ from bpt import theme
 
 W, H = 10.8, 19.2
 ARRIBA, ABAJO = 0.80, 0.16
-COLORES = {"MLB": theme.ACCENT, "LVBP": theme.LVBP}
+
+
+def _color_liga(liga: str):
+    """Verde para la LVBP; para todo lo demás, el acento de la paleta activa (se lee al
+    dibujar, así una historia de fútbol toma el lima y una de MLB el ámbar)."""
+    return theme.LVBP if liga == "LVBP" else theme.ACCENT
+
+
+def tanteo(m: dict) -> tuple[int, int]:
+    """(visitante, local) del marcador: carreras, goles o puntos según el deporte."""
+    for v, l in (("carreras_v", "carreras_l"), ("goles_v", "goles_l"),
+                 ("puntos_v", "puntos_l")):
+        if v in m and l in m:
+            return m[v], m[l]
+    raise KeyError("el marcador necesita carreras_v/_l, goles_v/_l o puntos_v/_l")
 
 
 def _caja(fig, x, y, w, h, color, r=0.012):
@@ -30,11 +44,13 @@ def render_historia_especial(h: dict, out_path: Path, fuente: str = "Datos: MLB 
 
     antetitulo, titulo (lista de 1-3 líneas), marcador {visitante, local, carreras_v,
     carreras_l, nota}, figuras [{nombre, pais, linea, venezolano?}], dato {cifra, texto},
-    proximo {titulo, linea1, linea2}, liga ("MLB" por defecto).
+    proximo {titulo, linea1, linea2}, liga ("MLB" por defecto), titulo_figuras (opcional).
+    En otros deportes el marcador lleva goles_v/goles_l o puntos_v/puntos_l; en un empate
+    los dos equipos quedan resaltados.
     """
     fonts = theme.apply()
     num = fonts["number"]
-    color = COLORES.get(h.get("liga", "MLB"), theme.ACCENT)
+    color = _color_liga(h.get("liga", "MLB"))
     fig = plt.figure(figsize=(W, H), dpi=100)
     x, w = 0.05, 0.90
 
@@ -53,9 +69,11 @@ def render_historia_especial(h: dict, out_path: Path, fuente: str = "Datos: MLB 
     _caja(fig, x, y - alto, w, alto, theme.SURFACE)
     _caja(fig, x, y - alto, 0.010, alto, color, r=0.004)
     fila1, fila2 = y - 0.030, y - 0.072
-    gana_l = m["carreras_l"] > m["carreras_v"]
-    for yy, eq, c, gana in ((fila1, m["visitante"], m["carreras_v"], not gana_l),
-                            (fila2, m["local"], m["carreras_l"], gana_l)):
+    cv, cl = tanteo(m)
+    empate = cv == cl
+    gana_l = cl > cv
+    for yy, eq, c, gana in ((fila1, m["visitante"], cv, empate or not gana_l),
+                            (fila2, m["local"], cl, empate or gana_l)):
         tono = theme.TEXT if gana else theme.MUTED
         fig.text(x + 0.040, yy, eq, fontsize=36, weight="bold", color=tono, va="center")
         fig.text(x + w - 0.040, yy, str(c), fontsize=48, family=num, weight="bold",
@@ -65,7 +83,7 @@ def render_historia_especial(h: dict, out_path: Path, fuente: str = "Datos: MLB 
     y -= alto + 0.026
 
     # Figuras
-    fig.text(x, y, "FIGURAS DEL JUEGO", fontsize=19, weight="bold", color=color,
+    fig.text(x, y, h.get("titulo_figuras", "FIGURAS DEL JUEGO"), fontsize=19, weight="bold", color=color,
              va="center")
     y -= 0.028
     for f in h.get("figuras", [])[:3]:

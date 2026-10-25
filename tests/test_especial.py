@@ -188,3 +188,53 @@ def test_lamina_de_tipo_desconocido_se_rechaza(tmp_path):
     malo.write_text(json.dumps(datos), encoding="utf-8")
     with pytest.raises(especial.EspecialError):
         especial.generar(malo, tmp_path)
+
+
+# --- MBP Deportes: paleta por deporte ----------------------------------------------------
+
+def _historia_futbol(**extra):
+    datos = {"slug": "clasico-prueba", "tipo": "historia", "deporte": "fútbol",
+             "titular": "Clásico", "fuente": "Datos: LaLiga",
+             "historia": {"liga": "LaLiga", "antetitulo": "MBP · FÚTBOL",
+                          "titulo": ["EL CLÁSICO"], "titulo_figuras": "FIGURAS DEL PARTIDO",
+                          "marcador": {"visitante": "Real Madrid", "local": "Barcelona",
+                                       "goles_v": 1, "goles_l": 1, "nota": "Final"}}}
+    datos.update(extra)
+    return datos
+
+
+def test_deporte_cambia_la_paleta_y_la_restaura():
+    from bpt import theme
+    ambar = theme.ACCENT
+    with theme.deporte("Fútbol") as paleta:
+        assert theme.ACCENT == paleta["ACCENT"] != ambar
+        assert theme.BG == theme.DEPORTES["futbol"]["BG"]
+    assert theme.ACCENT == ambar and theme.BG == theme.DEPORTES["beisbol"]["BG"]
+
+
+def test_deporte_desconocido_se_rechaza(tmp_path):
+    from bpt import especial
+    with pytest.raises(especial.EspecialError, match="deporte desconocido"):
+        especial.validar_estructura(_historia_futbol(deporte="curling"))
+
+
+def test_otro_deporte_exige_fuente():
+    from bpt import especial
+    datos = _historia_futbol()
+    del datos["fuente"]
+    with pytest.raises(especial.EspecialError, match="fuente"):
+        especial.validar_estructura(datos)
+
+
+def test_historia_de_futbol_con_goles_y_fondo_del_deporte(tmp_path, monkeypatch):
+    from bpt import especial, theme
+    monkeypatch.setenv("BPT_VERIFICAR_HECHOS", "0")
+    r = especial.generar_datos(_historia_futbol(), salida=tmp_path)
+    carpeta = tmp_path / "clasico-prueba"
+    img = Image.open(carpeta / "historia.png").convert("RGB")
+    assert img.size == (1080, 1920)
+    fondo = "#%02X%02X%02X" % img.getpixel((5, 5))
+    assert fondo == theme.DEPORTES["futbol"]["BG"]
+    assert r["deporte"] == "futbol"
+    assert json.loads((carpeta / "resumen.json").read_text())["deporte"] == "futbol"
+    assert theme.BG == theme.DEPORTES["beisbol"]["BG"]      # la casa queda intacta

@@ -268,7 +268,9 @@ def armar_paquete(carpeta: Path, voz: bool = True, handle: str = theme.HANDLE) -
         guion = ((r or {}).get("textos") or {}).get("guion", "")
         if not guion.strip():
             continue
-        info = armar(p.imagenes, guion, carpeta / f"reel_{p.id}.mp4", voz=voz, handle=handle)
+        with theme.deporte(resumen.get("deporte")):     # misma paleta que las láminas
+            info = armar(p.imagenes, guion, carpeta / f"reel_{p.id}.mp4", voz=voz,
+                         handle=handle)
         info["pieza"] = p.id
         hechos.append(info)
     if hechos:
