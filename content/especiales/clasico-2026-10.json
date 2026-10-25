@@ -1,0 +1,71 @@
+{
+ "slug": "clasico-2026-10",
+ "deporte": "futbol",
+ "fecha": "2026-10-25",
+ "titular": "Barcelona 1-2 Real Madrid: Mbappé decide el Clásico",
+ "fuente": "Datos: ESPN · El Español · El Espectador",
+ "equipos": {
+  "A": {"nombre": "Barcelona", "liga": "LaLiga · 1.º · 27 pts", "color": "#E0316B"},
+  "B": {"nombre": "Real Madrid", "liga": "LaLiga · 3.º · 24 pts", "color": "#FEBE10"}
+ },
+ "laminas": [
+  {"tipo": "portada", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "MBAPPÉ\nDECIDE",
+   "subtitulo": "LaLiga · Jornada 10 · Spotify Camp Nou",
+   "datos": {"A": [{"cifra": "9-0-1", "texto": "primera derrota en LaLiga"},
+                   {"cifra": "1", "texto": "gol, con 4,33 de promedio"}],
+             "B": [{"cifra": "24 pts", "texto": "a 3 del líder"},
+                   {"cifra": "2", "texto": "goles de Mbappé"}]},
+   "remate": {"cifra": "1-2", "texto": "Final en el Camp Nou: Barcelona 1, Real Madrid 2"}},
+  {"tipo": "cifras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "El promedio decía…\npero el Clásico dijo",
+   "ancho_cifra": 0.27,
+   "items": [
+    {"equipo": "A", "cifra": "4,33 → 1", "tamano": 34, "texto": "el Barça promediaba 4,33 goles por partido; en el Clásico hizo uno"},
+    {"equipo": "B", "cifra": "11", "texto": "goles de Mbappé en LaLiga tras su doblete: queda a 2 de Raphinha (13)"},
+    {"equipo": "A", "cifra": "2", "texto": "derrotas del Barça en cinco días: PSG en Champions y hoy el Madrid"},
+    {"equipo": "B", "cifra": "34' · 66'", "tamano": 30, "texto": "Lunin le saca el gol a Anthony Gordon y a Gerard Martín"}
+   ]},
+  {"tipo": "cifras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "Así se jugó",
+   "ancho_cifra": 0.17,
+   "items": [
+    {"equipo": "B", "cifra": "41'", "texto": "0-1 · Mbappé aprovecha un despeje fallido de Gerard Martín"},
+    {"equipo": "A", "cifra": "61'", "texto": "1-1 · Raphinha la cruza de zurda tras un pase de Pedri"},
+    {"equipo": "A", "cifra": "78'", "texto": "Lamine Yamal estrella el balón en el poste"},
+    {"equipo": "B", "cifra": "87'", "texto": "1-2 · Camavinga entra al área y se la deja servida a Mbappé"}
+   ]},
+  {"tipo": "figuras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "FIGURAS DEL PARTIDO",
+   "jugadores": {
+    "A": [{"rol": "Delantero", "nombre": "Raphinha", "pais": "Brasil", "linea": "gol del 1-1 (61')", "nota": "13 goles en LaLiga"},
+          {"rol": "Mediocampista", "nombre": "Pedri", "pais": "España", "linea": "asistencia del 1-1"},
+          {"rol": "Delantero", "nombre": "Lamine Yamal", "pais": "España", "linea": "poste en el 78'"}],
+    "B": [{"rol": "Delantero", "nombre": "Kylian Mbappé", "pais": "Francia", "linea": "2 goles (41' y 87')", "nota": "11 goles en LaLiga"},
+          {"rol": "Mediocampista", "nombre": "Eduardo Camavinga", "pais": "Francia", "linea": "asistencia del 1-2 (87')"},
+          {"rol": "Portero", "nombre": "Andriy Lunin", "pais": "Ucrania", "linea": "paradas en el 34' y el 66'", "nota": "titular por la gripe de Courtois"}]
+   }},
+  {"tipo": "cifras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "Cómo queda la pelea",
+   "subtitulo": "LaLiga tras 10 jornadas",
+   "ancho_cifra": 0.2,
+   "items": [
+    {"equipo": "A", "cifra": "27", "texto": "puntos del Barça: sigue líder, ahora con 9 triunfos y 1 derrota"},
+    {"cifra": "25", "texto": "puntos del Atlético de Madrid, 2.º"},
+    {"equipo": "B", "cifra": "24", "texto": "puntos del Madrid: 3.º, a 3 del líder"},
+    {"equipo": "A", "cifra": "4/6", "texto": "de los últimos seis Clásicos los ganó el Barça; el Madrid se lleva los 2 que faltan"}
+   ]}
+ ],
+ "textos": {
+  "angulo": "Resultado del Clásico con el formato MBP: lo que decía el promedio y lo que dijo el partido.",
+  "instagram": "⚽ FINAL | Barcelona 1-2 Real Madrid · LaLiga, jornada 10 · Spotify Camp Nou\n\n🎯 Kylian Mbappé decide el Clásico: gol en el 41' y en el 87', este último servido por Eduardo Camavinga. Raphinha había empatado en el 61' con pase de Pedri.\n\n📊 El promedio decía que el Barça mete 4,33 goles por partido… pero el Clásico dijo 1. Es su primera derrota en LaLiga tras 9 triunfos.\n\n🧤 Andriy Lunin, titular por la gripe de Courtois, salvó dos goles cantados (34' y 66').\n\n📋 Arriba: Barça 27, Atlético 25, Madrid 24. La liga se aprieta.\n\nEn MBP el béisbol es la casa, pero cuando el mundo se paraliza, también lo contamos con números. ¿Quién la gana? 👇\n\n#ElClásico #LaLiga #BarçaRealMadrid #MBPDeportes",
+  "hilo_x": [
+   "⚽ Final: Barcelona 1-2 Real Madrid en el Spotify Camp Nou. Mbappé marcó en el 41' y el 87'; Raphinha empató en el 61'. 🧵",
+   "📊 El promedio decía 4,33 goles por partido del Barça… pero el Clásico dijo 1. Primera derrota en LaLiga: llegaba 9 de 9.",
+   "🎯 Mbappé llega a 11 goles en LaLiga, a 2 de Raphinha (13). El 1-2 lo fabricó Camavinga entrando al área.",
+   "🧤 Lunin, titular por la gripe de Courtois, le sacó el gol a Gordon (34') y a Gerard Martín (66'). Lamine Yamal pegó en el poste en el 78'.",
+   "📋 Así queda arriba: Barça 27, Atlético 25, Madrid 24. Dos derrotas del Barça en cinco días y la liga apretada."
+  ],
+  "guion": "El Madrid asalta el Camp Nou. Mbappé marcó en el cuarenta y uno y en el ochenta y siete, y Raphinha había empatado. El Barça promediaba más de cuatro goles por partido y esta vez solo hizo uno: es su primera derrota en la liga. Lunin, que jugó por la gripe de Courtois, salvó dos goles. Arriba queda el Barça con veintisiete, el Atlético con veinticinco y el Madrid con veinticuatro."
+ }
+}

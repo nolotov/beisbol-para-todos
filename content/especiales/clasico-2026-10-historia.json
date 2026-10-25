@@ -1,0 +1,35 @@
+{
+ "slug": "clasico-2026-10-historia",
+ "tipo": "historia",
+ "deporte": "futbol",
+ "fecha": "2026-10-25",
+ "titular": "El Madrid gana el Clásico en el Camp Nou",
+ "fuente": "Datos: ESPN · El Español · El Espectador",
+ "historia": {
+  "liga": "LaLiga",
+  "antetitulo": "MBP  ·  FÚTBOL  ·  LALIGA · JORNADA 10",
+  "titulo": ["¡EL MADRID", "ASALTA EL", "CAMP NOU!"],
+  "marcador": {
+   "visitante": "Real Madrid",
+   "local": "Barcelona",
+   "goles_v": 2,
+   "goles_l": 1,
+   "nota": "Final · Mbappé 41' y 87' · Raphinha 61'"
+  },
+  "titulo_figuras": "FIGURAS DEL PARTIDO",
+  "figuras": [
+   {"nombre": "Kylian Mbappé", "pais": "francés · Madrid", "linea": "2 goles · llega a 11 en LaLiga"},
+   {"nombre": "Andriy Lunin", "pais": "ucraniano · Madrid", "linea": "paradas clave en el 34' y el 66'"},
+   {"nombre": "Raphinha", "pais": "brasileño · Barça", "linea": "gol del 1-1 · llega a 13 en LaLiga"}
+  ],
+  "dato": {
+   "cifra": "1",
+   "texto": "derrota del Barça en LaLiga en 10 partidos:\nllegaba con 9 triunfos en 9"
+  },
+  "proximo": {
+   "titulo": "Así queda arriba",
+   "linea1": "Barça 27 · Atlético 25 · Madrid 24",
+   "linea2": "El Madrid se pone a 3 puntos del líder"
+  }
+ }
+}
