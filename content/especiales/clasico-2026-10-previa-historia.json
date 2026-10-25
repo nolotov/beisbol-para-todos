@@ -1,0 +1,34 @@
+{
+ "slug": "clasico-2026-10-previa-historia",
+ "tipo": "historia",
+ "deporte": "futbol",
+ "fecha": "2026-10-25",
+ "titular": "Hoy es el Clásico",
+ "fuente": "Datos: ESPN",
+ "historia": {
+  "liga": "LaLiga",
+  "antetitulo": "MBP  ·  FÚTBOL  ·  LALIGA · JORNADA 10",
+  "titulo": ["HOY ES", "EL CLÁSICO"],
+  "marcador": {
+   "visitante": "Real Madrid",
+   "local": "Barcelona",
+   "hora": "4:00 PM",
+   "nota": "Hora de Venezuela (5:00 p. m. en Chile) · Spotify Camp Nou"
+  },
+  "titulo_figuras": "A QUIÉN SEGUIR",
+  "figuras": [
+   {"nombre": "Raphinha", "pais": "brasileño · Barça", "linea": "12 goles en 8 partidos"},
+   {"nombre": "Kylian Mbappé", "pais": "francés · Madrid", "linea": "9 goles en 9 partidos"},
+   {"nombre": "Lamine Yamal", "pais": "español · Barça", "linea": "8 goles · 6 asistencias"}
+  ],
+  "dato": {
+   "cifra": "4/5",
+   "texto": "de los últimos cinco Clásicos\nlos ganó el Barça"
+  },
+  "proximo": {
+   "titulo": "Cómo llegan",
+   "linea1": "Barça 27 pts · Madrid 21 pts",
+   "linea2": "Al Madrid le faltan Vinícius (sanción) y Courtois (gripe)"
+  }
+ }
+}

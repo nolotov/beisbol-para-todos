@@ -1,0 +1,75 @@
+{
+ "slug": "clasico-2026-10-previa",
+ "deporte": "futbol",
+ "fecha": "2026-10-25",
+ "titular": "Previa del Clásico: Barcelona vs. Real Madrid",
+ "fuente": "Datos: ESPN",
+ "equipos": {
+  "A": {"nombre": "Barcelona", "liga": "LaLiga · 1.º · 27 pts", "color": "#E0316B"},
+  "B": {"nombre": "Real Madrid", "liga": "LaLiga · 3.º · 21 pts", "color": "#FEBE10"}
+ },
+ "laminas": [
+  {"tipo": "portada", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "EL CLÁSICO\nEN NÚMEROS",
+   "subtitulo": "LaLiga · Jornada 10 · Spotify Camp Nou\n4:00 p. m. Venezuela · 5:00 p. m. Chile",
+   "datos": {"A": [{"cifra": "9-0-0", "texto": "ganó sus 9 partidos"},
+                   {"cifra": "4,33", "texto": "goles por partido"}],
+             "B": [{"cifra": "7-0-2", "texto": "7 triunfos y 2 derrotas"},
+                   {"cifra": "2,56", "texto": "goles por partido"}]},
+   "remate": {"cifra": "6 pts", "texto": "le saca el Barça al Madrid antes del pitazo"}},
+  {"tipo": "cara_a_cara", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "Cómo llegan",
+   "subtitulo": "Promedios por partido en LaLiga 2026-27",
+   "filas": [
+    {"stat": "Goles a favor", "A": "4,33", "B": "2,56", "mejor": "A"},
+    {"stat": "xG a favor", "ayuda": "goles esperados: cuántos goles valen las ocasiones creadas", "A": "3,60", "B": "2,13", "mejor": "A"},
+    {"stat": "Goles en contra", "A": "1,00", "B": "1,00", "mejor": "ambos"},
+    {"stat": "xG en contra", "ayuda": "goles esperados que permite al rival", "A": "0,95", "B": "0,93", "mejor": "B"},
+    {"stat": "Posesión", "A": "71 %", "B": "53 %", "mejor": "A"},
+    {"stat": "Porterías a cero", "ayuda": "partidos sin recibir gol", "A": "4", "B": "2", "mejor": "A"}
+   ],
+   "nota": "Barça con 9 partidos y Madrid con 9 partidos jugados."},
+  {"tipo": "cifras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "El marcador dice…\npero el xG dice",
+   "subtitulo": "xG = goles esperados según la calidad de cada ocasión",
+   "ancho_cifra": 0.27,
+   "items": [
+    {"equipo": "A", "cifra": "+0,73", "texto": "goles por partido que el Barça mete por encima de lo esperado (4,33 reales vs. 3,60 de xG)"},
+    {"equipo": "B", "cifra": "+0,43", "texto": "goles por partido que el Madrid mete por encima de lo esperado (2,56 reales vs. 2,13 de xG)"},
+    {"cifra": "0,95 / 0,93", "tamano": 30, "texto": "xG en contra casi idéntico: atrás, los dos permiten lo mismo"},
+    {"equipo": "A", "cifra": "+1,47", "texto": "goles esperados más que el Madrid en cada partido: la diferencia está en cuánto crea el Barça"}
+   ]},
+  {"tipo": "figuras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "A QUIÉN SEGUIR",
+   "subtitulo": "Goles en LaLiga 2026-27",
+   "jugadores": {
+    "A": [{"rol": "Delantero", "nombre": "Raphinha", "pais": "Brasil", "linea": "12 goles · 8 partidos", "nota": "Máximo goleador del Barça"},
+          {"rol": "Delantero", "nombre": "Lamine Yamal", "pais": "España", "linea": "8 goles · 6 asistencias", "nota": "9 partidos"},
+          {"rol": "Mediocampista", "nombre": "Fermín López", "pais": "España", "linea": "4 goles · 8 partidos"}],
+    "B": [{"rol": "Delantero", "nombre": "Kylian Mbappé", "pais": "Francia", "linea": "9 goles · 9 partidos", "nota": "Máximo goleador del Madrid"},
+          {"rol": "Mediocampista", "nombre": "Jude Bellingham", "pais": "Inglaterra", "linea": "3 goles · 9 partidos"},
+          {"rol": "Mediocampista", "nombre": "Arda Güler", "pais": "Turquía", "linea": "2 goles · 9 partidos"}]
+   }},
+  {"tipo": "cifras", "etiqueta": "MBP  ·  FÚTBOL  ·  EL CLÁSICO",
+   "titulo": "Lo que hay que saber",
+   "ancho_cifra": 0.22,
+   "items": [
+    {"equipo": "A", "cifra": "4/5", "texto": "de los últimos cinco Clásicos los ganó el Barça; el Madrid ganó el 2-1 del Bernabéu en octubre de 2025"},
+    {"equipo": "B", "cifra": "4", "texto": "partidos de sanción para Vinícius Júnior: no juega hoy"},
+    {"equipo": "B", "cifra": "Baja", "tamano": 32, "texto": "Thibaut Courtois se pierde el Clásico por gripe"},
+    {"cifra": "25", "texto": "puntos del Atlético de Madrid, 2.º con 10 partidos: mira desde arriba lo que pase hoy"}
+   ]}
+ ],
+ "textos": {
+  "angulo": "Previa del Clásico con el formato MBP: lo que dicen los goles y lo que dice el xG.",
+  "instagram": "⚽ HOY ES EL CLÁSICO | Barcelona vs. Real Madrid · LaLiga, jornada 10 · Spotify Camp Nou\n🕓 4:00 p. m. Venezuela · 5:00 p. m. Chile\n\nEl Barça llega 9-0-0 y le saca 6 puntos al Madrid, que suma 7 triunfos y 2 derrotas.\n\n📊 El marcador dice que el Barça mete 4,33 goles por partido… pero el xG (goles esperados: cuánto valen las ocasiones que crea) dice 3,60. Convierte por encima de lo esperado. El Madrid también: 2,56 goles contra 2,13 de xG.\n\n👀 A quién seguir: Raphinha (12 goles) y Lamine Yamal (8 goles y 6 asistencias) contra Kylian Mbappé (9 goles).\n\n🚑 Al Madrid le faltan Vinícius Júnior (sanción) y Thibaut Courtois (gripe).\n\nEn MBP el béisbol es la casa, pero cuando el mundo se paraliza, también lo contamos con números. ¿Quién gana hoy? 👇\n\n#ElClásico #LaLiga #BarçaRealMadrid #MBPDeportes",
+  "hilo_x": [
+   "⚽ Hoy es el Clásico: Barcelona vs. Real Madrid, jornada 10 de LaLiga en el Spotify Camp Nou. 4:00 p. m. Venezuela · 5:00 p. m. Chile. 🧵",
+   "📋 El Barça llega 9-0-0 con 27 puntos; el Madrid, 3.º con 21. Son 6 puntos de diferencia antes del pitazo.",
+   "📊 El marcador dice 4,33 goles por partido del Barça… pero el xG (goles esperados) dice 3,60. Convierte +0,73 por encima de lo esperado. El Madrid: 2,56 goles vs. 2,13 de xG.",
+   "👀 A quién seguir: Raphinha (12 goles en 8 partidos) y Lamine Yamal (8 goles, 6 asistencias) contra Kylian Mbappé (9 goles en 9 partidos).",
+   "🚑 Al Madrid le faltan Vinícius Júnior (4 partidos de sanción) y Courtois (gripe). El Barça ganó 4 de los últimos 5 Clásicos. ¿Quién se lo lleva hoy?"
+  ],
+  "guion": "Hoy es el Clásico. El Barça llega perfecto, nueve de nueve, y le saca seis puntos al Madrid. Mete más de cuatro goles por partido, pero el xG, los goles esperados, dice tres coma seis: convierte por encima de lo esperado. Al Madrid le faltan Vinícius y Courtois, y tiene a Mbappé con nueve goles. ¿Quién gana hoy?"
+ }
+}

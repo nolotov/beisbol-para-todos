@@ -24,12 +24,15 @@ def _color_liga(liga: str):
     return theme.LVBP if liga == "LVBP" else theme.ACCENT
 
 
-def tanteo(m: dict) -> tuple[int, int]:
-    """(visitante, local) del marcador: carreras, goles o puntos según el deporte."""
+def tanteo(m: dict) -> tuple[int, int] | None:
+    """(visitante, local) del marcador: carreras, goles o puntos según el deporte. En una
+    previa (marcador con "hora" y sin tanteo) devuelve None."""
     for v, l in (("carreras_v", "carreras_l"), ("goles_v", "goles_l"),
                  ("puntos_v", "puntos_l")):
         if v in m and l in m:
             return m[v], m[l]
+    if m.get("hora"):
+        return None
     raise KeyError("el marcador necesita carreras_v/_l, goles_v/_l o puntos_v/_l")
 
 
@@ -69,15 +72,23 @@ def render_historia_especial(h: dict, out_path: Path, fuente: str = "Datos: MLB 
     _caja(fig, x, y - alto, w, alto, theme.SURFACE)
     _caja(fig, x, y - alto, 0.010, alto, color, r=0.004)
     fila1, fila2 = y - 0.030, y - 0.072
-    cv, cl = tanteo(m)
-    empate = cv == cl
-    gana_l = cl > cv
-    for yy, eq, c, gana in ((fila1, m["visitante"], cv, empate or not gana_l),
-                            (fila2, m["local"], cl, empate or gana_l)):
-        tono = theme.TEXT if gana else theme.MUTED
-        fig.text(x + 0.040, yy, eq, fontsize=36, weight="bold", color=tono, va="center")
-        fig.text(x + w - 0.040, yy, str(c), fontsize=48, family=num, weight="bold",
-                 color=color if gana else theme.MUTED, va="center", ha="right")
+    t = tanteo(m)
+    if t is None:           # previa: los dos equipos y la hora a la derecha
+        for yy, eq in ((fila1, m["visitante"]), (fila2, m["local"])):
+            fig.text(x + 0.040, yy, eq, fontsize=36, weight="bold", color=theme.TEXT,
+                     va="center")
+        fig.text(x + w - 0.040, (fila1 + fila2) / 2, m["hora"], fontsize=40, family=num,
+                 weight="bold", color=color, va="center", ha="right")
+    else:
+        cv, cl = t
+        empate = cv == cl
+        gana_l = cl > cv
+        for yy, eq, c, gana in ((fila1, m["visitante"], cv, empate or not gana_l),
+                                (fila2, m["local"], cl, empate or gana_l)):
+            tono = theme.TEXT if gana else theme.MUTED
+            fig.text(x + 0.040, yy, eq, fontsize=36, weight="bold", color=tono, va="center")
+            fig.text(x + w - 0.040, yy, str(c), fontsize=48, family=num, weight="bold",
+                     color=color if gana else theme.MUTED, va="center", ha="right")
     fig.text(x + 0.040, y - 0.104, m.get("nota", "Final"), fontsize=17, color=theme.MUTED,
              va="center")
     y -= alto + 0.026
