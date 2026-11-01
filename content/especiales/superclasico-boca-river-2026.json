@@ -1,24 +1,42 @@
 {
  "slug": "superclasico-boca-river-2026",
  "tipo": "historia",
+ "deporte": "futbol",
  "fecha": "2026-11-01",
  "titular": "Boca gana el Superclásico",
  "fuente": "Datos: La Nación, Infobae, LM Neuquén, Bolavip",
  "historia": {
-  "liga": "Fútbol",
-  "antetitulo": "MBP  ·  SUPERCLÁSICO · CLAUSURA, FECHA 15",
-  "titulo": ["BOCA GANÓ", "UN CLÁSICO", "DE POLÉMICA"],
+  "liga": "Liga Profesional",
+  "antetitulo": "MBP  ·  FÚTBOL  ·  SUPERCLÁSICO · CLAUSURA F15",
+  "titulo": [
+   "BOCA GANÓ",
+   "UN CLÁSICO",
+   "DE POLÉMICA"
+  ],
   "marcador": {
    "visitante": "River",
    "local": "Boca",
-   "carreras_v": 0,
-   "carreras_l": 1,
-   "nota": "Final · La Bombonera · River terminó con 9"
+   "goles_v": 0,
+   "goles_l": 1,
+   "nota": "Final · Di Lollo 27' · River terminó con 9"
   },
+  "titulo_figuras": "FIGURAS DEL PARTIDO",
   "figuras": [
-   {"nombre": "Lautaro Di Lollo", "pais": "argentino", "linea": "Gol de cabeza al 27' tras córner"},
-   {"nombre": "Sebastián Villa", "pais": "colombiano", "linea": "Asistencia de córner en el 1-0"},
-   {"nombre": "Miguel Merentiel", "pais": "uruguayo", "linea": "Forzó la roja a Martínez Quarta (8')"}
+   {
+    "nombre": "Lautaro Di Lollo",
+    "pais": "argentino · Boca",
+    "linea": "gol de cabeza al 27' tras córner"
+   },
+   {
+    "nombre": "Sebastián Villa",
+    "pais": "colombiano · Boca",
+    "linea": "asistencia de córner en el 1-0"
+   },
+   {
+    "nombre": "Miguel Merentiel",
+    "pais": "uruguayo · Boca",
+    "linea": "forzó la roja a Martínez Quarta (8')"
+   }
   ],
   "dato": {
    "cifra": "2",
