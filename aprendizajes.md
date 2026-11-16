@@ -1,4 +1,4 @@
-Métricas al 2026-11-09 (últimos 28 días):
+Métricas al 2026-11-16 (últimos 28 días):
 - Instagram: el formato con más alcance por pieza es Propuesta del editor (2, 4 piezas); el de menos, historia_extra (0).
 - Instagram: la mejor tasa de interacción la tiene Propuesta del editor (83,3 %).
 - Instagram: publicar en la noche (hora de Venezuela) rinde más alcance que en la mañana.
